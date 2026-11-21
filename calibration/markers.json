@@ -1,0 +1,18 @@
+{
+  "_doc": "Marker roles for normakit.markers. Sheet: ~/Downloads/aruco_markers_A4.pdf (DICT_4X4_50, 40 mm). corners = marker id -> its CENTRE on the table in metres (fill after measuring; >= 4 needed for the pixel->table homography).",
+  "dictionary": "DICT_4X4_50",
+  "marker_side_mm": 40,
+  "names": {
+    "0": "corner front-left",
+    "1": "corner front-right",
+    "2": "corner back-right",
+    "3": "corner back-left",
+    "4": "zone A",
+    "5": "zone B",
+    "6": "zone C",
+    "7": "bowl"
+  },
+  "drop": 6,
+  "zones": {"A": 4, "B": 5, "C": 6},
+  "corners": {}
+}

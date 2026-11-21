@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+- 2026-11-21 17:30 - `calibration/markers.json`: team marker sheet (DICT_4X4_50, 40 mm): IDs 0-3 corners FL/FR/BR/BL, 4/5/6 zones A/B/C, 7 bowl; **zone C (ID 6) = DROP**; corner table positions still to measure. `markers.py`: names from the file, `find_role(markers, 'drop'|'A')` - Bart + Claude
 - 2026-11-21 17:20 - `src/normakit/markers.py`: ArUco/AprilTag detection with dictionary auto-detect, roles from `calibration/markers.json` (corners -> pixel->table homography, DROP, zones), `px_to_table`; `detect_live.py --markers` overlay + JSONL. Tested on synthetic DICT_4X4_50 and AprilTag 36h11 images - Bart + Claude
 - 2026-11-21 17:15 - Prompt test on a tape-measure photo (`snapshots/tape_measure.png`): `measuring tape` alone 0.43, with `bottle` 0.11; `black device` + `bottle` 0.59. Lesson noted in `detect.py`: extra classes/synonyms lower scores, appearance phrases beat names - Claude
 - 2026-11-21 17:05 - `detect.py`: whitelist with synonyms (`label=phrase1|phrase2`, deduped per label), `DEMO_OBJECTS` (duplo, can, bottle), `phrase` field; `detect_live.py --demo`. Note: a whitelist forces look-alikes into a class (sample photo with no can -> `can` 0.41), so keep `--conf` >= ~0.3 and check on the real scene - Bart + Claude

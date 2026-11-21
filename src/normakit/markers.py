@@ -69,14 +69,27 @@ class MarkerDetector:
     # -------- roles
     def role(self, marker_id: int) -> str:
         r = self.roles
+        name = r.get("names", {}).get(str(marker_id), "")
         if r.get("drop") == marker_id:
-            return "DROP"
+            return f"DROP ({name})" if name else "DROP"
+        if name:
+            return name
         if str(marker_id) in r.get("corners", {}):
             return f"corner{marker_id}"
-        for name, mid in r.get("zones", {}).items():
+        for zone, mid in r.get("zones", {}).items():
             if mid == marker_id:
-                return f"zone {name}"
+                return f"zone {zone}"
         return ""
+
+    def find_role(self, markers: list[dict], role: str = "drop") -> dict:
+        """The marker with this role ('drop' or a zone letter), as JSON with a readable error."""
+        r = self.roles
+        want = r.get("drop") if role == "drop" else r.get("zones", {}).get(role)
+        for m in markers:
+            if m["id"] == want:
+                return {"ok": True, "role": role, **m}
+        seen = [m["id"] for m in markers]
+        return {"ok": False, "error": f"marker for '{role}' (ID {want}) not visible; visible IDs: {seen or 'none'}"}
 
     def homography(self, markers: list[dict]):
         """H (3x3) mapping pixel -> table metres from >= 4 corner markers, or None."""
