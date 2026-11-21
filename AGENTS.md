@@ -20,3 +20,10 @@ otherwise the shell CLI: `python -m normakit.robotctl <verb>` (images land in `r
 6. Opening a bus's calibration page in the web UI auto-resets that bus. Only open it to recalibrate.
 7. Never run two writers on the same bus (web-UI mirroring, Python teleop, MCP/agent). Two opposite mirrors can run at once and fight.
 8. Document every change: `CHANGELOG.md`; every problem: `docs/ISSUES.md` (label guesses as guesses).
+
+## Operating principles (from the owner's EBIM project - see docs/09_EBIM_PLAYBOOK.md)
+- Build the loop: one autonomous process (`scripts/autorun.py`), no hand-chaining of scripts; Claude only for perception.
+- View the RGB camera frame before theorising. Verify grasps visually, never by jaw gap or current alone.
+- Calibration (grip depth, jaw opening) in JSON from teleop demos; object positions measured live, never hardcoded.
+- Grasp: close fully, wait for the jaw to stop, +2 s, then lift. Ask the owner for a teleop demo when geometry is unclear.
+- Report evidence before editing code that worked; never delete irreplaceable data; keep replies terse.

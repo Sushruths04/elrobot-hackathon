@@ -64,10 +64,11 @@ def _pos(b: bytes) -> int:
 class StationBackend(Backend):
     name = "station"
 
-    def __init__(self, host="localhost:8888", bus_serial: str | None = None, enable_torque=False):
+    def __init__(self, host="localhost:8888", bus_serial: str | None = None, enable_torque=False, require_motors=True):
         self.host = host
         self.bus_serial = bus_serial or os.environ.get("NORMA_BUS_SERIAL") or _bus_from_file("follower")
         self.enable_torque = enable_torque
+        self.require_motors = require_motors
         self._state: dict[int, JointState] = {}
         self._bus: str | None = None
         self._frames: dict[str, bytes] = {}
@@ -83,9 +84,9 @@ class StationBackend(Backend):
         if not self._ready.wait(15):
             raise RuntimeError("Station not reachable on %s (is `station --web --tcp` running?)" % self.host)
         t0 = time.time()
-        while time.time() - t0 < 10 and len(self._state) < 8:
+        while self.require_motors and time.time() - t0 < 10 and len(self._state) < 8:
             time.sleep(0.1)
-        if len(self._state) < 8:
+        if self.require_motors and len(self._state) < 8:
             raise RuntimeError(f"Only saw motors {sorted(self._state)}; need 1..8 on the follower bus. "
                                "Set NORMA_BUS_SERIAL to pick the right bus.")
         if self.enable_torque:

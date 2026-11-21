@@ -20,3 +20,11 @@ calibration/PRINT_*.pdf
 calibration/ARUCO_markers_A4.pdf
 calibration/aruco_page*.png
 calibration/checkerboard_*.png
+
+# session scratch
+run/autorun/
+run/handeye/
+run/pose_pairs.json
+run/station.yaml.bak*
+run/*.npz
+run/touch*.log

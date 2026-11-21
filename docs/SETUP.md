@@ -10,3 +10,6 @@
 - **3D viewer mapping** (`station-viewer .../elrobot/config.ts`): joints 1-7 linear over URDF limits; gripper (motor 8) flipped.
 - **Official board:** `calibration/official/opencv_pattern_9x6_25mm_A4_*` = OpenCV's `doc/pattern.png`, 9x6 inner corners, 25.00 mm squares (measured), A4 landscape.
 - **Read-only tools:** `./norma status|identify|backup|smoke`, `scripts/dump_buses.py`, `monitor_calib.py`, `twin_view.py`, `snap_cams.py`. Moving tools: `first_motion.py` (needs `--yes`).
+- **Camera format (Station beta.10):** set in `run/station.yaml` as `usb-video: formats: [ {format: "640x480@30fps,mjpeg"} ]` and `resize_target: 0`; restart Station. The `resolution:` key is ignored in this build. Default (empty list) opens MJPG 320x240 which gave washed-out pictures. Camera controls (exposure etc.) can be read/set with `scripts/uvc_ctl.py` only while Station is NOT holding the camera.
+- **USB hub:** the shared hub dropped repeatedly (kernel `error -71`, 15 disconnects on one port in 3 h). Cameras plugged directly into laptop ports are stable so far. udev rule `/etc/udev/rules.d/99-norma.rules` makes the serial boards and cameras world-writable (applies on re-plug).
+- **Camera calibration needs no arms and no hub:** `scripts/calibrate_camera.py` only reads frames from Station (`require_motors=False`).

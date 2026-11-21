@@ -16,10 +16,12 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--cam", default="cam0"); ap.add_argument("--cols", type=int, default=9); ap.add_argument("--rows", type=int, default=6)
 ap.add_argument("--square-mm", type=float, default=25.0); ap.add_argument("--frames", type=int, default=15)
 ap.add_argument("--table", action="store_true"); ap.add_argument("--origin-x", type=float, default=0.0); ap.add_argument("--origin-y", type=float, default=0.0)
-ap.add_argument("--rot-deg", type=float, default=0.0); ap.add_argument("--selftest")
+ap.add_argument("--rot-deg", type=float, default=0.0); ap.add_argument("--selftest"); ap.add_argument("--timeout", type=float, default=240, help="seconds to wait for the board"); ap.add_argument("--name", help="label for the output files (default: the camera name), e.g. front or wrist")
+ap.add_argument("--intrinsics", help="lens calibration json to use for --table (default calibration/camera_<name>.json)")
 ap.add_argument("--ruler-mm", type=float, default=100.0, help="what the printed 100 mm ruler REALLY measures (corrects printer scaling)")
 a = ap.parse_args()
 a.square_mm *= a.ruler_mm / 100.0
+a.name = a.name or a.cam
 PAT = (a.cols, a.rows)
 
 def find(img):
@@ -35,16 +37,19 @@ if a.selftest:
     c = find(im); print("selftest: found" if c is not None else "selftest: NOT found", None if c is None else len(c), "corners"); sys.exit(0 if c is not None else 1)
 
 from normakit.station_backend import StationBackend
-b = StationBackend("localhost:8888"); b.start(); time.sleep(1)
+b = StationBackend("localhost:8888", require_motors=False); b.start(); time.sleep(1)
 def grab():
-    return cv2.imdecode(np.frombuffer(b.frame_jpeg(a.cam), np.uint8), cv2.IMREAD_COLOR)
+    for _ in range(60):                      # a freshly started stream may need a few seconds for its first frame
+        try: return cv2.imdecode(np.frombuffer(b.frame_jpeg(a.cam), np.uint8), cv2.IMREAD_COLOR)
+        except Exception: time.sleep(0.25)
+    raise SystemExit(f"no frames from {a.cam}; cameras: {b.cameras()}")
 objp = np.zeros((PAT[0] * PAT[1], 3), np.float32); objp[:, :2] = np.mgrid[0:PAT[0], 0:PAT[1]].T.reshape(-1, 2) * (a.square_mm / 1000.0)
 
 def finish(code=0):
     sys.stdout.flush(); import os; os._exit(code)
 
 if a.table:
-    cam = ROOT / f"calibration/camera_{a.cam}.json"
+    cam = Path(a.intrinsics) if a.intrinsics else ROOT / f"calibration/camera_{a.name}.json"
     for _ in range(40):
         img = grab(); c = find(img)
         if c is not None: break
@@ -59,7 +64,7 @@ if a.table:
     H, _ = cv2.findHomography(c, world, cv2.RANSAC, 0.003)
     proj = cv2.perspectiveTransform(c.reshape(-1, 1, 2).astype(np.float32), H).reshape(-1, 2)
     err = np.linalg.norm(proj - world, axis=1)
-    out = ROOT / f"calibration/table_{a.cam}.json"
+    out = ROOT / f"calibration/table_{a.name}.json"
     out.write_text(json.dumps({"cam": a.cam, "H_pixel_to_robot_xy_m": H.tolist(), "image_size": [img.shape[1], img.shape[0]], "undistorted": K is not None,
                                "board": {"cols": a.cols, "rows": a.rows, "square_mm": a.square_mm, "origin_xy_m": [a.origin_x, a.origin_y], "rot_deg": a.rot_deg},
                                "mean_err_mm": float(err.mean() * 1000), "max_err_mm": float(err.max() * 1000)}, indent=1))
@@ -68,7 +73,7 @@ if a.table:
 pts, imgs, last, t_last, size = [], [], None, 0, None
 print(f"hold the {a.cols+1}x{a.rows+1}-square board in view of {a.cam}; tilt it and change distance between captures. Need {a.frames} frames.", flush=True)
 t0 = time.time()
-while len(pts) < a.frames and time.time() - t0 < 240:
+while len(pts) < a.frames and time.time() - t0 < a.timeout:
     img = grab(); size = (img.shape[1], img.shape[0]); c = find(img)
     if c is None or time.time() - t_last < 1.5: time.sleep(0.2); continue
     ctr = c.mean(0); diag = np.linalg.norm(c[0] - c[-1])
@@ -76,9 +81,17 @@ while len(pts) < a.frames and time.time() - t0 < 240:
     if last is not None and np.abs(key - last).max() < 12: time.sleep(0.2); continue   # not different enough from the last capture
     pts.append(c.astype(np.float32)); imgs.append(objp); last = key; t_last = time.time(); print(f"  captured {len(pts)}/{a.frames}", flush=True)
 if len(pts) < 8: print("too few views captured (need >= 8): is the board visible and sharp?"); finish(1)
-rms, K, dist, rv, tv = cv2.calibrateCamera(imgs, pts, size, None, None)
-errs = [float(np.sqrt(np.mean(np.sum((cv2.projectPoints(o, r_, t_, K, dist)[0].reshape(-1, 2) - p_) ** 2, 1)))) for o, p_, r_, t_ in zip(imgs, pts, rv, tv)]
-out = ROOT / f"calibration/camera_{a.cam}.json"
-out.write_text(json.dumps({"cam": a.cam, "image_size": list(size), "K": K.tolist(), "dist": dist.ravel().tolist(), "rms_px": float(rms), "per_view_px": errs, "views": len(pts),
+def fit(P, O):
+    rms, K, dist, rv, tv = cv2.calibrateCamera(O, P, size, None, None)
+    errs = [float(np.sqrt(np.mean(np.sum((cv2.projectPoints(o, r_, t_, K, dist)[0].reshape(-1, 2) - p_) ** 2, 1)))) for o, p_, r_, t_ in zip(O, P, rv, tv)]
+    return rms, K, dist, errs
+rms, K, dist, errs = fit(pts, imgs); dropped = 0
+for _ in range(2):                                   # reject blurred / bent-board views, then refit (keeps at least 8 views)
+    med = float(np.median(errs)); keep = [i for i, e in enumerate(errs) if e <= max(1.0, 2.5 * med)]
+    if len(keep) == len(errs) or len(keep) < 8: break
+    dropped += len(errs) - len(keep); pts = [pts[i] for i in keep]; imgs = [imgs[i] for i in keep]; rms, K, dist, errs = fit(pts, imgs)
+np.savez(ROOT / f"calibration/camera_{a.name}_points.npz", pts=np.array(pts), objp=objp)
+out = ROOT / f"calibration/camera_{a.name}.json"
+out.write_text(json.dumps({"cam": a.cam, "image_size": list(size), "K": K.tolist(), "dist": dist.ravel().tolist(), "rms_px": float(rms), "per_view_px": errs, "views": len(pts), "views_rejected": dropped,
                            "board": {"cols": a.cols, "rows": a.rows, "square_mm": a.square_mm}}, indent=1))
-print(f"saved {out.relative_to(ROOT)}  size {size}  rms {rms:.2f} px  fx={K[0,0]:.0f} fy={K[1,1]:.0f}" + ("  <-- rms > 1 px: redo with sharper, more tilted views" if rms > 1 else "  (good)")); finish()
+print(f"saved {out.relative_to(ROOT)}  size {size}  views kept {len(pts)} (rejected {dropped})  rms {rms:.2f} px  fx={K[0,0]:.0f} fy={K[1,1]:.0f}" + ("  <-- rms > 1 px: redo with sharper, more tilted views" if rms > 1 else "  (good)")); finish()

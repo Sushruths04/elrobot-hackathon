@@ -32,6 +32,7 @@ async def snapshot(host="localhost:8888", client=None, queue=None):
         d = {}
         for m in bus.get_motors():
             s = bytes(m.get_state())
+            if len(s) < 0x47: continue                       # truncated register read (motor did not answer this cycle): skip it
             lo, hi = m.get_range_min(), m.get_range_max()
             pos = sb._pos(s)
             d[m.get_id()] = dict(pos=pos, lo=lo, hi=hi, norm=norm_of(pos, lo, hi), torque=s[0x28], temp=s[0x3F], frozen=bool(m.get_range_freezed()), status=s[0x41],

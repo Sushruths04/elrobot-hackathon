@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from PIL import Image
 from normakit.station_backend import StationBackend
-b = StationBackend("localhost:8888"); b.start(); time.sleep(2)
+b = StationBackend("localhost:8888", require_motors=False); b.start(); time.sleep(2)
 print("cameras:", b.cameras())
 for c in b.cameras():
     if c.startswith("cam"):

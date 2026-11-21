@@ -3,15 +3,17 @@ drivers:
     enabled: true
     current-threshold: 100
     deadband: 20
+    motor-current-thresholds:
+      4: 250
   vesc-trampa:
     enabled: true
     port-baud-rate: 115200
   system-info: true
   usb-video:
     enabled: true
-    resolution: auto
     resize_target: 0
-    formats: []
+    formats:
+    - format: 640x480@30fps,mjpeg
     frame-skip: 0
 inference:
 - queue-id: inference/normvla

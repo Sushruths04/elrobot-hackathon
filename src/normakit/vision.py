@@ -100,4 +100,7 @@ class Homography:
 
     @classmethod
     def load(cls, path):
-        return cls(np.array(json.loads(Path(path).read_text())))
+        d = json.loads(Path(path).read_text())
+        if isinstance(d, dict):                       # calibration/table_<cam>.json from scripts/calibrate_camera.py
+            d = d["H_pixel_to_robot_xy_m"]
+        return cls(np.array(d))

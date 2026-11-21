@@ -39,3 +39,18 @@
 - **Status:** investigating
 - **Evidence:** 40 s sample: leader j2 54-62% (14 deg), follower 65-82% (31 deg), mean lag 18 points; no faults, current 4 mA, no protection-block lines in that window. Gap closed to ~1 point at rest.
 - **Cause:** unknown (delay/speed vs start offset). Re-test with slow single-joint moves.
+
+### ISSUE-109 - Camera pictures washed out / black-and-white (RESOLVED 2026-11-21 15:35)
+- **Status:** resolved
+- **Symptom:** both KD cameras gave ~242/255 mean brightness, 86% pure-white pixels, one nearly grayscale, not changing over 24 s.
+- **Evidence:** camera controls read over USB were normal (auto exposure mode 8, brightness 0, gain 0, contrast 40, saturation 64). Station was opening MJPG **320x240** (its smallest mode). The `resolution:` key I had put in `run/station.yaml` is NOT understood by this Station build (beta.10) and was silently ignored.
+- **Fix:** `usb-video: formats: [ {format: "640x480@30fps,mjpeg"} ]` plus `resize_target: 0`, then restart Station. Result: 640x480, mean brightness 124/255, correct colours.
+- **Also seen:** one `Failed to get stream handle: -51` on the first open attempt, then fine.
+
+### ISSUE-110 - Leader joint 4 range narrow / odd at one location (parked 2026-11-21 17:25)
+- **Status:** open, parked by the owner to move on to camera calibration
+- **Evidence:** leader j4 saved range [1404,2692] = 1288 ticks vs follower [884,3212] = 2328 ticks, so Station's percent mirroring moves the follower j4 ~1.8x the leader. Automatic calibration of the leader gives j4 ~1000-1290 (994, 1000, 1002, 1023, 1064, 1288 over several runs); a manual sweep reached 1918. The owner reports the leader behaving oddly at one position on that joint.
+- **Cause:** suspected weak torque in the automatic sweep (7.5 V, current limit 50) and/or a mechanical issue on the leader's elbow. Unverified.
+- **Also fixed:** follower j4 tripped Station's current protection (108/122 vs limit 100) and stuck; `motor-current-thresholds: {4: 250}` added to `run/station.yaml`.
+- **Workarounds if needed:** manual leader sweep including j4 to both real stops; or `scripts/teleop.py` (1:1 tick mapping, needs a fresh `--set-rest` after any leader recalibration).
+- **Note:** the leader's saved ranges changed between 17:06:58 and 17:15:04 (another calibration run, not by the agent).

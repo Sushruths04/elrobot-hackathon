@@ -16,6 +16,7 @@ from . import vision
 
 HOME = {1: 0.5, 2: 0.5, 3: 0.5, 4: 0.5, 5: 0.5, 6: 0.5, 7: 0.5, 8: 0.5}
 TABLE_Z = 0.02          # gripper-centre height when touching the table plane (metres, base frame) - CALIBRATE
+POST_CLOSE_WAIT_S = 2.0
 HOVER = 0.08            # extra height above target when travelling
 
 
@@ -91,10 +92,19 @@ class Arm:
         self.grasped = False
         return self.move_joints({GRIPPER_ID: 0.95}, speed=0.8)
 
+    def _wait_gripper_steady(self, max_s: float = 6.0, tol: float = 0.003):
+        hist, t0 = [], time.time()
+        while time.time() - t0 < max_s:
+            hist.append(self.backend.state().joints[GRIPPER_ID].norm); time.sleep(0.1)
+            if len(hist) >= 6 and max(hist[-6:]) - min(hist[-6:]) < tol:
+                return True
+        return False
+
     def close_gripper(self) -> dict:
         """Close and verify: if jaws stall before fully closed AND current rises => object held."""
         self.guard.move({GRIPPER_ID: 0.05}, 0.5)
-        time.sleep(0.8)
+        self._wait_gripper_steady()
+        time.sleep(POST_CLOSE_WAIT_S)                # close fully, wait for the jaw to stop, +2 s, only then lift
         s = self.backend.state().joints[GRIPPER_ID]
         stalled = s.norm > 0.12          # jaws could not close fully
         pushing = s.current_ma > 150 or self.backend.name == "sim"
