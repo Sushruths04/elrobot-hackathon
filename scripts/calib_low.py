@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Add calibration plane C (jaw tip 4 cm above the table, over the BRICK/PEN area x -0.12..0.08, y 0.20..0.36) to calibration/table_tip_front.json.
+"""Add calibration plane C (jaw tip 4 cm above the table, over the work area x -0.12..0.17, y 0.21..0.31) to calibration/table_tip_front.json.
 The tip stays 1.6 cm above the Duplo bricks, so extrapolating to the brick tops (z 0.02) is a short step instead of the long one from 6 and 10 cm.  Needs ARM (waits)."""
 import json, sys, time, urllib.request
 from pathlib import Path
@@ -16,7 +16,7 @@ while A("/state")["armed_s"] < 200:
     if time.time() - t > 150: sys.exit("not armed (need >= 200 s)")
     if int(time.time() - t) % 10 == 0: log("WAITING: press 'ARM motion' at http://127.0.0.1:8890"); time.sleep(1)
     time.sleep(0.4)
-Z = 0.04; grid = [(x, y) for y in (0.21, 0.26, 0.31, 0.355) for x in (0.06, -0.01, -0.07, -0.12)]
+Z = 0.04; grid = [(x, y) for y in (0.21, 0.26, 0.31) for x in (0.17, 0.12, 0.06, -0.01, -0.07, -0.12)]      # now reaches x = 0.17 (duster, caps and the bin side)
 det = json.loads((ROOT / "run/detect_pose_follower.json").read_text())
 tp = A("/state")["tip"]
 if np.hypot(tp[0] - det["tip"][0], tp[1] - det["tip"][1]) > 0.04: A("/move_tip", {"x": 0.0, "y": 0.20, "z": 0.26, "roll": 0.0, "speed": 700, "timeout": 20, "low_ok": True})

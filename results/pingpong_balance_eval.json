@@ -1,0 +1,27 @@
+{
+  "task": "balance",
+  "checkpoint": "models/pingpong/balance_ppo.pt",
+  "state_eval": {
+    "episodes": 40,
+    "obs_mode": "controller",
+    "successes": 39,
+    "success_rate_pct": 97.5,
+    "mean_steps": 297.6,
+    "mean_survival_s": 9.92,
+    "mean_bounces": 0.0,
+    "max_bounces": 0,
+    "median_final_r_cm": 0.98
+  },
+  "camera_eval": {
+    "episodes": 20,
+    "obs_mode": "camera",
+    "successes": 0,
+    "success_rate_pct": 0.0,
+    "mean_steps": 73.5,
+    "mean_survival_s": 2.45,
+    "mean_bounces": 0.0,
+    "max_bounces": 0,
+    "median_final_r_cm": 11.16
+  },
+  "video": "results/pingpong_balance.mp4"
+}

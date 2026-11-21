@@ -23,3 +23,15 @@ Not yet shown: reliability over many positions (a handful of runs only), the pla
 - teleop demos (follower 40 Hz + leader 50 Hz + 8 fps camera): `run/demos/teleop_pick1*` (failure, placed wrongly), `teleop_pick2*` (success); labels `run/demos/episodes.json`; videos in `run/recordings/` (not committed, 50 MB).
 - run videos with joints and logs: `results/runs/<time>/` (25 fps overlay video, joints.jsonl, log) - only runs after 23:00.
 - Earlier run logs were overwritten (logs/pick_loop.log is truncated per run); this table is the record.
+
+## Later runs (2026-11-22 00:15) - duster with a magnet in its centre collects two metal bottle caps and goes into the white box
+Script `scripts/duster_caps.py` (detector `src/normakit/duster.py`). Last run: duster grasped at its centre on the FIRST try (jaws 1889 ticks, ~310 mA, the cut duster is ~3 cm wide), held ~1.2 cm above each of the 2 caps for 1 s (no sliding, no pressing - the magnet is strong and takes the cap from a distance),
+parked to the side, camera check: 0 of the 2 targeted caps left on the table, then straight over the white box (no waypoint, slow carry moves, acc 12) and released. Final picture `results/images/duster_result.jpg`: duster lies in the box, both caps gone from the table (they are on the magnet underneath, not visible).
+Earlier attempts the same evening failed for known reasons: jaws closed on a thin edge because the old, thicker duster was taller than the clearance under the wrist-camera board; duster mapped 4-5 cm off at x >= 0.12 (calibration plane C did not reach there; extended to x = 0.17); verification that went to the detection pose and a waypoint move that dropped the duster twice (removed); the strong magnet also dragged caps around the table.
+
+## Brick stacking (red brick on the yellow one) - not finished
+Scripts `stack_bricks.py`, `stack_loop.py`, `practice_stack.py`, colour detector `src/normakit/bricks.py`. One run placed the red brick perfectly on the yellow one (user's words), then pressing knocked it off; later runs held the brick (1933 ticks) but the table-level position error (1.5-4 cm) made placement unreliable. Pen/marker into the box (`pick_loop.py`) is the reliable task (~23 s, first-try holds).
+
+## What is saved where
+- Images of the results: `results/images/`. Teleop demos with video: `demo_backup/*.mp4` (H.264) and the LeRobot v3.0 dataset `datasets/elrobot_teleop/` (113 MB, left out of git because its video file is 117 MB; on disk only).
+- NOT filmed: the pen runs, the brick runs and the duster runs - only photos and logs exist for them (`logs/` is not in git; the log lines are summarised above).

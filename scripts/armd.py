@@ -30,11 +30,11 @@ def to_norm(st, i, t):
 def to_ticks(st, i, n): j = st.joints[i]; return int(round(j.lo + n * ((j.hi - j.lo) % 4096))) % 4096
 def q_of(st, ticks=None): return {i: norm_to_rad(i, to_norm(st, i, (ticks or {}).get(i, st.joints[i].raw))) for i in range(1, 8)}
 def hold(): st = S(); be._sync(REG_GOAL_POS, {i: (st.joints[i].raw % 4096).to_bytes(2, "little") for i in J if i in st.joints})
-def drive(target, speed, wait=True, tol=30, timeout=10.0):
+def drive(target, speed, wait=True, tol=30, timeout=10.0, acc=60):
     """target: {joint: ticks}. Servo-side trajectory: speed_i = speed * |d_i| / max|d|; one write each for acc, speeds, goals."""
     st = S(); d = {i: wd(t, st.joints[i].raw) for i, t in target.items()}; dmax = max(1, max(abs(v) for v in d.values())); t0 = time.time()
     sp = {i: int(max(40, min(SPEED_CAP[i], speed * abs(d[i]) / dmax))) for i in target}
-    be._sync(REG_ACC, {i: bytes([60]) for i in target}); be._sync(REG_GOAL_SPEED, {i: v.to_bytes(2, "little") for i, v in sp.items()})
+    be._sync(REG_ACC, {i: bytes([int(acc)]) for i in target}); be._sync(REG_GOAL_SPEED, {i: v.to_bytes(2, "little") for i, v in sp.items()})
     be._sync(REG_GOAL_POS, {i: (int(t) % 4096).to_bytes(2, "little") for i, t in target.items()}); tw = time.time() - t0
     if not wait: return {"write_ms": round(tw * 1000), "speeds": sp, "worst_ticks_to_go": max(abs(v) for v in d.values())}
     last = {}; steady = 0
@@ -121,13 +121,13 @@ def api(path, b):
         if path == "/move_joints":
             tg = {int(k): int(v) for k, v in b["ticks"].items()}; st = S(); low = path_min_z(st, tg) if all(i in tg for i in range(1, 8)) else None
             if low is not None and low < ZMIN and not b.get("low_ok"): return {"error": f"path would take the jaw tip to z={low:.3f} < {ZMIN}"}
-            return drive(tg, speed, b.get("wait", True), timeout=float(b.get("timeout", 10)))
+            return drive(tg, speed, b.get("wait", True), timeout=float(b.get("timeout", 10)), acc=int(b.get("acc", 60)))
         if path == "/move_tip":
             st = S(); t0 = time.time(); q, pe, oe, tilt = kin.ik_jaw_tip((b["x"], b["y"], b["z"]), roll_rad=float(b.get("roll", 0.0)), tilt_deg=b.get("tilt"), seed_rad=q_of(st)); tik = time.time() - t0
             if pe > 0.02: return {"error": f"IK cannot reach (err {pe*100:.1f} cm)", "ik_ms": round(tik * 1000)}
             tg = {i: to_ticks(st, i, rad_to_norm(i, q[i])) for i in range(1, 8)}; low = path_min_z(st, tg)
             if low < min(ZMIN, b["z"] - 0.005) and not b.get("low_ok"): return {"error": f"path would dip to z={low:.3f}"}
-            r = drive(tg, speed, b.get("wait", True), timeout=float(b.get("timeout", 10))); r.update({"ik_ms": round(tik * 1000), "ik_err_mm": round(pe * 1000, 1), "ori_err_deg": round(oe, 1), "tilt": round(tilt)}); return r
+            r = drive(tg, speed, b.get("wait", True), timeout=float(b.get("timeout", 10)), acc=int(b.get("acc", 60))); r.update({"ik_ms": round(tik * 1000), "ik_err_mm": round(pe * 1000, 1), "ori_err_deg": round(oe, 1), "tilt": round(tilt)}); return r
         if path == "/gripper":
             to = b.get("to", "open"); tgt = OPEN if to == "open" else CLOSED if to == "close" else int(to)
             if to == "close":                                              # an object stops the jaws before the closed value: success = jaws steady (not moving) for 0.5 s
