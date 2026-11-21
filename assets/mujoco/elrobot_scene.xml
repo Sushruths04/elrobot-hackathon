@@ -1,0 +1,306 @@
+<mujoco model="Elrobot">
+  <compiler angle="radian" boundinertia="1e-07" autolimits="true" />
+  <option timestep="0.002" gravity="0 0 -9.81" integrator="implicitfast" cone="elliptic" impratio="5" />
+  <visual>
+    <global offwidth="640" offheight="480" />
+    <quality shadowsize="512" offsamples="0" />
+    <headlight ambient="0.30 0.30 0.30" diffuse="0.22 0.22 0.22" specular="0.08 0.08 0.08" />
+  </visual>
+  <asset>
+    <mesh name="base_link" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/base_link.stl" scale="0.001 0.001 0.001" />
+    <mesh name="ST3215_1_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/ST3215_1_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="Joint_01_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/Joint_01_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="ST3215_2_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/ST3215_2_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="Joint_02_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/Joint_02_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="ST3215_3_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/ST3215_3_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="Joint_03_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/Joint_03_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="ST3215_4_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/ST3215_4_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="Joint_04_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/Joint_04_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="ST3215_5_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/ST3215_5_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="Joint_05_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/Joint_05_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="ST3215_6_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/ST3215_6_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="Joint_06_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/Joint_06_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="ST3215_7_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/ST3215_7_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="Gripper_Base_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/Gripper_Base_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="ST3215_8_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/ST3215_8_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="Gripper_Gear_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/Gripper_Gear_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="Gripper_Jaw_02_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/Gripper_Jaw_02_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="Gripper_Jaw_01_v1_1" file="../../vendor/norma-core-src/hardware/elrobot/simulation/assets/Gripper_Jaw_01_v1_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="jaw_01_hull_00" file="hulls/jaw_01_hull_00.stl" />
+    <mesh name="jaw_01_hull_01" file="hulls/jaw_01_hull_01.stl" />
+    <mesh name="jaw_01_hull_02" file="hulls/jaw_01_hull_02.stl" />
+    <mesh name="jaw_01_hull_03" file="hulls/jaw_01_hull_03.stl" />
+    <mesh name="jaw_01_hull_04" file="hulls/jaw_01_hull_04.stl" />
+    <mesh name="jaw_01_hull_05" file="hulls/jaw_01_hull_05.stl" />
+    <mesh name="jaw_01_hull_06" file="hulls/jaw_01_hull_06.stl" />
+    <mesh name="jaw_01_hull_07" file="hulls/jaw_01_hull_07.stl" />
+    <mesh name="jaw_01_hull_08" file="hulls/jaw_01_hull_08.stl" />
+    <mesh name="jaw_01_hull_09" file="hulls/jaw_01_hull_09.stl" />
+    <mesh name="jaw_01_hull_10" file="hulls/jaw_01_hull_10.stl" />
+    <mesh name="jaw_01_hull_11" file="hulls/jaw_01_hull_11.stl" />
+    <mesh name="jaw_01_hull_12" file="hulls/jaw_01_hull_12.stl" />
+    <mesh name="jaw_01_hull_13" file="hulls/jaw_01_hull_13.stl" />
+    <mesh name="jaw_01_hull_14" file="hulls/jaw_01_hull_14.stl" />
+    <mesh name="jaw_01_hull_15" file="hulls/jaw_01_hull_15.stl" />
+    <mesh name="jaw_02_hull_00" file="hulls/jaw_02_hull_00.stl" />
+    <mesh name="jaw_02_hull_01" file="hulls/jaw_02_hull_01.stl" />
+    <mesh name="jaw_02_hull_02" file="hulls/jaw_02_hull_02.stl" />
+    <mesh name="jaw_02_hull_03" file="hulls/jaw_02_hull_03.stl" />
+    <mesh name="jaw_02_hull_04" file="hulls/jaw_02_hull_04.stl" />
+    <mesh name="jaw_02_hull_05" file="hulls/jaw_02_hull_05.stl" />
+    <mesh name="jaw_02_hull_06" file="hulls/jaw_02_hull_06.stl" />
+    <mesh name="jaw_02_hull_07" file="hulls/jaw_02_hull_07.stl" />
+    <mesh name="jaw_02_hull_08" file="hulls/jaw_02_hull_08.stl" />
+    <mesh name="jaw_02_hull_09" file="hulls/jaw_02_hull_09.stl" />
+    <mesh name="jaw_02_hull_10" file="hulls/jaw_02_hull_10.stl" />
+    <mesh name="jaw_02_hull_11" file="hulls/jaw_02_hull_11.stl" />
+    <mesh name="jaw_02_hull_12" file="hulls/jaw_02_hull_12.stl" />
+    <mesh name="jaw_02_hull_13" file="hulls/jaw_02_hull_13.stl" />
+    <mesh name="jaw_02_hull_14" file="hulls/jaw_02_hull_14.stl" />
+    <mesh name="jaw_02_hull_15" file="hulls/jaw_02_hull_15.stl" />
+    <mesh name="jaw_02_hull_16" file="hulls/jaw_02_hull_16.stl" />
+    <mesh name="jaw_02_hull_17" file="hulls/jaw_02_hull_17.stl" />
+    <mesh name="jaw_02_hull_18" file="hulls/jaw_02_hull_18.stl" />
+    <mesh name="cup_wall_00" file="hulls/cup_wall_00.stl" />
+    <mesh name="cup_wall_01" file="hulls/cup_wall_01.stl" />
+    <mesh name="cup_wall_02" file="hulls/cup_wall_02.stl" />
+    <mesh name="cup_wall_03" file="hulls/cup_wall_03.stl" />
+    <mesh name="cup_wall_04" file="hulls/cup_wall_04.stl" />
+    <mesh name="cup_wall_05" file="hulls/cup_wall_05.stl" />
+    <mesh name="cup_wall_06" file="hulls/cup_wall_06.stl" />
+    <mesh name="cup_wall_07" file="hulls/cup_wall_07.stl" />
+    <mesh name="cup_wall_08" file="hulls/cup_wall_08.stl" />
+    <mesh name="cup_wall_09" file="hulls/cup_wall_09.stl" />
+    <mesh name="cup_wall_10" file="hulls/cup_wall_10.stl" />
+    <mesh name="cup_wall_11" file="hulls/cup_wall_11.stl" />
+    <mesh name="cup_wall_12" file="hulls/cup_wall_12.stl" />
+    <mesh name="cup_wall_13" file="hulls/cup_wall_13.stl" />
+    <mesh name="cup_wall_14" file="hulls/cup_wall_14.stl" />
+    <mesh name="cup_wall_15" file="hulls/cup_wall_15.stl" />
+    <mesh name="cup_wall_16" file="hulls/cup_wall_16.stl" />
+    <mesh name="cup_wall_17" file="hulls/cup_wall_17.stl" />
+    <mesh name="cup_wall_18" file="hulls/cup_wall_18.stl" />
+    <mesh name="cup_wall_19" file="hulls/cup_wall_19.stl" />
+    <mesh name="cup_wall_20" file="hulls/cup_wall_20.stl" />
+    <mesh name="cup_wall_21" file="hulls/cup_wall_21.stl" />
+    <mesh name="cup_wall_22" file="hulls/cup_wall_22.stl" />
+    <mesh name="cup_wall_23" file="hulls/cup_wall_23.stl" />
+    <mesh name="cup_floor" file="hulls/cup_floor.stl" />
+    <mesh name="cup_visual" file="hulls/cup_visual.stl" />
+    <texture name="table_tex" type="2d" file="table_tex.png" />
+    <texture name="sky_tex" type="skybox" builtin="gradient" rgb1="0.78 0.80 0.82" rgb2="0.62 0.64 0.66" width="256" height="256" />
+    <material name="table_mat" texture="table_tex" specular="0.12" shininess="0.15" reflectance="0.02" />
+    <material name="cup_mat" rgba="0.09 0.09 0.10 1" specular="0.18" shininess="0.25" />
+    <material name="arm_pla_mat" rgba="0.14 0.14 0.15 1" specular="0.15" shininess="0.2" />
+    <material name="servo_mat" rgba="0.07 0.07 0.08 1" specular="0.22" shininess="0.3" />
+    <material name="bottle_glass_mat" rgba="0.84 0.86 0.84 0.48" specular="0.65" shininess="0.85" />
+    <material name="bottle_label_mat" rgba="0.12 0.12 0.13 1" specular="0.1" shininess="0.1" />
+    <material name="coaster_mat" rgba="0.14 0.32 0.86 1" specular="0.1" shininess="0.1" />
+  </asset>
+  <worldbody>
+    <body name="base_link">
+      <inertial pos="4.1532e-10 0.0130841 0.019551" quat="0.344336 0.617602 0.344336 0.617602" mass="0.0683124" diaginertia="6.39443e-05 4.60557e-05 3.6e-05" />
+      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="base_link" name="vis_base_link_0" material="arm_pla_mat" />
+      <body name="ST3215_1_v1_1" pos="0 0.007585 0.0315">
+        <inertial pos="4.07635e-06 0.0226902 -0.00142358" quat="0.707107 0.707107 0 0" mass="0.0319067" diaginertia="8e-06 7e-06 4e-06" />
+        <geom pos="0 -0.007585 -0.0315" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="ST3215_1_v1_1" name="vis_ST3215_1_v1_1_0" material="servo_mat" />
+        <body name="Joint_01_1" pos="0 0.034904 0.017505">
+          <inertial pos="0.000192934 0.0105354 -0.00290341" quat="0.69707 0.118714 -0.118714 0.69707" mass="0.0360248" diaginertia="2.14031e-05 2e-05 8.59688e-06" />
+          <joint name="rev_motor_01" pos="0 0 0" axis="0 -0.008727 0.999962" range="-1.5509 1.5509" actuatorfrcrange="-2.94 2.94" armature="0.012" damping="0.35" frictionloss="0.14" />
+          <geom pos="0 -0.042489 -0.049005" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="Joint_01_1" name="vis_Joint_01_1_0" material="arm_pla_mat" />
+          <body name="ST3215_2_v1_1" pos="0.000625 -5.8e-05 0.0067">
+            <inertial pos="-0.00142358 -0.000194073 0.0226894" quat="0.707107 0 0 0.707107" mass="0.0319067" diaginertia="8e-06 7e-06 4e-06" />
+            <geom pos="-0.000625 -0.042431 -0.055705" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="ST3215_2_v1_1" name="vis_ST3215_2_v1_1_0" material="servo_mat" />
+            <body name="Joint_02_1" pos="-0.020293 -0.000308 0.035233">
+              <inertial pos="0.0201873 -0.000360715 0.0404889" quat="0.707107 0 0 0.707107" mass="0.0431342" diaginertia="3.4e-05 2.4e-05 1.7e-05" />
+              <joint name="rev_motor_02" pos="0 0 0" axis="-0.999962 -7.6e-05 0.008726" range="-1.6122 1.6122" actuatorfrcrange="-2.94 2.94" armature="0.016" damping="0.55" frictionloss="0.22" />
+              <geom pos="0.019668 -0.042123 -0.090938" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="Joint_02_1" name="vis_Joint_02_1_0" material="arm_pla_mat" />
+              <body name="ST3215_3_v1_1" pos="0.019863 -0.000487 0.055827">
+                <inertial pos="-0.00122587 -0.000193839 0.0227006" quat="0.707107 0 0 0.707107" mass="0.0319067" diaginertia="8e-06 7e-06 4e-06" />
+                <geom pos="-0.000195 -0.041636 -0.146765" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="ST3215_3_v1_1" name="vis_ST3215_3_v1_1_0" material="servo_mat" />
+                <body name="Joint_03_v1_1" pos="-0.019985 -0.000309 0.035408">
+                  <inertial pos="0.0213835 0.00259737 0.0285733" quat="0.567843 0.421372 0.567843 0.421372" mass="0.0370549" diaginertia="1.83028e-05 1.46972e-05 1.1e-05" />
+                  <joint name="rev_motor_03" pos="0 0 0" axis="-0.999848 -0.000152 0.017452" range="-1.761 1.761" actuatorfrcrange="-2.94 2.94" armature="0.016" damping="0.60" frictionloss="0.242" />
+                  <geom pos="0.01979 -0.041327 -0.182173" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="Joint_03_v1_1" name="vis_Joint_03_v1_1_0" material="arm_pla_mat" />
+                  <body name="ST3215_4_v1_1" pos="0.021263 0.001933 0.036403">
+                    <inertial pos="-0.0014236 0.0226888 0.00021877" quat="0.5 0.5 -0.5 0.5" mass="0.0319067" diaginertia="8e-06 7e-06 4e-06" />
+                    <geom pos="-0.001473 -0.04326 -0.218576" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="ST3215_4_v1_1" name="vis_ST3215_4_v1_1_0" material="servo_mat" />
+                    <body name="Joint_04_v1_1" pos="-0.02029 0.035229 0.000662">
+                      <inertial pos="0.0204147 0.0463478 0.000473377" quat="0.490312 0.509504 -0.509504 0.490312" mass="0.0491054" diaginertia="4.70384e-05 3.7e-05 2.09616e-05" />
+                      <joint name="rev_motor_04" pos="0 0 0" axis="-0.99981 0.008574 0.017527" range="-1.7533 1.7533" actuatorfrcrange="-2.94 2.94" armature="0.014" damping="0.42" frictionloss="0.135" />
+                      <geom pos="0.018817 -0.078489 -0.219238" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="Joint_04_v1_1" name="vis_Joint_04_v1_1_0" material="arm_pla_mat" />
+                      <body name="ST3215_5_v1_1" pos="0.020391 0.065663 -0.010035">
+                        <inertial pos="0.000383017 -0.00162101 0.0224312" mass="0.0319067" diaginertia="8e-06 7e-06 4e-06" />
+                        <geom pos="-0.001574 -0.144152 -0.209203" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="ST3215_5_v1_1" name="vis_ST3215_5_v1_1_0" material="servo_mat" />
+                        <body name="Joint_05_v1_1" pos="0.000323 0.0172 0.010051">
+                          <inertial pos="-0.00145117 0.0148862 0.000239189" quat="0.5 0.5 0.5 0.5" mass="0.0150304" diaginertia="5e-06 5e-06 3e-06" />
+                          <joint name="rev_motor_05" pos="0 0 0" axis="-0.008573 -0.999963 0.000151" range="-2.62 3.252" actuatorfrcrange="-2.94 2.94" armature="0.006" damping="0.18" frictionloss="0.06" />
+                          <geom pos="-0.001897 -0.161352 -0.219254" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="Joint_05_v1_1" name="vis_Joint_05_v1_1_0" material="arm_pla_mat" />
+                          <body name="ST3215_6_v1_1" pos="6.5e-05 0.0075 -1e-06">
+                            <inertial pos="-0.00122925 0.0227012 1.77753e-05" quat="0.5 0.5 -0.5 0.5" mass="0.0319067" diaginertia="8e-06 7e-06 4e-06" />
+                            <geom pos="-0.001962 -0.168852 -0.219253" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="ST3215_6_v1_1" name="vis_ST3215_6_v1_1_0" material="servo_mat" />
+                            <body name="Joint_06_v1_1" pos="-0.019988 0.035407 0.000351">
+                              <inertial pos="0.020434 0.0319765 0.000356481" quat="0.5 0.5 -0.5 0.5" mass="0.0372771" diaginertia="2.2e-05 1.6e-05 1.6e-05" />
+                              <joint name="rev_motor_06" pos="0 0 0" axis="-0.999697 0.0173 0.017525" range="-1.3775 1.7641" actuatorfrcrange="-2.94 2.94" armature="0.008" damping="0.22" frictionloss="0.08" />
+                              <geom pos="0.018026 -0.204259 -0.219604" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="Joint_06_v1_1" name="vis_Joint_06_v1_1_0" material="arm_pla_mat" />
+                              <body name="ST3215_7_v1_1" pos="0.020478 0.038023 -0.010611">
+                                <inertial pos="0.000373154 -0.00142571 0.022445" mass="0.0319067" diaginertia="8e-06 7e-06 4e-06" />
+                                <geom pos="-0.002452 -0.242282 -0.208993" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="ST3215_7_v1_1" name="vis_ST3215_7_v1_1_0" material="servo_mat" />
+                                <body name="Gripper_Base_v1_1" pos="0.000473 0.017284 0.009899">
+                                  <inertial pos="0.000560525 0.03192 -0.000594693" quat="0 0.707107 0 0.707107" mass="0.0468955" diaginertia="3.1e-05 2.9e-05 2.2e-05" />
+                                  <joint name="rev_motor_07" pos="0 0 0" axis="-0.017144 -0.999812 0.009029" range="-3.2014 2.7336" actuatorfrcrange="-2.94 2.94" armature="0.005" damping="0.15" frictionloss="0.05" />
+                                  <geom pos="-0.002925 -0.259566 -0.218892" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="Gripper_Base_v1_1" name="vis_Gripper_Base_v1_1_0" material="arm_pla_mat" />
+                                  <geom pos="-0.002925 -0.259566 -0.218892" quat="1 0 0 0" type="mesh" rgba="0.7 0.7 0.7 1" mesh="Gripper_Base_v1_1" name="col_Gripper_Base_v1_1_1" group="3" contype="2" conaffinity="1" />
+                                  <body name="ST3215_8_v1_1" pos="0.000776 0.045242 -0.000409">
+                                    <inertial pos="-0.000545923 -0.0189261 -0.0122064" mass="0.0319067" diaginertia="8e-06 7e-06 4e-06" />
+                                    <geom pos="-0.003701 -0.304808 -0.218483" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="ST3215_8_v1_1" name="vis_ST3215_8_v1_1_0" material="servo_mat" />
+                                    <body name="Gripper_Gear_v1_1">
+                                      <inertial pos="6.40669e-05 0.0037564 -3.38342e-05" mass="0.00247908" diaginertia="1e-07 1e-07 1e-07" />
+                                      <joint name="rev_motor_08" pos="0 0 0" axis="0.017144 0.999812 -0.009029" range="0 2.2028" actuatorfrcrange="-2.94 2.94" armature="0.004" damping="0.12" frictionloss="0.02" />
+                                      <geom pos="-0.003701 -0.304808 -0.218483" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="Gripper_Gear_v1_1" name="vis_Gripper_Gear_v1_1_0" material="arm_pla_mat" />
+                                    </body>
+                                  </body>
+                                  <body name="Gripper_Jaw_02_v1_1" pos="0.311734 -0.199648 0.032849">
+                                    <inertial pos="-0.338681 0.262592 -0.0303165" mass="0.0124922" diaginertia="5e-06 4e-06 3e-06" />
+                                    <joint name="rev_motor_08_1" pos="0 0 0" axis="-0.999697 0.0173 0.017525" type="slide" range="-0.0255 0" actuatorfrcrange="-2.94 2.94" armature="0.01" damping="1.5" frictionloss="0.01" />
+                                    <geom pos="-0.314659 -0.059918 -0.251741" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="Gripper_Jaw_02_v1_1" name="vis_Gripper_Jaw_02_v1_1_0" material="arm_pla_mat" />
+                                    <geom name="col_jaw02_00" type="mesh" mesh="jaw_02_hull_00" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_01" type="mesh" mesh="jaw_02_hull_01" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_02" type="mesh" mesh="jaw_02_hull_02" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_03" type="mesh" mesh="jaw_02_hull_03" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_04" type="mesh" mesh="jaw_02_hull_04" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_05" type="mesh" mesh="jaw_02_hull_05" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_06" type="mesh" mesh="jaw_02_hull_06" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_07" type="mesh" mesh="jaw_02_hull_07" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_08" type="mesh" mesh="jaw_02_hull_08" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_09" type="mesh" mesh="jaw_02_hull_09" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_10" type="mesh" mesh="jaw_02_hull_10" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_11" type="mesh" mesh="jaw_02_hull_11" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_12" type="mesh" mesh="jaw_02_hull_12" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_13" type="mesh" mesh="jaw_02_hull_13" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_14" type="mesh" mesh="jaw_02_hull_14" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_15" type="mesh" mesh="jaw_02_hull_15" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_16" type="mesh" mesh="jaw_02_hull_16" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_17" type="mesh" mesh="jaw_02_hull_17" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw02_18" type="mesh" mesh="jaw_02_hull_18" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                  </body>
+                                  <body name="Gripper_Jaw_01_v1_1" pos="0.308573 -0.243367 -0.049391">
+                                    <inertial pos="-0.279442 0.305316 0.0462797" mass="0.0124922" diaginertia="5e-06 4e-06 3e-06" />
+                                    <joint name="rev_motor_08_2" pos="0 0 0" axis="-0.999697 0.0173 0.017525" type="slide" range="0 0.0255" actuatorfrcrange="-2.94 2.94" armature="0.01" damping="1.5" frictionloss="0.01" />
+                                    <geom pos="-0.311498 -0.016199 -0.171401" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="Gripper_Jaw_01_v1_1" name="vis_Gripper_Jaw_01_v1_1_0" material="arm_pla_mat" />
+                                    <geom name="col_jaw01_00" type="mesh" mesh="jaw_01_hull_00" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_01" type="mesh" mesh="jaw_01_hull_01" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_02" type="mesh" mesh="jaw_01_hull_02" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_03" type="mesh" mesh="jaw_01_hull_03" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_04" type="mesh" mesh="jaw_01_hull_04" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_05" type="mesh" mesh="jaw_01_hull_05" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_06" type="mesh" mesh="jaw_01_hull_06" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_07" type="mesh" mesh="jaw_01_hull_07" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_08" type="mesh" mesh="jaw_01_hull_08" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_09" type="mesh" mesh="jaw_01_hull_09" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_10" type="mesh" mesh="jaw_01_hull_10" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_11" type="mesh" mesh="jaw_01_hull_11" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_12" type="mesh" mesh="jaw_01_hull_12" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_13" type="mesh" mesh="jaw_01_hull_13" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_14" type="mesh" mesh="jaw_01_hull_14" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                    <geom name="col_jaw01_15" type="mesh" mesh="jaw_01_hull_15" group="3" contype="1" conaffinity="3" condim="4" friction="1.05 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+                                  </body>
+                                  <site name="ee_site" pos="0 0 0" size="0.004" group="4" />
+                                  <site name="jaw_tip_site" pos="0.0009 0.092 0.0" size="0.004" group="4" />
+                                  <body name="wrist_cam_mount" pos="0.0008 0.038 0.036">
+                                    <inertial pos="0 0 0" mass="0.038" diaginertia="6e-06 6e-06 4e-06" />
+                                    <geom name="vis_wrist_cam_mount_0" type="box" size="0.016 0.016 0.004" contype="0" conaffinity="0" group="1" material="arm_pla_mat" />
+                                  </body>
+                                  <camera name="wrist" pos="0.0008 0.036 0.040" xyaxes="1 0 0 0 0.374607 0.927184" resolution="640 480" sensorsize="0.0064 0.0048" focalpixel="302.189 301.752" principalpixel="-4.031 9.244" />
+                                </body>
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+    <light name="ceil_main" pos="0.0 0.28 1.35" dir="0 0 -1" diffuse="0.48 0.48 0.47" specular="0.18 0.18 0.18" castshadow="true" />
+    <light name="ceil_fill" pos="0.25 0.55 1.10" dir="-0.2 -0.3 -0.9" diffuse="0.22 0.22 0.24" specular="0.06 0.06 0.06" castshadow="false" />
+    <geom name="table_top" type="box" pos="0.0 0.35 -0.015" size="0.50 0.50 0.015" material="table_mat" contype="1" conaffinity="3" condim="4" friction="0.72 0.01 0.001" />
+    <geom name="back_wall" type="box" pos="0.0 -0.22 0.25" size="0.65 0.02 0.35" rgba="0.78 0.79 0.78 1" contype="0" conaffinity="0" />
+    <camera name="front" pos="-0.03872 0.60899 0.32807" xyaxes="-0.988538 -0.117632 -0.094633 0.022210 -0.733313 0.679528" resolution="640 480" sensorsize="0.0064 0.0048" focalpixel="307.551 320.427" principalpixel="41.314 29.649" />
+    <body name="place_target" mocap="true" pos="-0.09 0.25 0.0008">
+      <geom name="place_coaster_geom" type="cylinder" size="0.052 0.0008" material="coaster_mat" contype="0" conaffinity="0" />
+    </body>
+    <body name="black_cup" pos="0.06 0.24 0.001">
+      <freejoint name="cup_freejoint" />
+      <inertial pos="0 0 0.041" mass="0.042" diaginertia="4.6e-05 4.6e-05 2.4e-05" />
+      <geom name="cup_vis" type="mesh" mesh="cup_visual" material="cup_mat" contype="0" conaffinity="0" group="1" />
+      <geom name="cup_col_floor" type="mesh" mesh="cup_floor" group="3" contype="1" conaffinity="3" condim="4" friction="0.85 0.02 0.002" solref="0.004 1" solimp="0.93 0.99 0.0008" />
+      <geom name="cup_col_w00" type="mesh" mesh="cup_wall_00" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w01" type="mesh" mesh="cup_wall_01" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w02" type="mesh" mesh="cup_wall_02" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w03" type="mesh" mesh="cup_wall_03" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w04" type="mesh" mesh="cup_wall_04" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w05" type="mesh" mesh="cup_wall_05" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w06" type="mesh" mesh="cup_wall_06" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w07" type="mesh" mesh="cup_wall_07" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w08" type="mesh" mesh="cup_wall_08" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w09" type="mesh" mesh="cup_wall_09" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w10" type="mesh" mesh="cup_wall_10" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w11" type="mesh" mesh="cup_wall_11" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w12" type="mesh" mesh="cup_wall_12" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w13" type="mesh" mesh="cup_wall_13" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w14" type="mesh" mesh="cup_wall_14" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w15" type="mesh" mesh="cup_wall_15" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w16" type="mesh" mesh="cup_wall_16" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w17" type="mesh" mesh="cup_wall_17" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w18" type="mesh" mesh="cup_wall_18" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w19" type="mesh" mesh="cup_wall_19" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w20" type="mesh" mesh="cup_wall_20" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w21" type="mesh" mesh="cup_wall_21" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w22" type="mesh" mesh="cup_wall_22" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+      <geom name="cup_col_w23" type="mesh" mesh="cup_wall_23" group="3" contype="1" conaffinity="3" condim="4" friction="0.90 0.03 0.002" solref="0.004 1" solimp="0.94 0.99 0.0008" />
+    </body>
+    <body name="distractor_bottle" pos="-0.16 0.34 0.001">
+      <freejoint name="bottle_freejoint" />
+      <inertial pos="0 0 0.085" mass="0.240" diaginertia="0.00085 0.00085 0.00016" />
+      <geom name="bottle_body" type="cylinder" pos="0 0 0.062" size="0.032 0.062" material="bottle_glass_mat" contype="1" conaffinity="3" condim="4" friction="0.65 0.01 0.001" />
+      <geom name="bottle_shoulder" type="ellipsoid" pos="0 0 0.124" size="0.032 0.032 0.024" material="bottle_glass_mat" contype="0" conaffinity="0" />
+      <geom name="bottle_neck" type="cylinder" pos="0 0 0.165" size="0.013 0.028" material="bottle_glass_mat" contype="1" conaffinity="3" />
+      <geom name="bottle_neck_label" type="cylinder" pos="0 0 0.155" size="0.014 0.010" material="bottle_label_mat" contype="0" conaffinity="0" />
+    </body>
+  </worldbody>
+  <contact>
+    <exclude body1="Gripper_Jaw_01_v1_1" body2="Gripper_Jaw_02_v1_1" />
+    <exclude body1="Gripper_Base_v1_1" body2="Gripper_Jaw_01_v1_1" />
+    <exclude body1="ST3215_8_v1_1" body2="Gripper_Jaw_01_v1_1" />
+    <exclude body1="Gripper_Gear_v1_1" body2="Gripper_Jaw_01_v1_1" />
+    <exclude body1="ST3215_7_v1_1" body2="Gripper_Jaw_01_v1_1" />
+    <exclude body1="wrist_cam_mount" body2="Gripper_Jaw_01_v1_1" />
+    <exclude body1="Joint_06_v1_1" body2="Gripper_Jaw_01_v1_1" />
+    <exclude body1="Gripper_Base_v1_1" body2="Gripper_Jaw_02_v1_1" />
+    <exclude body1="ST3215_8_v1_1" body2="Gripper_Jaw_02_v1_1" />
+    <exclude body1="Gripper_Gear_v1_1" body2="Gripper_Jaw_02_v1_1" />
+    <exclude body1="ST3215_7_v1_1" body2="Gripper_Jaw_02_v1_1" />
+    <exclude body1="wrist_cam_mount" body2="Gripper_Jaw_02_v1_1" />
+    <exclude body1="Joint_06_v1_1" body2="Gripper_Jaw_02_v1_1" />
+  </contact>
+  <equality>
+    <joint name="mimic_jaw_02" joint1="rev_motor_08_1" joint2="rev_motor_08" polycoef="0 -0.01157618 0 0 0" solref="0.002 1" solimp="0.98 0.998 0.0002" />
+    <joint name="mimic_jaw_01" joint1="rev_motor_08_2" joint2="rev_motor_08" polycoef="0 0.01157618 0 0 0" solref="0.002 1" solimp="0.98 0.998 0.0002" />
+  </equality>
+  <actuator>
+    <motor name="act_motor_01" joint="rev_motor_01" ctrlrange="-2.94 2.94" gear="1" />
+    <motor name="act_motor_02" joint="rev_motor_02" ctrlrange="-2.94 2.94" gear="1" />
+    <motor name="act_motor_03" joint="rev_motor_03" ctrlrange="-2.94 2.94" gear="1" />
+    <motor name="act_motor_04" joint="rev_motor_04" ctrlrange="-2.94 2.94" gear="1" />
+    <motor name="act_motor_05" joint="rev_motor_05" ctrlrange="-2.94 2.94" gear="1" />
+    <motor name="act_motor_06" joint="rev_motor_06" ctrlrange="-2.94 2.94" gear="1" />
+    <motor name="act_motor_07" joint="rev_motor_07" ctrlrange="-2.94 2.94" gear="1" />
+    <motor name="act_motor_08" joint="rev_motor_08" ctrlrange="-2.94 2.94" gear="1" />
+  </actuator>
+</mujoco>
