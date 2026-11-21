@@ -9,6 +9,6 @@ COPY src/normakit/policy_api.py src/normakit/policy_api.py
 COPY server/policy_server.py server/policy_server.py
 # policy_server imports normakit.policy_api only; provide the package marker
 RUN touch src/normakit/__init__.py
-ENV PORT=8000 POLICY_TYPE=act DEVICE=auto HF_HOME=/models
+ENV HOST=0.0.0.0 PORT=8000 POLICY_TYPE=act DEVICE=auto HF_HOME=/models
 EXPOSE 8000
-CMD ["sh", "-c", "python server/policy_server.py --checkpoint \"$CHECKPOINT\" --policy-type \"$POLICY_TYPE\" --device \"$DEVICE\" --port \"$PORT\""]
+CMD ["sh", "-c", "python server/policy_server.py --checkpoint \"$CHECKPOINT\" --policy-type \"$POLICY_TYPE\" --device \"$DEVICE\" --host \"$HOST\" --port \"$PORT\""]

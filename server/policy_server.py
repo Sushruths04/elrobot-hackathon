@@ -5,7 +5,9 @@
   python server/policy_server.py --dummy --port 8765      # no torch/GPU
 
 Endpoints: GET /health, POST /act, POST /reset, GET /metrics.
-Optional auth: set env POLICY_API_TOKEN, clients send "Authorization: Bearer <token>".
+Auth: set env POLICY_API_TOKEN, clients send "Authorization: Bearer <token>". The server refuses to
+start without a token unless --dummy or --no-auth. Binds 127.0.0.1 by default. Plain HTTP: use an
+SSH tunnel, VPN or a TLS proxy across the WAN (see server/README.md).
 """
 from __future__ import annotations
 
@@ -27,7 +29,7 @@ from normakit.policy_api import (  # noqa: E402
     DEFAULT_CHUNK, DEFAULT_CHUNK_DT, N_JOINTS, ActRequest, ActResponse, decode_jpeg_b64,
 )
 
-IMAGE_KEY = "observation.images.table"
+DEFAULT_IMAGE_KEY = "observation.images.table"
 STATE_KEY = "observation.state"
 
 
@@ -35,6 +37,7 @@ class DummyPolicy:
     """Deterministic smooth chunk: eases from the given state toward a fixed pose."""
     name = "dummy"
     device = "cpu"
+    needs_image = False
 
     def __init__(self, chunk=DEFAULT_CHUNK):
         self.chunk = chunk
@@ -52,7 +55,7 @@ class DummyPolicy:
 
 
 class LeRobotPolicy:
-    def __init__(self, checkpoint, policy_type, device):
+    def __init__(self, checkpoint, policy_type, device, image_key=None):
         import torch
         from lerobot.policies.factory import get_policy_class, make_pre_post_processors
 
@@ -70,6 +73,29 @@ class LeRobotPolicy:
         self.chunk = getattr(self.policy.config, "chunk_size", DEFAULT_CHUNK)
         self.fps = getattr(self.policy.config, "fps", None) or 30
         self.use_amp = device.startswith("cuda")
+        self._validate_config(image_key)
+
+    def _validate_config(self, image_key):
+        cfg = self.policy.config
+        inputs = getattr(cfg, "input_features", None) or {}
+        out = getattr(cfg, "output_features", None) or {}
+        self.image_keys = [k for k in inputs if k.startswith("observation.images.")]
+        self.needs_image = bool(self.image_keys)
+        if self.needs_image:
+            if len(self.image_keys) > 1:
+                raise ValueError(f"checkpoint expects several cameras {self.image_keys}; "
+                                 "the API carries one image")
+            if image_key and image_key != self.image_keys[0]:
+                raise ValueError(f"--image-key {image_key} not in checkpoint inputs {self.image_keys}")
+            self.image_key = self.image_keys[0]
+        if STATE_KEY in inputs:
+            sd = tuple(inputs[STATE_KEY].shape)
+            if sd != (N_JOINTS,):
+                raise ValueError(f"checkpoint state shape {sd}, expected ({N_JOINTS},)")
+        act = out.get("action")
+        if act is None or tuple(act.shape) != (N_JOINTS,):
+            raise ValueError(f"checkpoint action shape {getattr(act, 'shape', None)}, "
+                             f"expected ({N_JOINTS},)")
 
     def reset(self):
         self.policy.reset()
@@ -80,18 +106,25 @@ class LeRobotPolicy:
         from PIL import Image
 
         batch = {STATE_KEY: torch.tensor(state, dtype=torch.float32).unsqueeze(0)}
-        if jpeg is not None:
+        if self.needs_image and jpeg is None:
+            raise ValueError(f"this policy needs an image ({self.image_key})")
+        if jpeg is not None and self.needs_image:
             img = np.asarray(Image.open(io.BytesIO(jpeg)).convert("RGB"))
             t = torch.from_numpy(img).permute(2, 0, 1).float().div(255.0).unsqueeze(0)
-            batch[IMAGE_KEY] = t
+            batch[self.image_key] = t
         if task:
             batch["task"] = [task]
         with torch.inference_mode():
             batch = self.pre(batch)
             chunk = self.policy.predict_action_chunk(batch)  # (1, N, D)
             chunk = self.post(chunk)
-        rows = chunk.squeeze(0).float().cpu().clamp(0.0, 1.0).tolist()
-        return [r[:N_JOINTS] for r in rows], 1.0 / float(self.fps)
+        arr = chunk.squeeze(0).float().cpu()
+        if arr.ndim != 2 or arr.shape[1] != N_JOINTS:
+            raise RuntimeError(f"policy returned action shape {tuple(arr.shape)}, expected (N, {N_JOINTS})")
+        if not bool(torch.isfinite(arr).all()) or float(arr.min()) < -0.1 or float(arr.max()) > 1.1:
+            raise RuntimeError("policy actions are outside the 0..1 joint-norm range "
+                               "(checkpoint trained on other units?)")
+        return arr.clamp(0.0, 1.0).tolist(), 1.0 / float(self.fps)
 
 
 def create_app(policy, token=None):
@@ -104,7 +137,7 @@ def create_app(policy, token=None):
         if tok and not hmac.compare_digest(authorization, f"Bearer {tok}"):
             raise HTTPException(401, "bad or missing bearer token")
 
-    @app.get("/health")
+    @app.get("/health", dependencies=[Depends(auth)])
     def health():
         return {"ready": True, "model": policy.name, "device": policy.device,
                 "chunk": policy.chunk, "joints": N_JOINTS}
@@ -112,7 +145,14 @@ def create_app(policy, token=None):
     @app.post("/act", response_model=ActResponse, dependencies=[Depends(auth)])
     def act(req: ActRequest):
         t0 = time.perf_counter()
-        jpeg = decode_jpeg_b64(req.image_jpeg_b64) if req.image_jpeg_b64 else None
+        if not all(math.isfinite(x) for x in req.state):
+            raise HTTPException(422, "state contains NaN or Inf")
+        if getattr(policy, "needs_image", False) and not req.image_jpeg_b64:
+            raise HTTPException(422, "this policy requires image_jpeg_b64")
+        try:
+            jpeg = decode_jpeg_b64(req.image_jpeg_b64) if req.image_jpeg_b64 else None
+        except Exception:
+            raise HTTPException(422, "image_jpeg_b64 is not valid base64")
         with lock:
             if req.reset:
                 policy.reset()
@@ -127,7 +167,7 @@ def create_app(policy, token=None):
             policy.reset()
         return {"ok": True}
 
-    @app.get("/metrics")
+    @app.get("/metrics", dependencies=[Depends(auth)])
     def metrics():
         v = sorted(lat)
         if not v:
@@ -144,15 +184,22 @@ def main():
     ap.add_argument("--checkpoint", default=os.environ.get("CHECKPOINT"))
     ap.add_argument("--policy-type", default=os.environ.get("POLICY_TYPE", "act"))
     ap.add_argument("--device", default=os.environ.get("DEVICE", "auto"))
-    ap.add_argument("--host", default="0.0.0.0")
+    ap.add_argument("--host", default=os.environ.get("HOST", "127.0.0.1"),
+                    help="bind address (default 127.0.0.1; use 0.0.0.0 only with a token)")
+    ap.add_argument("--image-key", default=os.environ.get("IMAGE_KEY"),
+                    help="expected camera key; default read from the checkpoint")
+    ap.add_argument("--no-auth", action="store_true", help="allow serving without POLICY_API_TOKEN")
     ap.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8000")))
     a = ap.parse_args()
+    if not (a.dummy or a.no_auth or os.environ.get("POLICY_API_TOKEN")):
+        ap.error("POLICY_API_TOKEN is not set; set it, or pass --no-auth (or --dummy)")
     if a.dummy:
         policy = DummyPolicy()
     elif a.checkpoint:
-        policy = LeRobotPolicy(a.checkpoint, a.policy_type, a.device)
+        policy = LeRobotPolicy(a.checkpoint, a.policy_type, a.device, a.image_key)
     else:
         ap.error("--checkpoint (or env CHECKPOINT) required unless --dummy")
+
     import uvicorn
     uvicorn.run(create_app(policy), host=a.host, port=a.port)
 

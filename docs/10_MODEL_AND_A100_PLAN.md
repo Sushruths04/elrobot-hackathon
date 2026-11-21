@@ -51,7 +51,7 @@ All numbers are estimates. Measure with the client in FEAT-003.
 | Downlink (chunk of 50x8 floats, ~2 KB) | included in RTT |
 | **Total per chunk** | **~60-170 ms** |
 
-Action chunking is what makes this work. ACT predicts k future actions per call. At 30 fps, a chunk of 50 covers ~1.6 s of motion, far longer than the 60-170 ms round trip. The client keeps executing the current chunk and requests the next one asynchronously a few steps before it runs out (or blends overlapping chunks). Even a 300 ms RTT is hidden. The real limit is the **Guard 10 Hz rate limit**: until it is changed, the arm receives goals at 10 Hz, so sub-sampled or interpolated chunk steps are what get sent. Keep the policy loop at 10 Hz first, tune up later.
+Action chunking is what makes this work. ACT predicts k future actions per call. At 30 fps, a chunk of 50 covers ~1.6 s of motion, far longer than the 60-170 ms round trip. The real limit is the **Guard 10 Hz rate limit**: the arm receives goals at 10 Hz, so `scripts/run_policy.py` interpolates the chunk in time. Each 0.1 s tick advances `0.1 / chunk_dt` rows (3 rows at 30 fps), so playback runs at the demonstrated speed. v1 fetches synchronously: once half the chunk has been played it blocks on the next `/act` while the arm holds its last goal (one RTT, 60-170 ms estimated). The second half of each chunk is dropped because it was predicted from an older observation. Asynchronous prefetch and ACT temporal ensembling are possible upgrades once the RTT is measured. `--max-delta` (default 0.05 norm per tick, 0.5 norm/s at 10 Hz) caps speed below the Guard's 0.35 step limit; raise it if fast demonstrated motions lag.
 
 Also keep server and robot clocks out of the control loop. The client owns the clock and the Guard.
 
