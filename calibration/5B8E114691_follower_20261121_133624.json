@@ -1,0 +1,64 @@
+{
+ "bus": "5B8E114691",
+ "role": "follower",
+ "saved": "2026-11-21 13:36:24",
+ "complete": true,
+ "motors": {
+  "1": {
+   "min": 1439,
+   "max": 2657,
+   "midpoint": 2048,
+   "span": 1218,
+   "frozen": true
+  },
+  "2": {
+   "min": 996,
+   "max": 3100,
+   "midpoint": 2048,
+   "span": 2104,
+   "frozen": true
+  },
+  "3": {
+   "min": 888,
+   "max": 3208,
+   "midpoint": 2048,
+   "span": 2320,
+   "frozen": true
+  },
+  "4": {
+   "min": 885,
+   "max": 3211,
+   "midpoint": 2048,
+   "span": 2326,
+   "frozen": true
+  },
+  "5": {
+   "min": 130,
+   "max": 3966,
+   "midpoint": 2048,
+   "span": 3836,
+   "frozen": true
+  },
+  "6": {
+   "min": 1030,
+   "max": 3066,
+   "midpoint": 2048,
+   "span": 2036,
+   "frozen": true
+  },
+  "7": {
+   "min": 121,
+   "max": 3975,
+   "midpoint": 2048,
+   "span": 3854,
+   "frozen": true
+  },
+  "8": {
+   "min": 1245,
+   "max": 2851,
+   "midpoint": 2048,
+   "span": 1606,
+   "frozen": true
+  }
+ }
+}

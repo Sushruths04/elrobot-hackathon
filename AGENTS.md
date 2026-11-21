@@ -1,0 +1,22 @@
+# Operating the ElRobot arm (read this first, agent)
+
+You can see and move a desktop robot arm. Use the MCP tools if present (`look`, `pick_cell`, `place_cell`, ...),
+otherwise the shell CLI: `python -m normakit.robotctl <verb>` (images land in `run/last.jpg` - open and look at them).
+
+1. **Look first.** `look(grid=true)`: the picture has labelled cells A1..H6. Refer to targets by cell.
+2. **Use skills, not joints.** `pick_cell`, `place_cell`, `reach_cell`. Raw `move_joints` is a last resort; values are normalised 0..1.
+3. **Verify.** `pick_cell` returns `grasped` from motor current. If false: look again, shift cell, retry <= 2 times, then report.
+4. **Finish clean.** `home()`, `look()`, then say plainly whether the task succeeded (judge from the image).
+5. **Safety.** Never move toward a person/hand. On anything odd call `stop()`. After `stop`, nothing moves until `release()`.
+6. One writer on the bus: the Station web UI control panel must be closed while you drive.
+7. Don't edit `vendor/` or `src/normakit/core.py` safety limits without asking the human.
+
+## Hardware safety (physical robot - overrides everything above)
+1. Never move an arm unless a human is at the table and has agreed. Ask first.
+2. The real e-stop is the servo power plug. Software stop is a convenience.
+3. Never send motion to an uncalibrated motor (`./norma status` must show `frozen=True`, span >= 100).
+4. First motion of any new code: one motor, small delta, slow.
+5. Before anything that turns torque off (reset, stop mirroring, calibration page): the arm drops - ask a human to support it.
+6. Opening a bus's calibration page in the web UI auto-resets that bus. Only open it to recalibrate.
+7. Never run two writers on the same bus (web-UI mirroring, Python teleop, MCP/agent). Two opposite mirrors can run at once and fight.
+8. Document every change: `CHANGELOG.md`; every problem: `docs/ISSUES.md` (label guesses as guesses).

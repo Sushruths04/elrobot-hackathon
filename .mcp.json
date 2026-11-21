@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "elrobot": {
+      "command": ".venv/bin/python",
+      "args": [
+        "-m",
+        "normakit.mcp_server",
+        "--backend",
+        "sim"
+      ],
+      "env": {
+        "PYTHONPATH": "src"
+      }
+    },
+    "elrobot-real": {
+      "command": ".venv/bin/python",
+      "args": [
+        "-m",
+        "normakit.mcp_server",
+        "--backend",
+        "station"
+      ],
+      "env": {
+        "PYTHONPATH": "src"
+      }
+    }
+  }
+}

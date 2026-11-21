@@ -1,0 +1,21 @@
+# heavy / local-only (symlinks and runtime data)
+bin
+vendor
+.venv
+logs/
+run/station_data/
+run/*.jpg
+run/*.png
+run/*.log
+run/dbg.py
+run/calibration_backup*.json
+run/trials.jsonl
+__pycache__/
+*.pyc
+.env
+
+# competitive strategy docs: kept local for now
+docs/02_TASK_PREDICTIONS.md
+docs/03_WINNING_ANGLES.md
+docs/06_CRAZY_PROJECT.md
+docs/07_VISION_LIVING_DESK.md

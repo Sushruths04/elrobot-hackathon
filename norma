@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Shortcuts for the NormaCore hackathon rig.   ./norma help
+cd "$(dirname "$0")" || exit 1
+PY=.venv/bin/python
+case "$1" in
+  status)   pgrep -a station >/dev/null && echo "station: running" || echo "station: NOT running"
+            ls /dev/ttyACM* 2>/dev/null; $PY scripts/dump_buses.py 2>&1 | tail -20 ;;
+  start)    pgrep -x station >/dev/null && { echo "already running"; exit 0; }
+            (cd run && nohup ../bin/station --web --tcp --config station.yaml > ../logs/station.log 2>&1 &); sleep 4; tail -n 3 logs/station.log | cut -c1-150 ;;
+  stop)     pkill -x station && echo stopped ;;
+  restart)  echo "WARNING: Station may forget calibration on restart. Run ./norma backup first."; pkill -x station; sleep 2; $0 start ;;
+  logs)     tail -n 40 logs/station.log | grep -v usbvideo ;;
+  monitor)  exec $PY scripts/monitor_calib.py ;;
+  backup)   $PY scripts/backup_calibration.py ;;
+  identify) $PY scripts/identify_arm.py "${2:-10}" ;;
+  home-set) $PY scripts/set_home.py "${2:?leader|follower}" ;;
+  smoke)    $PY scripts/smoke_station.py ;;
+  mcp)      exec env PYTHONPATH=src $PY -m normakit.mcp_server --backend "${2:-station}" ;;
+  simtest)  $PY scripts/selftest_sim.py ;;
+  web)      echo "http://localhost:8889  (use Firefox: Chrome WebGL is disabled here)" ;;
+  *)        echo "usage: ./norma {status|start|stop|restart|logs|monitor|backup|identify [s]|home-set leader|follower|smoke|mcp [sim|station]|simtest|web}" ;;
+esac
