@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+- 2026-11-21 16:35 - `docs/NEXT_STEPS.md`: handoff header (state, follower-only project, joint-check + camera steps with exact commands) - Bart + Claude
 - 2026-11-21 15:58 - `tools/calibrate.py`: watch (read-only live spans vs reference) / reset / save (freeze) / auto / stop over TCP, no web UI needed - Claude [ISSUE-109]
 - 2026-11-21 15:40 - Merged Bart's macOS work onto this repo: `tools/` (verify_station, estop, reset_calibration, speed_limit), `start_station.sh`, `restart_station.sh`, `patches/teleop-max-speed.patch`, `docs/CONCEPTS.md`; ISSUE-001..015 appended to `docs/ISSUES.md`; macOS section in `docs/SETUP.md`; tools now find upstream at `vendor/norma-core-src`; `.gitignore` += `repo/`, `snapshots/` - Bart + Claude
 - 2026-11-21 - `scripts/twin_view.py`: renders both real arms from live joint data (`run/twin.png`), using the Station viewer's mapping
