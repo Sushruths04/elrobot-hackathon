@@ -1,0 +1,47 @@
+{
+  "demo_replay_fit": {
+    "duration_s": 19.5,
+    "ee_mean_err_mm": 6.79,
+    "ee_rms_err_mm": 9.3,
+    "ee_p95_err_mm": 22.82,
+    "demo_cup_peak_lift_cm": 12.78,
+    "demo_cup_final_xyz_m": [
+      0.0568,
+      0.353,
+      -0.0
+    ],
+    "demo_cup_upright_cos": 1.0
+  },
+  "gravity_sag_j3_limp": {
+    "real_ee_z_before_m": 0.22,
+    "real_ee_z_after_m": 0.1382,
+    "real_elbow_sag_deg": 28.0,
+    "sim_ee_z_before_m": 0.2173,
+    "sim_ee_z_after_m": 0.1373,
+    "sim_elbow_sag_deg": 25.79
+  },
+  "elbow_stall_comparison": {
+    "real_observed": {
+      "cmd_40_ticks_dj3": 0,
+      "cmd_40_ticks_dj4": 13,
+      "lift_timeout_err_ticks": 449
+    },
+    "station_default": {
+      "cmd_40_ticks_dj3": 4,
+      "cmd_40_ticks_dj4": 13,
+      "lift_460_ticks_remaining_err_j3": 34,
+      "j3_overloaded": false
+    },
+    "calibrated_fix": {
+      "cmd_40_ticks_dj3": 44,
+      "cmd_40_ticks_dj4": 43,
+      "lift_460_ticks_remaining_err_j3": 2,
+      "j3_overloaded": false
+    }
+  },
+  "calibration_180_finding": {
+    "original_table_front_mean_residual_mm": 26.41,
+    "fixed_180_jaw_tip_mean_residual_mm": 6.1,
+    "cause": "Human stood behind robot during 4-corner touch (180-deg TL/TR/BR/BL swap) and touched outer 10x7 pattern border while recording EE_LINK instead of jaw tip."
+  }
+}

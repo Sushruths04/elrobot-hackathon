@@ -1,5 +1,13 @@
 # Changelog (newest first)
 
+## [Unreleased] - 2026-11-21 night
+### Added
+- `assets/mujoco/elrobot_scene.xml`, `scripts/build_mujoco_assets.py`: MuJoCo 3.2.7 physics twin compiled from `elrobot_follower.urdf` with V-HACD convex-decomposed gripper jaws (16 + 19 hulls), 24-sector hollow black cup, clear glass bottle distractor, textured table, and calibrated `front` + `wrist` cameras.
+- `src/normakit/mujoco_backend.py`: `MujocoBackend` matching `StationBackend` (`state()`, `send_goals()`, `_sync()`, `frame_jpeg()`, real follower `5B8E114691` encoder spans, ST3215 12V PID + speed/acc ramps, 4096-tick quantisation, deadband, backlash, bus lag, overload derating, MP4 video recorder, passive viewer).
+- `src/normakit/cup_skill.py`, `calibration/cup_grasp.json`, `Kin.ik_jaw_tip`, `station_backend.wrist_camera`: 7-DoF jaw-tip IK, 2-step wrist-camera 3D ray-plane alignment (eliminating +-3 cm table mapping error), back-rim radial pinch grasp, visual grasp/place verification, and `--sim mujoco` support in `scripts/grab_cup.py` and `scripts/autorun.py`.
+- `scripts/validate_twin.py`, `scripts/sim_benchmark.py`, `results/twin_validation.json`, `results/sim_100.json`, `docs/MUJOCO_TWIN_REPORT.md`: sim-vs-real twin validation and 100-trial randomised benchmark.
+- `docs/REAL_RUNBOOK.md`, `scripts/servo_diag_and_fix.py`, `calibration/table_front_180fix.json`: step-by-step real-robot runbook, guarded open-air `j3/j4` diagnostic/PID-torque helper, and 180-deg-corrected table homography (`6.1 mm` corner residual vs `26.4 mm` in `table_front.json`).
+
 ## [Unreleased]
 ### Added
 - 2026-11-22 - Throw-into-box training/eval/deploy (sim only): `src/normakit/throw_policy.py`, `scripts/train_throw.py` (CEM, `--smoke`), `scripts/eval_throw.py`, `scripts/run_throw.py` (sim dry run default; `--real` needs `--i-have-a-human`, one-motor test, Guard.move only). Measured: 85/100 in box in sim, real arm untested. `core.py` untouched - Claude

@@ -1,0 +1,3446 @@
+{
+  "summary": {
+    "trials": 100,
+    "seed": 20261121,
+    "mode": "pick_and_hold_5cm_3s",
+    "vision": "blob",
+    "workspace_x_m": [
+      -0.15,
+      0.2
+    ],
+    "workspace_y_m": [
+      0.15,
+      0.38
+    ],
+    "injected_mapping_error_sigma_cm": 3.0,
+    "cup_mass_range_g": [
+      30.0,
+      60.0
+    ],
+    "cup_friction_range": [
+      0.6,
+      1.0
+    ],
+    "servo_lag_range_ms": [
+      15.0,
+      55.0
+    ],
+    "lifted_5cm_for_3s_count": 94,
+    "lifted_5cm_for_3s_rate_pct": 94.0,
+    "strict_upright_success_count": 90,
+    "strict_upright_success_rate_pct": 90.0,
+    "aborts": 0,
+    "median_sim_time_s": 19.23,
+    "median_held_height_cm": 10.66,
+    "mean_wrist_align_err_mm": 9.2,
+    "median_wrist_align_err_mm": 4.96,
+    "failure_reasons": {
+      "held_tilted_gt_41deg": 4,
+      "lift_or_hold_short": 6
+    },
+    "failure_videos_dir": "results/failure_videos",
+    "success_video": "results/success_example.mp4"
+  },
+  "trials": [
+    {
+      "trial": 0,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.5,
+      "true_cup_xy_m": [
+        0.073,
+        0.3722
+      ],
+      "injected_map_err_cm": [
+        -1.26,
+        -2.87
+      ],
+      "wrist_aligned_xy_m": [
+        0.0744,
+        0.372
+      ],
+      "wrist_align_err_mm": 1.45,
+      "held_cup_z_cm": 12.09,
+      "final_cup_xyz_m": [
+        0.0847,
+        0.409,
+        0.1209
+      ],
+      "cup_upright_cos": 0.762,
+      "cup_mass_g": 41.4,
+      "cup_friction": 0.96,
+      "servo_lag_ms": 38.2,
+      "exposure_gain": 1.054,
+      "video": "results/success_example.mp4"
+    },
+    {
+      "trial": 1,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.85,
+      "true_cup_xy_m": [
+        0.1497,
+        0.3439
+      ],
+      "injected_map_err_cm": [
+        1.47,
+        -0.82
+      ],
+      "wrist_aligned_xy_m": [
+        0.1542,
+        0.3423
+      ],
+      "wrist_align_err_mm": 4.79,
+      "held_cup_z_cm": 11.84,
+      "final_cup_xyz_m": [
+        0.1737,
+        0.3796,
+        0.1184
+      ],
+      "cup_upright_cos": 0.754,
+      "cup_mass_g": 30.7,
+      "cup_friction": 0.691,
+      "servo_lag_ms": 44.1,
+      "exposure_gain": 1.038,
+      "video": null
+    },
+    {
+      "trial": 2,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.15,
+      "true_cup_xy_m": [
+        0.0848,
+        0.2545
+      ],
+      "injected_map_err_cm": [
+        -2.56,
+        1.84
+      ],
+      "wrist_aligned_xy_m": [
+        0.0804,
+        0.2565
+      ],
+      "wrist_align_err_mm": 4.82,
+      "held_cup_z_cm": 10.18,
+      "final_cup_xyz_m": [
+        0.0958,
+        0.2861,
+        0.1018
+      ],
+      "cup_upright_cos": 0.891,
+      "cup_mass_g": 47.9,
+      "cup_friction": 0.853,
+      "servo_lag_ms": 30.6,
+      "exposure_gain": 0.872,
+      "video": null
+    },
+    {
+      "trial": 3,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.55,
+      "true_cup_xy_m": [
+        0.0825,
+        0.2619
+      ],
+      "injected_map_err_cm": [
+        -0.89,
+        -2.49
+      ],
+      "wrist_aligned_xy_m": [
+        0.0834,
+        0.2611
+      ],
+      "wrist_align_err_mm": 1.17,
+      "held_cup_z_cm": 10.64,
+      "final_cup_xyz_m": [
+        0.0946,
+        0.2884,
+        0.1064
+      ],
+      "cup_upright_cos": 0.894,
+      "cup_mass_g": 44.0,
+      "cup_friction": 0.798,
+      "servo_lag_ms": 43.1,
+      "exposure_gain": 1.036,
+      "video": null
+    },
+    {
+      "trial": 4,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 20.1,
+      "true_cup_xy_m": [
+        0.0416,
+        0.177
+      ],
+      "injected_map_err_cm": [
+        1.49,
+        4.73
+      ],
+      "wrist_aligned_xy_m": [
+        0.0434,
+        0.1778
+      ],
+      "wrist_align_err_mm": 1.97,
+      "held_cup_z_cm": 10.78,
+      "final_cup_xyz_m": [
+        0.0531,
+        0.2061,
+        0.1078
+      ],
+      "cup_upright_cos": 0.894,
+      "cup_mass_g": 48.7,
+      "cup_friction": 0.834,
+      "servo_lag_ms": 49.0,
+      "exposure_gain": 0.844,
+      "video": null
+    },
+    {
+      "trial": 5,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 20.45,
+      "true_cup_xy_m": [
+        -0.0807,
+        0.1806
+      ],
+      "injected_map_err_cm": [
+        2.02,
+        1.18
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0784,
+        0.1815
+      ],
+      "wrist_align_err_mm": 2.45,
+      "held_cup_z_cm": 10.27,
+      "final_cup_xyz_m": [
+        -0.0873,
+        0.2126,
+        0.1027
+      ],
+      "cup_upright_cos": 0.893,
+      "cup_mass_g": 41.8,
+      "cup_friction": 0.824,
+      "servo_lag_ms": 42.0,
+      "exposure_gain": 1.053,
+      "video": null
+    },
+    {
+      "trial": 6,
+      "success": false,
+      "pick_hold_5cm_3s_ok": false,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "held_tilted_gt_41deg (z=12.3cm, cos=0.73)",
+      "sim_seconds": 18.7,
+      "true_cup_xy_m": [
+        0.1827,
+        0.3383
+      ],
+      "injected_map_err_cm": [
+        1.4,
+        1.11
+      ],
+      "wrist_aligned_xy_m": [
+        0.1875,
+        0.3359
+      ],
+      "wrist_align_err_mm": 5.37,
+      "held_cup_z_cm": 12.29,
+      "final_cup_xyz_m": [
+        0.2093,
+        0.3706,
+        0.1229
+      ],
+      "cup_upright_cos": 0.726,
+      "cup_mass_g": 59.5,
+      "cup_friction": 0.643,
+      "servo_lag_ms": 35.8,
+      "exposure_gain": 0.992,
+      "video": "results/failure_videos/trial_006.mp4"
+    },
+    {
+      "trial": 7,
+      "success": false,
+      "pick_hold_5cm_3s_ok": false,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "held_tilted_gt_41deg (z=12.8cm, cos=0.69)",
+      "sim_seconds": 18.45,
+      "true_cup_xy_m": [
+        -0.1243,
+        0.3797
+      ],
+      "injected_map_err_cm": [
+        5.11,
+        4.31
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1195,
+        0.3813
+      ],
+      "wrist_align_err_mm": 5.0,
+      "held_cup_z_cm": 12.77,
+      "final_cup_xyz_m": [
+        -0.1305,
+        0.4208,
+        0.1277
+      ],
+      "cup_upright_cos": 0.694,
+      "cup_mass_g": 47.0,
+      "cup_friction": 0.924,
+      "servo_lag_ms": 51.3,
+      "exposure_gain": 1.158,
+      "video": "results/failure_videos/trial_007.mp4"
+    },
+    {
+      "trial": 8,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 22.7,
+      "true_cup_xy_m": [
+        0.0748,
+        0.1718
+      ],
+      "injected_map_err_cm": [
+        -3.59,
+        -2.26
+      ],
+      "wrist_aligned_xy_m": [
+        0.0735,
+        0.1716
+      ],
+      "wrist_align_err_mm": 1.29,
+      "held_cup_z_cm": 10.43,
+      "final_cup_xyz_m": [
+        0.0889,
+        0.2,
+        0.1043
+      ],
+      "cup_upright_cos": 0.889,
+      "cup_mass_g": 34.3,
+      "cup_friction": 0.746,
+      "servo_lag_ms": 51.5,
+      "exposure_gain": 1.023,
+      "video": null
+    },
+    {
+      "trial": 9,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.65,
+      "true_cup_xy_m": [
+        -0.0807,
+        0.3602
+      ],
+      "injected_map_err_cm": [
+        -2.13,
+        -2.4
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0876,
+        0.3592
+      ],
+      "wrist_align_err_mm": 6.96,
+      "held_cup_z_cm": 11.54,
+      "final_cup_xyz_m": [
+        -0.0931,
+        0.4003,
+        0.1154
+      ],
+      "cup_upright_cos": 0.778,
+      "cup_mass_g": 54.1,
+      "cup_friction": 0.683,
+      "servo_lag_ms": 36.4,
+      "exposure_gain": 0.977,
+      "video": null
+    },
+    {
+      "trial": 10,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.6,
+      "true_cup_xy_m": [
+        -0.0944,
+        0.3439
+      ],
+      "injected_map_err_cm": [
+        2.36,
+        -0.21
+      ],
+      "wrist_aligned_xy_m": [
+        -0.094,
+        0.3438
+      ],
+      "wrist_align_err_mm": 0.36,
+      "held_cup_z_cm": 10.38,
+      "final_cup_xyz_m": [
+        -0.0984,
+        0.3703,
+        0.1038
+      ],
+      "cup_upright_cos": 0.852,
+      "cup_mass_g": 57.0,
+      "cup_friction": 0.758,
+      "servo_lag_ms": 30.5,
+      "exposure_gain": 1.051,
+      "video": null
+    },
+    {
+      "trial": 11,
+      "success": false,
+      "pick_hold_5cm_3s_ok": false,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "held_tilted_gt_41deg (z=12.3cm, cos=0.73)",
+      "sim_seconds": 18.45,
+      "true_cup_xy_m": [
+        -0.1002,
+        0.374
+      ],
+      "injected_map_err_cm": [
+        -0.97,
+        -1.65
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1043,
+        0.3733
+      ],
+      "wrist_align_err_mm": 4.22,
+      "held_cup_z_cm": 12.33,
+      "final_cup_xyz_m": [
+        -0.113,
+        0.412,
+        0.1233
+      ],
+      "cup_upright_cos": 0.735,
+      "cup_mass_g": 44.2,
+      "cup_friction": 0.637,
+      "servo_lag_ms": 49.4,
+      "exposure_gain": 1.027,
+      "video": "results/failure_videos/trial_011.mp4"
+    },
+    {
+      "trial": 12,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.6,
+      "true_cup_xy_m": [
+        -0.0062,
+        0.3055
+      ],
+      "injected_map_err_cm": [
+        -2.05,
+        1.07
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0133,
+        0.3063
+      ],
+      "wrist_align_err_mm": 7.13,
+      "held_cup_z_cm": 10.64,
+      "final_cup_xyz_m": [
+        -0.0126,
+        0.3349,
+        0.1064
+      ],
+      "cup_upright_cos": 0.897,
+      "cup_mass_g": 39.6,
+      "cup_friction": 0.796,
+      "servo_lag_ms": 19.4,
+      "exposure_gain": 1.089,
+      "video": null
+    },
+    {
+      "trial": 13,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.3,
+      "true_cup_xy_m": [
+        0.011,
+        0.2342
+      ],
+      "injected_map_err_cm": [
+        3.39,
+        0.87
+      ],
+      "wrist_aligned_xy_m": [
+        0.0183,
+        0.2347
+      ],
+      "wrist_align_err_mm": 7.36,
+      "held_cup_z_cm": 10.66,
+      "final_cup_xyz_m": [
+        0.0233,
+        0.264,
+        0.1066
+      ],
+      "cup_upright_cos": 0.893,
+      "cup_mass_g": 32.5,
+      "cup_friction": 0.801,
+      "servo_lag_ms": 52.4,
+      "exposure_gain": 0.874,
+      "video": null
+    },
+    {
+      "trial": 14,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.3,
+      "true_cup_xy_m": [
+        0.198,
+        0.1688
+      ],
+      "injected_map_err_cm": [
+        -1.16,
+        -0.81
+      ],
+      "wrist_aligned_xy_m": [
+        0.2001,
+        0.1658
+      ],
+      "wrist_align_err_mm": 3.65,
+      "held_cup_z_cm": 10.39,
+      "final_cup_xyz_m": [
+        0.2268,
+        0.1839,
+        0.1039
+      ],
+      "cup_upright_cos": 0.889,
+      "cup_mass_g": 35.8,
+      "cup_friction": 0.695,
+      "servo_lag_ms": 19.8,
+      "exposure_gain": 0.889,
+      "video": null
+    },
+    {
+      "trial": 15,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 24.2,
+      "true_cup_xy_m": [
+        -0.0229,
+        0.1584
+      ],
+      "injected_map_err_cm": [
+        0.65,
+        2.77
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0202,
+        0.1591
+      ],
+      "wrist_align_err_mm": 2.8,
+      "held_cup_z_cm": 11.9,
+      "final_cup_xyz_m": [
+        -0.0341,
+        0.2084,
+        0.119
+      ],
+      "cup_upright_cos": 0.838,
+      "cup_mass_g": 52.8,
+      "cup_friction": 0.994,
+      "servo_lag_ms": 26.1,
+      "exposure_gain": 1.127,
+      "video": null
+    },
+    {
+      "trial": 16,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 20.45,
+      "true_cup_xy_m": [
+        0.1432,
+        0.1573
+      ],
+      "injected_map_err_cm": [
+        -2.67,
+        -4.11
+      ],
+      "wrist_aligned_xy_m": [
+        0.1424,
+        0.1568
+      ],
+      "wrist_align_err_mm": 0.87,
+      "held_cup_z_cm": 10.66,
+      "final_cup_xyz_m": [
+        0.1633,
+        0.177,
+        0.1066
+      ],
+      "cup_upright_cos": 0.896,
+      "cup_mass_g": 50.4,
+      "cup_friction": 0.721,
+      "servo_lag_ms": 42.6,
+      "exposure_gain": 0.895,
+      "video": null
+    },
+    {
+      "trial": 17,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.6,
+      "true_cup_xy_m": [
+        0.0368,
+        0.2497
+      ],
+      "injected_map_err_cm": [
+        6.82,
+        -1.82
+      ],
+      "wrist_aligned_xy_m": [
+        0.0517,
+        0.2485
+      ],
+      "wrist_align_err_mm": 14.96,
+      "held_cup_z_cm": 10.93,
+      "final_cup_xyz_m": [
+        0.0573,
+        0.2761,
+        0.1093
+      ],
+      "cup_upright_cos": 0.893,
+      "cup_mass_g": 52.6,
+      "cup_friction": 0.921,
+      "servo_lag_ms": 35.2,
+      "exposure_gain": 0.918,
+      "video": null
+    },
+    {
+      "trial": 18,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.9,
+      "true_cup_xy_m": [
+        0.0361,
+        0.2105
+      ],
+      "injected_map_err_cm": [
+        0.46,
+        1.51
+      ],
+      "wrist_aligned_xy_m": [
+        0.0371,
+        0.2105
+      ],
+      "wrist_align_err_mm": 1.06,
+      "held_cup_z_cm": 10.71,
+      "final_cup_xyz_m": [
+        0.0436,
+        0.2382,
+        0.1071
+      ],
+      "cup_upright_cos": 0.896,
+      "cup_mass_g": 58.9,
+      "cup_friction": 0.623,
+      "servo_lag_ms": 20.5,
+      "exposure_gain": 1.107,
+      "video": null
+    },
+    {
+      "trial": 19,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.9,
+      "true_cup_xy_m": [
+        -0.0736,
+        0.2957
+      ],
+      "injected_map_err_cm": [
+        2.59,
+        -3.65
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0752,
+        0.2946
+      ],
+      "wrist_align_err_mm": 1.98,
+      "held_cup_z_cm": 10.64,
+      "final_cup_xyz_m": [
+        -0.08,
+        0.3236,
+        0.1064
+      ],
+      "cup_upright_cos": 0.894,
+      "cup_mass_g": 39.3,
+      "cup_friction": 0.903,
+      "servo_lag_ms": 49.1,
+      "exposure_gain": 0.923,
+      "video": null
+    },
+    {
+      "trial": 20,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 20.1,
+      "true_cup_xy_m": [
+        0.014,
+        0.1911
+      ],
+      "injected_map_err_cm": [
+        1.72,
+        -5.34
+      ],
+      "wrist_aligned_xy_m": [
+        0.017,
+        0.1898
+      ],
+      "wrist_align_err_mm": 3.32,
+      "held_cup_z_cm": 9.77,
+      "final_cup_xyz_m": [
+        0.0216,
+        0.2231,
+        0.0977
+      ],
+      "cup_upright_cos": 0.9,
+      "cup_mass_g": 58.1,
+      "cup_friction": 0.707,
+      "servo_lag_ms": 16.8,
+      "exposure_gain": 0.956,
+      "video": null
+    },
+    {
+      "trial": 21,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 20.3,
+      "true_cup_xy_m": [
+        -0.1404,
+        0.2017
+      ],
+      "injected_map_err_cm": [
+        5.97,
+        -1.56
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1376,
+        0.2029
+      ],
+      "wrist_align_err_mm": 3.05,
+      "held_cup_z_cm": 10.71,
+      "final_cup_xyz_m": [
+        -0.1521,
+        0.23,
+        0.1071
+      ],
+      "cup_upright_cos": 0.89,
+      "cup_mass_g": 32.3,
+      "cup_friction": 0.827,
+      "servo_lag_ms": 36.8,
+      "exposure_gain": 1.133,
+      "video": null
+    },
+    {
+      "trial": 22,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 22.75,
+      "true_cup_xy_m": [
+        -0.0679,
+        0.1705
+      ],
+      "injected_map_err_cm": [
+        3.17,
+        -0.85
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0603,
+        0.1737
+      ],
+      "wrist_align_err_mm": 8.21,
+      "held_cup_z_cm": 10.33,
+      "final_cup_xyz_m": [
+        -0.0667,
+        0.2104,
+        0.1033
+      ],
+      "cup_upright_cos": 0.882,
+      "cup_mass_g": 46.8,
+      "cup_friction": 0.852,
+      "servo_lag_ms": 26.3,
+      "exposure_gain": 0.908,
+      "video": null
+    },
+    {
+      "trial": 23,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.6,
+      "true_cup_xy_m": [
+        0.0572,
+        0.2843
+      ],
+      "injected_map_err_cm": [
+        -3.5,
+        -5.03
+      ],
+      "wrist_aligned_xy_m": [
+        0.0605,
+        0.2825
+      ],
+      "wrist_align_err_mm": 3.66,
+      "held_cup_z_cm": 10.61,
+      "final_cup_xyz_m": [
+        0.0687,
+        0.3106,
+        0.1061
+      ],
+      "cup_upright_cos": 0.896,
+      "cup_mass_g": 54.2,
+      "cup_friction": 0.825,
+      "servo_lag_ms": 20.7,
+      "exposure_gain": 0.923,
+      "video": null
+    },
+    {
+      "trial": 24,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.7,
+      "true_cup_xy_m": [
+        -0.0158,
+        0.3426
+      ],
+      "injected_map_err_cm": [
+        -3.66,
+        1.84
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0238,
+        0.3438
+      ],
+      "wrist_align_err_mm": 8.14,
+      "held_cup_z_cm": 11.18,
+      "final_cup_xyz_m": [
+        -0.0228,
+        0.3803,
+        0.1118
+      ],
+      "cup_upright_cos": 0.846,
+      "cup_mass_g": 44.8,
+      "cup_friction": 0.973,
+      "servo_lag_ms": 22.1,
+      "exposure_gain": 0.892,
+      "video": null
+    },
+    {
+      "trial": 25,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.65,
+      "true_cup_xy_m": [
+        -0.048,
+        0.3678
+      ],
+      "injected_map_err_cm": [
+        1.42,
+        -0.63
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0468,
+        0.3684
+      ],
+      "wrist_align_err_mm": 1.38,
+      "held_cup_z_cm": 11.43,
+      "final_cup_xyz_m": [
+        -0.0474,
+        0.4105,
+        0.1143
+      ],
+      "cup_upright_cos": 0.78,
+      "cup_mass_g": 32.1,
+      "cup_friction": 0.667,
+      "servo_lag_ms": 54.9,
+      "exposure_gain": 1.014,
+      "video": null
+    },
+    {
+      "trial": 26,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 20.55,
+      "true_cup_xy_m": [
+        0.0019,
+        0.2214
+      ],
+      "injected_map_err_cm": [
+        -1.42,
+        -4.69
+      ],
+      "wrist_aligned_xy_m": [
+        0.0027,
+        0.2202
+      ],
+      "wrist_align_err_mm": 1.45,
+      "held_cup_z_cm": 10.64,
+      "final_cup_xyz_m": [
+        0.006,
+        0.2489,
+        0.1064
+      ],
+      "cup_upright_cos": 0.896,
+      "cup_mass_g": 39.0,
+      "cup_friction": 0.643,
+      "servo_lag_ms": 28.3,
+      "exposure_gain": 1.072,
+      "video": null
+    },
+    {
+      "trial": 27,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.7,
+      "true_cup_xy_m": [
+        0.0843,
+        0.3705
+      ],
+      "injected_map_err_cm": [
+        -1.95,
+        3.6
+      ],
+      "wrist_aligned_xy_m": [
+        0.0828,
+        0.3713
+      ],
+      "wrist_align_err_mm": 1.75,
+      "held_cup_z_cm": 12.11,
+      "final_cup_xyz_m": [
+        0.0939,
+        0.4082,
+        0.1211
+      ],
+      "cup_upright_cos": 0.758,
+      "cup_mass_g": 41.6,
+      "cup_friction": 0.85,
+      "servo_lag_ms": 35.5,
+      "exposure_gain": 0.847,
+      "video": null
+    },
+    {
+      "trial": 28,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 20.5,
+      "true_cup_xy_m": [
+        -0.1082,
+        0.1526
+      ],
+      "injected_map_err_cm": [
+        -0.51,
+        -1.42
+      ],
+      "wrist_aligned_xy_m": [
+        -0.107,
+        0.1533
+      ],
+      "wrist_align_err_mm": 1.36,
+      "held_cup_z_cm": 10.76,
+      "final_cup_xyz_m": [
+        -0.1218,
+        0.1807,
+        0.1076
+      ],
+      "cup_upright_cos": 0.89,
+      "cup_mass_g": 36.5,
+      "cup_friction": 0.747,
+      "servo_lag_ms": 50.9,
+      "exposure_gain": 1.109,
+      "video": null
+    },
+    {
+      "trial": 29,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.6,
+      "true_cup_xy_m": [
+        0.1306,
+        0.1587
+      ],
+      "injected_map_err_cm": [
+        -0.57,
+        -0.22
+      ],
+      "wrist_aligned_xy_m": [
+        0.1313,
+        0.1578
+      ],
+      "wrist_align_err_mm": 1.12,
+      "held_cup_z_cm": 10.26,
+      "final_cup_xyz_m": [
+        0.1552,
+        0.1792,
+        0.1026
+      ],
+      "cup_upright_cos": 0.894,
+      "cup_mass_g": 50.5,
+      "cup_friction": 0.832,
+      "servo_lag_ms": 51.8,
+      "exposure_gain": 0.924,
+      "video": null
+    },
+    {
+      "trial": 30,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.95,
+      "true_cup_xy_m": [
+        -0.0711,
+        0.2035
+      ],
+      "injected_map_err_cm": [
+        -1.64,
+        5.72
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0732,
+        0.2045
+      ],
+      "wrist_align_err_mm": 2.3,
+      "held_cup_z_cm": 10.69,
+      "final_cup_xyz_m": [
+        -0.0801,
+        0.2327,
+        0.1069
+      ],
+      "cup_upright_cos": 0.895,
+      "cup_mass_g": 30.1,
+      "cup_friction": 0.852,
+      "servo_lag_ms": 37.8,
+      "exposure_gain": 0.852,
+      "video": null
+    },
+    {
+      "trial": 31,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.05,
+      "true_cup_xy_m": [
+        -0.0724,
+        0.3388
+      ],
+      "injected_map_err_cm": [
+        0.5,
+        -4.01
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0618,
+        0.3403
+      ],
+      "wrist_align_err_mm": 10.68,
+      "held_cup_z_cm": 11.09,
+      "final_cup_xyz_m": [
+        -0.0632,
+        0.3761,
+        0.1109
+      ],
+      "cup_upright_cos": 0.844,
+      "cup_mass_g": 32.0,
+      "cup_friction": 0.724,
+      "servo_lag_ms": 26.5,
+      "exposure_gain": 1.112,
+      "video": null
+    },
+    {
+      "trial": 32,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.0,
+      "true_cup_xy_m": [
+        0.0333,
+        0.3076
+      ],
+      "injected_map_err_cm": [
+        -1.9,
+        3.62
+      ],
+      "wrist_aligned_xy_m": [
+        0.027,
+        0.3094
+      ],
+      "wrist_align_err_mm": 6.57,
+      "held_cup_z_cm": 10.67,
+      "final_cup_xyz_m": [
+        0.0322,
+        0.3383,
+        0.1067
+      ],
+      "cup_upright_cos": 0.894,
+      "cup_mass_g": 38.2,
+      "cup_friction": 0.677,
+      "servo_lag_ms": 37.4,
+      "exposure_gain": 1.032,
+      "video": null
+    },
+    {
+      "trial": 33,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.95,
+      "true_cup_xy_m": [
+        -0.1065,
+        0.3612
+      ],
+      "injected_map_err_cm": [
+        2.4,
+        2.54
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1033,
+        0.3625
+      ],
+      "wrist_align_err_mm": 3.43,
+      "held_cup_z_cm": 11.91,
+      "final_cup_xyz_m": [
+        -0.1114,
+        0.3997,
+        0.1191
+      ],
+      "cup_upright_cos": 0.769,
+      "cup_mass_g": 59.0,
+      "cup_friction": 0.738,
+      "servo_lag_ms": 32.5,
+      "exposure_gain": 1.09,
+      "video": null
+    },
+    {
+      "trial": 34,
+      "success": false,
+      "pick_hold_5cm_3s_ok": false,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "lift_or_hold_short (z=-0.0cm, vis=True)",
+      "sim_seconds": 18.1,
+      "true_cup_xy_m": [
+        -0.0613,
+        0.1861
+      ],
+      "injected_map_err_cm": [
+        -1.12,
+        -2.71
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0763,
+        0.1626
+      ],
+      "wrist_align_err_mm": 27.89,
+      "held_cup_z_cm": -0.0,
+      "final_cup_xyz_m": [
+        -0.0651,
+        0.1887,
+        -0.0
+      ],
+      "cup_upright_cos": 1.0,
+      "cup_mass_g": 32.4,
+      "cup_friction": 0.737,
+      "servo_lag_ms": 29.4,
+      "exposure_gain": 0.937,
+      "video": "results/failure_videos/trial_034.mp4"
+    },
+    {
+      "trial": 35,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.85,
+      "true_cup_xy_m": [
+        -0.0475,
+        0.1672
+      ],
+      "injected_map_err_cm": [
+        -1.54,
+        4.6
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0538,
+        0.1736
+      ],
+      "wrist_align_err_mm": 9.02,
+      "held_cup_z_cm": 10.85,
+      "final_cup_xyz_m": [
+        -0.0607,
+        0.2053,
+        0.1085
+      ],
+      "cup_upright_cos": 0.888,
+      "cup_mass_g": 38.0,
+      "cup_friction": 0.637,
+      "servo_lag_ms": 15.7,
+      "exposure_gain": 0.918,
+      "video": null
+    },
+    {
+      "trial": 36,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.05,
+      "true_cup_xy_m": [
+        0.0089,
+        0.3499
+      ],
+      "injected_map_err_cm": [
+        0.39,
+        1.75
+      ],
+      "wrist_aligned_xy_m": [
+        0.0101,
+        0.3499
+      ],
+      "wrist_align_err_mm": 1.25,
+      "held_cup_z_cm": 10.86,
+      "final_cup_xyz_m": [
+        0.0143,
+        0.3828,
+        0.1086
+      ],
+      "cup_upright_cos": 0.847,
+      "cup_mass_g": 55.1,
+      "cup_friction": 0.721,
+      "servo_lag_ms": 40.9,
+      "exposure_gain": 0.852,
+      "video": null
+    },
+    {
+      "trial": 37,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.0,
+      "true_cup_xy_m": [
+        0.1888,
+        0.2924
+      ],
+      "injected_map_err_cm": [
+        2.97,
+        -2.35
+      ],
+      "wrist_aligned_xy_m": [
+        0.1945,
+        0.2885
+      ],
+      "wrist_align_err_mm": 6.86,
+      "held_cup_z_cm": 10.45,
+      "final_cup_xyz_m": [
+        0.2124,
+        0.3111,
+        0.1045
+      ],
+      "cup_upright_cos": 0.849,
+      "cup_mass_g": 51.7,
+      "cup_friction": 0.842,
+      "servo_lag_ms": 52.5,
+      "exposure_gain": 1.046,
+      "video": null
+    },
+    {
+      "trial": 38,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.35,
+      "true_cup_xy_m": [
+        -0.0248,
+        0.2531
+      ],
+      "injected_map_err_cm": [
+        -0.36,
+        -3.55
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0257,
+        0.2523
+      ],
+      "wrist_align_err_mm": 1.23,
+      "held_cup_z_cm": 10.67,
+      "final_cup_xyz_m": [
+        -0.0256,
+        0.2811,
+        0.1067
+      ],
+      "cup_upright_cos": 0.896,
+      "cup_mass_g": 49.8,
+      "cup_friction": 0.759,
+      "servo_lag_ms": 28.0,
+      "exposure_gain": 1.111,
+      "video": null
+    },
+    {
+      "trial": 39,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.55,
+      "true_cup_xy_m": [
+        0.1887,
+        0.312
+      ],
+      "injected_map_err_cm": [
+        4.85,
+        2.0
+      ],
+      "wrist_aligned_xy_m": [
+        0.1924,
+        0.3104
+      ],
+      "wrist_align_err_mm": 4.04,
+      "held_cup_z_cm": 11.71,
+      "final_cup_xyz_m": [
+        0.2141,
+        0.3392,
+        0.1171
+      ],
+      "cup_upright_cos": 0.789,
+      "cup_mass_g": 49.0,
+      "cup_friction": 0.669,
+      "servo_lag_ms": 31.8,
+      "exposure_gain": 1.024,
+      "video": null
+    },
+    {
+      "trial": 40,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.95,
+      "true_cup_xy_m": [
+        -0.0893,
+        0.2519
+      ],
+      "injected_map_err_cm": [
+        -0.91,
+        1.83
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0939,
+        0.2507
+      ],
+      "wrist_align_err_mm": 4.83,
+      "held_cup_z_cm": 10.63,
+      "final_cup_xyz_m": [
+        -0.1012,
+        0.2786,
+        0.1063
+      ],
+      "cup_upright_cos": 0.897,
+      "cup_mass_g": 46.1,
+      "cup_friction": 0.668,
+      "servo_lag_ms": 43.9,
+      "exposure_gain": 1.08,
+      "video": null
+    },
+    {
+      "trial": 41,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.5,
+      "true_cup_xy_m": [
+        0.1701,
+        0.1844
+      ],
+      "injected_map_err_cm": [
+        -2.57,
+        -3.13
+      ],
+      "wrist_aligned_xy_m": [
+        0.172,
+        0.1817
+      ],
+      "wrist_align_err_mm": 3.34,
+      "held_cup_z_cm": 10.66,
+      "final_cup_xyz_m": [
+        0.193,
+        0.2013,
+        0.1066
+      ],
+      "cup_upright_cos": 0.896,
+      "cup_mass_g": 51.2,
+      "cup_friction": 0.82,
+      "servo_lag_ms": 22.9,
+      "exposure_gain": 0.885,
+      "video": null
+    },
+    {
+      "trial": 42,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.35,
+      "true_cup_xy_m": [
+        0.103,
+        0.2593
+      ],
+      "injected_map_err_cm": [
+        2.54,
+        -4.77
+      ],
+      "wrist_aligned_xy_m": [
+        0.1084,
+        0.2574
+      ],
+      "wrist_align_err_mm": 5.77,
+      "held_cup_z_cm": 9.78,
+      "final_cup_xyz_m": [
+        0.1214,
+        0.289,
+        0.0978
+      ],
+      "cup_upright_cos": 0.898,
+      "cup_mass_g": 58.8,
+      "cup_friction": 0.866,
+      "servo_lag_ms": 33.7,
+      "exposure_gain": 1.094,
+      "video": null
+    },
+    {
+      "trial": 43,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.95,
+      "true_cup_xy_m": [
+        0.0378,
+        0.3494
+      ],
+      "injected_map_err_cm": [
+        -3.68,
+        -3.15
+      ],
+      "wrist_aligned_xy_m": [
+        0.0523,
+        0.3474
+      ],
+      "wrist_align_err_mm": 14.63,
+      "held_cup_z_cm": 11.06,
+      "final_cup_xyz_m": [
+        0.0557,
+        0.3773,
+        0.1106
+      ],
+      "cup_upright_cos": 0.846,
+      "cup_mass_g": 30.1,
+      "cup_friction": 0.865,
+      "servo_lag_ms": 52.3,
+      "exposure_gain": 1.159,
+      "video": null
+    },
+    {
+      "trial": 44,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.05,
+      "true_cup_xy_m": [
+        -0.1437,
+        0.3306
+      ],
+      "injected_map_err_cm": [
+        2.13,
+        1.56
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1441,
+        0.3304
+      ],
+      "wrist_align_err_mm": 0.4,
+      "held_cup_z_cm": 9.79,
+      "final_cup_xyz_m": [
+        -0.149,
+        0.3594,
+        0.0979
+      ],
+      "cup_upright_cos": 0.843,
+      "cup_mass_g": 56.5,
+      "cup_friction": 0.816,
+      "servo_lag_ms": 38.4,
+      "exposure_gain": 0.994,
+      "video": null
+    },
+    {
+      "trial": 45,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.2,
+      "true_cup_xy_m": [
+        0.114,
+        0.2447
+      ],
+      "injected_map_err_cm": [
+        7.48,
+        -1.56
+      ],
+      "wrist_aligned_xy_m": [
+        0.1348,
+        0.2388
+      ],
+      "wrist_align_err_mm": 21.62,
+      "held_cup_z_cm": 10.55,
+      "final_cup_xyz_m": [
+        0.1546,
+        0.2632,
+        0.1055
+      ],
+      "cup_upright_cos": 0.89,
+      "cup_mass_g": 52.8,
+      "cup_friction": 0.918,
+      "servo_lag_ms": 36.8,
+      "exposure_gain": 0.875,
+      "video": null
+    },
+    {
+      "trial": 46,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 20.65,
+      "true_cup_xy_m": [
+        0.0532,
+        0.1731
+      ],
+      "injected_map_err_cm": [
+        1.33,
+        2.81
+      ],
+      "wrist_aligned_xy_m": [
+        0.0552,
+        0.1731
+      ],
+      "wrist_align_err_mm": 2.06,
+      "held_cup_z_cm": 10.83,
+      "final_cup_xyz_m": [
+        0.0675,
+        0.2014,
+        0.1083
+      ],
+      "cup_upright_cos": 0.891,
+      "cup_mass_g": 37.3,
+      "cup_friction": 0.67,
+      "servo_lag_ms": 36.2,
+      "exposure_gain": 1.136,
+      "video": null
+    },
+    {
+      "trial": 47,
+      "success": false,
+      "pick_hold_5cm_3s_ok": false,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "lift_or_hold_short (z=-0.0cm, vis=True)",
+      "sim_seconds": 19.0,
+      "true_cup_xy_m": [
+        0.0399,
+        0.2261
+      ],
+      "injected_map_err_cm": [
+        -8.01,
+        5.36
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0337,
+        0.284
+      ],
+      "wrist_align_err_mm": 93.62,
+      "held_cup_z_cm": -0.0,
+      "final_cup_xyz_m": [
+        0.0399,
+        0.2262,
+        -0.0
+      ],
+      "cup_upright_cos": 1.0,
+      "cup_mass_g": 31.6,
+      "cup_friction": 0.653,
+      "servo_lag_ms": 31.1,
+      "exposure_gain": 0.859,
+      "video": "results/failure_videos/trial_047.mp4"
+    },
+    {
+      "trial": 48,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.4,
+      "true_cup_xy_m": [
+        0.1252,
+        0.2703
+      ],
+      "injected_map_err_cm": [
+        2.11,
+        -3.91
+      ],
+      "wrist_aligned_xy_m": [
+        0.1328,
+        0.2666
+      ],
+      "wrist_align_err_mm": 8.47,
+      "held_cup_z_cm": 10.34,
+      "final_cup_xyz_m": [
+        0.1487,
+        0.2946,
+        0.1034
+      ],
+      "cup_upright_cos": 0.89,
+      "cup_mass_g": 40.1,
+      "cup_friction": 0.667,
+      "servo_lag_ms": 27.5,
+      "exposure_gain": 0.886,
+      "video": null
+    },
+    {
+      "trial": 49,
+      "success": false,
+      "pick_hold_5cm_3s_ok": false,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "lift_or_hold_short (z=-0.0cm, vis=True)",
+      "sim_seconds": 25.55,
+      "true_cup_xy_m": [
+        -0.0078,
+        0.2165
+      ],
+      "injected_map_err_cm": [
+        4.18,
+        -7.83
+      ],
+      "wrist_aligned_xy_m": [
+        0.0333,
+        0.145
+      ],
+      "wrist_align_err_mm": 82.52,
+      "held_cup_z_cm": -0.0,
+      "final_cup_xyz_m": [
+        -0.0078,
+        0.2165,
+        -0.0
+      ],
+      "cup_upright_cos": 1.0,
+      "cup_mass_g": 41.2,
+      "cup_friction": 0.662,
+      "servo_lag_ms": 17.2,
+      "exposure_gain": 0.961,
+      "video": "results/failure_videos/trial_049.mp4"
+    },
+    {
+      "trial": 50,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.05,
+      "true_cup_xy_m": [
+        0.1533,
+        0.2674
+      ],
+      "injected_map_err_cm": [
+        2.0,
+        2.95
+      ],
+      "wrist_aligned_xy_m": [
+        0.1614,
+        0.2647
+      ],
+      "wrist_align_err_mm": 8.5,
+      "held_cup_z_cm": 11.09,
+      "final_cup_xyz_m": [
+        0.1826,
+        0.2938,
+        0.1109
+      ],
+      "cup_upright_cos": 0.878,
+      "cup_mass_g": 41.6,
+      "cup_friction": 0.621,
+      "servo_lag_ms": 15.6,
+      "exposure_gain": 1.079,
+      "video": null
+    },
+    {
+      "trial": 51,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.5,
+      "true_cup_xy_m": [
+        0.1034,
+        0.2057
+      ],
+      "injected_map_err_cm": [
+        -2.67,
+        -1.28
+      ],
+      "wrist_aligned_xy_m": [
+        0.1016,
+        0.2055
+      ],
+      "wrist_align_err_mm": 1.83,
+      "held_cup_z_cm": 10.65,
+      "final_cup_xyz_m": [
+        0.1163,
+        0.2304,
+        0.1065
+      ],
+      "cup_upright_cos": 0.897,
+      "cup_mass_g": 50.6,
+      "cup_friction": 0.671,
+      "servo_lag_ms": 40.8,
+      "exposure_gain": 1.038,
+      "video": null
+    },
+    {
+      "trial": 52,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.75,
+      "true_cup_xy_m": [
+        0.0039,
+        0.326
+      ],
+      "injected_map_err_cm": [
+        -1.96,
+        -0.71
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0012,
+        0.3262
+      ],
+      "wrist_align_err_mm": 5.12,
+      "held_cup_z_cm": 11.74,
+      "final_cup_xyz_m": [
+        0.0019,
+        0.3699,
+        0.1174
+      ],
+      "cup_upright_cos": 0.85,
+      "cup_mass_g": 48.9,
+      "cup_friction": 0.786,
+      "servo_lag_ms": 42.3,
+      "exposure_gain": 1.145,
+      "video": null
+    },
+    {
+      "trial": 53,
+      "success": false,
+      "pick_hold_5cm_3s_ok": false,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "held_tilted_gt_41deg (z=12.2cm, cos=0.75)",
+      "sim_seconds": 18.9,
+      "true_cup_xy_m": [
+        -0.0835,
+        0.373
+      ],
+      "injected_map_err_cm": [
+        2.7,
+        3.1
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0811,
+        0.374
+      ],
+      "wrist_align_err_mm": 2.55,
+      "held_cup_z_cm": 12.18,
+      "final_cup_xyz_m": [
+        -0.0869,
+        0.413,
+        0.1218
+      ],
+      "cup_upright_cos": 0.749,
+      "cup_mass_g": 32.2,
+      "cup_friction": 0.968,
+      "servo_lag_ms": 49.1,
+      "exposure_gain": 0.939,
+      "video": "results/failure_videos/trial_053.mp4"
+    },
+    {
+      "trial": 54,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.4,
+      "true_cup_xy_m": [
+        -0.1052,
+        0.2742
+      ],
+      "injected_map_err_cm": [
+        5.57,
+        -0.18
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0993,
+        0.2765
+      ],
+      "wrist_align_err_mm": 6.33,
+      "held_cup_z_cm": 10.53,
+      "final_cup_xyz_m": [
+        -0.1066,
+        0.3072,
+        0.1053
+      ],
+      "cup_upright_cos": 0.889,
+      "cup_mass_g": 33.4,
+      "cup_friction": 0.651,
+      "servo_lag_ms": 44.3,
+      "exposure_gain": 0.859,
+      "video": null
+    },
+    {
+      "trial": 55,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.6,
+      "true_cup_xy_m": [
+        -0.085,
+        0.3228
+      ],
+      "injected_map_err_cm": [
+        -3.45,
+        -2.3
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0974,
+        0.3204
+      ],
+      "wrist_align_err_mm": 12.66,
+      "held_cup_z_cm": 11.85,
+      "final_cup_xyz_m": [
+        -0.106,
+        0.361,
+        0.1185
+      ],
+      "cup_upright_cos": 0.835,
+      "cup_mass_g": 38.3,
+      "cup_friction": 0.9,
+      "servo_lag_ms": 15.1,
+      "exposure_gain": 0.977,
+      "video": null
+    },
+    {
+      "trial": 56,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.15,
+      "true_cup_xy_m": [
+        -0.1175,
+        0.2132
+      ],
+      "injected_map_err_cm": [
+        2.34,
+        2.98
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1146,
+        0.2159
+      ],
+      "wrist_align_err_mm": 4.01,
+      "held_cup_z_cm": 10.66,
+      "final_cup_xyz_m": [
+        -0.1265,
+        0.2417,
+        0.1066
+      ],
+      "cup_upright_cos": 0.897,
+      "cup_mass_g": 46.1,
+      "cup_friction": 0.885,
+      "servo_lag_ms": 48.5,
+      "exposure_gain": 0.977,
+      "video": null
+    },
+    {
+      "trial": 57,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 22.45,
+      "true_cup_xy_m": [
+        0.0372,
+        0.1549
+      ],
+      "injected_map_err_cm": [
+        -0.07,
+        1.96
+      ],
+      "wrist_aligned_xy_m": [
+        0.035,
+        0.1561
+      ],
+      "wrist_align_err_mm": 2.54,
+      "held_cup_z_cm": 12.13,
+      "final_cup_xyz_m": [
+        0.0548,
+        0.2002,
+        0.1213
+      ],
+      "cup_upright_cos": 0.836,
+      "cup_mass_g": 43.8,
+      "cup_friction": 0.828,
+      "servo_lag_ms": 45.1,
+      "exposure_gain": 0.923,
+      "video": null
+    },
+    {
+      "trial": 58,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.0,
+      "true_cup_xy_m": [
+        -0.1149,
+        0.2428
+      ],
+      "injected_map_err_cm": [
+        1.4,
+        -1.06
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1167,
+        0.2417
+      ],
+      "wrist_align_err_mm": 2.2,
+      "held_cup_z_cm": 10.4,
+      "final_cup_xyz_m": [
+        -0.1278,
+        0.2719,
+        0.104
+      ],
+      "cup_upright_cos": 0.89,
+      "cup_mass_g": 46.4,
+      "cup_friction": 0.771,
+      "servo_lag_ms": 20.3,
+      "exposure_gain": 1.069,
+      "video": null
+    },
+    {
+      "trial": 59,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.1,
+      "true_cup_xy_m": [
+        0.1918,
+        0.2049
+      ],
+      "injected_map_err_cm": [
+        -2.14,
+        2.15
+      ],
+      "wrist_aligned_xy_m": [
+        0.1905,
+        0.2068
+      ],
+      "wrist_align_err_mm": 2.29,
+      "held_cup_z_cm": 10.67,
+      "final_cup_xyz_m": [
+        0.2116,
+        0.226,
+        0.1067
+      ],
+      "cup_upright_cos": 0.897,
+      "cup_mass_g": 43.5,
+      "cup_friction": 0.612,
+      "servo_lag_ms": 47.2,
+      "exposure_gain": 0.934,
+      "video": null
+    },
+    {
+      "trial": 60,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.2,
+      "true_cup_xy_m": [
+        0.0177,
+        0.2135
+      ],
+      "injected_map_err_cm": [
+        -5.5,
+        3.48
+      ],
+      "wrist_aligned_xy_m": [
+        0.0035,
+        0.2166
+      ],
+      "wrist_align_err_mm": 14.6,
+      "held_cup_z_cm": 10.73,
+      "final_cup_xyz_m": [
+        0.0104,
+        0.2471,
+        0.1073
+      ],
+      "cup_upright_cos": 0.886,
+      "cup_mass_g": 45.7,
+      "cup_friction": 0.609,
+      "servo_lag_ms": 53.2,
+      "exposure_gain": 1.085,
+      "video": null
+    },
+    {
+      "trial": 61,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.55,
+      "true_cup_xy_m": [
+        0.0193,
+        0.2266
+      ],
+      "injected_map_err_cm": [
+        3.97,
+        -1.86
+      ],
+      "wrist_aligned_xy_m": [
+        0.0265,
+        0.226
+      ],
+      "wrist_align_err_mm": 7.23,
+      "held_cup_z_cm": 10.62,
+      "final_cup_xyz_m": [
+        0.0319,
+        0.2559,
+        0.1062
+      ],
+      "cup_upright_cos": 0.891,
+      "cup_mass_g": 42.3,
+      "cup_friction": 0.791,
+      "servo_lag_ms": 18.3,
+      "exposure_gain": 0.849,
+      "video": null
+    },
+    {
+      "trial": 62,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.6,
+      "true_cup_xy_m": [
+        0.1328,
+        0.1703
+      ],
+      "injected_map_err_cm": [
+        -5.77,
+        0.94
+      ],
+      "wrist_aligned_xy_m": [
+        0.1267,
+        0.1744
+      ],
+      "wrist_align_err_mm": 7.29,
+      "held_cup_z_cm": 10.86,
+      "final_cup_xyz_m": [
+        0.1447,
+        0.1945,
+        0.1086
+      ],
+      "cup_upright_cos": 0.898,
+      "cup_mass_g": 43.2,
+      "cup_friction": 0.645,
+      "servo_lag_ms": 35.3,
+      "exposure_gain": 1.134,
+      "video": null
+    },
+    {
+      "trial": 63,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.5,
+      "true_cup_xy_m": [
+        -0.1218,
+        0.2497
+      ],
+      "injected_map_err_cm": [
+        -6.23,
+        0.21
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1327,
+        0.2462
+      ],
+      "wrist_align_err_mm": 11.48,
+      "held_cup_z_cm": 8.93,
+      "final_cup_xyz_m": [
+        -0.1476,
+        0.2812,
+        0.0893
+      ],
+      "cup_upright_cos": 0.903,
+      "cup_mass_g": 51.2,
+      "cup_friction": 0.875,
+      "servo_lag_ms": 40.4,
+      "exposure_gain": 1.042,
+      "video": null
+    },
+    {
+      "trial": 64,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.35,
+      "true_cup_xy_m": [
+        0.0022,
+        0.2641
+      ],
+      "injected_map_err_cm": [
+        -4.56,
+        -0.37
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0056,
+        0.2642
+      ],
+      "wrist_align_err_mm": 7.82,
+      "held_cup_z_cm": 10.47,
+      "final_cup_xyz_m": [
+        -0.0026,
+        0.2957,
+        0.1047
+      ],
+      "cup_upright_cos": 0.89,
+      "cup_mass_g": 39.9,
+      "cup_friction": 0.665,
+      "servo_lag_ms": 40.3,
+      "exposure_gain": 0.844,
+      "video": null
+    },
+    {
+      "trial": 65,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.55,
+      "true_cup_xy_m": [
+        0.0186,
+        0.2145
+      ],
+      "injected_map_err_cm": [
+        -1.38,
+        -4.09
+      ],
+      "wrist_aligned_xy_m": [
+        0.017,
+        0.2134
+      ],
+      "wrist_align_err_mm": 1.97,
+      "held_cup_z_cm": 10.4,
+      "final_cup_xyz_m": [
+        0.0229,
+        0.2449,
+        0.104
+      ],
+      "cup_upright_cos": 0.89,
+      "cup_mass_g": 38.5,
+      "cup_friction": 0.694,
+      "servo_lag_ms": 34.2,
+      "exposure_gain": 1.051,
+      "video": null
+    },
+    {
+      "trial": 66,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.8,
+      "true_cup_xy_m": [
+        -0.092,
+        0.3308
+      ],
+      "injected_map_err_cm": [
+        3.16,
+        -1.15
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0909,
+        0.3301
+      ],
+      "wrist_align_err_mm": 1.34,
+      "held_cup_z_cm": 11.25,
+      "final_cup_xyz_m": [
+        -0.0982,
+        0.3671,
+        0.1125
+      ],
+      "cup_upright_cos": 0.841,
+      "cup_mass_g": 30.7,
+      "cup_friction": 0.894,
+      "servo_lag_ms": 41.1,
+      "exposure_gain": 1.153,
+      "video": null
+    },
+    {
+      "trial": 67,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 20.75,
+      "true_cup_xy_m": [
+        -0.1469,
+        0.1664
+      ],
+      "injected_map_err_cm": [
+        8.26,
+        5.36
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1349,
+        0.1778
+      ],
+      "wrist_align_err_mm": 16.57,
+      "held_cup_z_cm": 10.6,
+      "final_cup_xyz_m": [
+        -0.1521,
+        0.2042,
+        0.106
+      ],
+      "cup_upright_cos": 0.89,
+      "cup_mass_g": 59.5,
+      "cup_friction": 0.674,
+      "servo_lag_ms": 52.7,
+      "exposure_gain": 1.135,
+      "video": null
+    },
+    {
+      "trial": 68,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 20.05,
+      "true_cup_xy_m": [
+        0.0016,
+        0.2887
+      ],
+      "injected_map_err_cm": [
+        -1.14,
+        -7.89
+      ],
+      "wrist_aligned_xy_m": [
+        0.0066,
+        0.2877
+      ],
+      "wrist_align_err_mm": 5.11,
+      "held_cup_z_cm": 10.62,
+      "final_cup_xyz_m": [
+        0.0098,
+        0.3164,
+        0.1062
+      ],
+      "cup_upright_cos": 0.896,
+      "cup_mass_g": 58.5,
+      "cup_friction": 0.82,
+      "servo_lag_ms": 54.7,
+      "exposure_gain": 0.992,
+      "video": null
+    },
+    {
+      "trial": 69,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.2,
+      "true_cup_xy_m": [
+        -0.0104,
+        0.3578
+      ],
+      "injected_map_err_cm": [
+        -0.79,
+        1.37
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0125,
+        0.3585
+      ],
+      "wrist_align_err_mm": 2.13,
+      "held_cup_z_cm": 10.37,
+      "final_cup_xyz_m": [
+        -0.0104,
+        0.3851,
+        0.1037
+      ],
+      "cup_upright_cos": 0.851,
+      "cup_mass_g": 46.9,
+      "cup_friction": 0.737,
+      "servo_lag_ms": 52.6,
+      "exposure_gain": 1.086,
+      "video": null
+    },
+    {
+      "trial": 70,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.05,
+      "true_cup_xy_m": [
+        0.1546,
+        0.2967
+      ],
+      "injected_map_err_cm": [
+        1.96,
+        0.56
+      ],
+      "wrist_aligned_xy_m": [
+        0.1618,
+        0.2943
+      ],
+      "wrist_align_err_mm": 7.61,
+      "held_cup_z_cm": 11.41,
+      "final_cup_xyz_m": [
+        0.1849,
+        0.3279,
+        0.1141
+      ],
+      "cup_upright_cos": 0.834,
+      "cup_mass_g": 35.2,
+      "cup_friction": 0.871,
+      "servo_lag_ms": 49.8,
+      "exposure_gain": 1.121,
+      "video": null
+    },
+    {
+      "trial": 71,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 21.1,
+      "true_cup_xy_m": [
+        0.0756,
+        0.1656
+      ],
+      "injected_map_err_cm": [
+        5.4,
+        3.35
+      ],
+      "wrist_aligned_xy_m": [
+        0.0898,
+        0.1608
+      ],
+      "wrist_align_err_mm": 14.99,
+      "held_cup_z_cm": 10.58,
+      "final_cup_xyz_m": [
+        0.1055,
+        0.1888,
+        0.1058
+      ],
+      "cup_upright_cos": 0.887,
+      "cup_mass_g": 30.2,
+      "cup_friction": 0.646,
+      "servo_lag_ms": 26.6,
+      "exposure_gain": 0.869,
+      "video": null
+    },
+    {
+      "trial": 72,
+      "success": false,
+      "pick_hold_5cm_3s_ok": false,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "lift_or_hold_short (z=-0.0cm, vis=True)",
+      "sim_seconds": 18.7,
+      "true_cup_xy_m": [
+        -0.0921,
+        0.1803
+      ],
+      "injected_map_err_cm": [
+        0.43,
+        -4.62
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0942,
+        0.145
+      ],
+      "wrist_align_err_mm": 35.36,
+      "held_cup_z_cm": -0.0,
+      "final_cup_xyz_m": [
+        -0.0921,
+        0.1803,
+        -0.0
+      ],
+      "cup_upright_cos": 1.0,
+      "cup_mass_g": 56.1,
+      "cup_friction": 0.788,
+      "servo_lag_ms": 37.0,
+      "exposure_gain": 0.962,
+      "video": "results/failure_videos/trial_072.mp4"
+    },
+    {
+      "trial": 73,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.25,
+      "true_cup_xy_m": [
+        -0.0435,
+        0.2201
+      ],
+      "injected_map_err_cm": [
+        0.86,
+        -1.87
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0431,
+        0.22
+      ],
+      "wrist_align_err_mm": 0.4,
+      "held_cup_z_cm": 10.4,
+      "final_cup_xyz_m": [
+        -0.0456,
+        0.252,
+        0.104
+      ],
+      "cup_upright_cos": 0.89,
+      "cup_mass_g": 32.9,
+      "cup_friction": 0.95,
+      "servo_lag_ms": 34.1,
+      "exposure_gain": 0.923,
+      "video": null
+    },
+    {
+      "trial": 74,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.6,
+      "true_cup_xy_m": [
+        0.095,
+        0.2238
+      ],
+      "injected_map_err_cm": [
+        5.43,
+        -4.31
+      ],
+      "wrist_aligned_xy_m": [
+        0.1091,
+        0.2184
+      ],
+      "wrist_align_err_mm": 15.11,
+      "held_cup_z_cm": 10.71,
+      "final_cup_xyz_m": [
+        0.1224,
+        0.2437,
+        0.1071
+      ],
+      "cup_upright_cos": 0.896,
+      "cup_mass_g": 55.8,
+      "cup_friction": 0.737,
+      "servo_lag_ms": 34.2,
+      "exposure_gain": 0.94,
+      "video": null
+    },
+    {
+      "trial": 75,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.7,
+      "true_cup_xy_m": [
+        0.0009,
+        0.3339
+      ],
+      "injected_map_err_cm": [
+        -0.57,
+        0.3
+      ],
+      "wrist_aligned_xy_m": [
+        -0.001,
+        0.334
+      ],
+      "wrist_align_err_mm": 1.87,
+      "held_cup_z_cm": 11.77,
+      "final_cup_xyz_m": [
+        0.0023,
+        0.3775,
+        0.1177
+      ],
+      "cup_upright_cos": 0.839,
+      "cup_mass_g": 30.1,
+      "cup_friction": 0.901,
+      "servo_lag_ms": 16.7,
+      "exposure_gain": 1.055,
+      "video": null
+    },
+    {
+      "trial": 76,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.35,
+      "true_cup_xy_m": [
+        0.091,
+        0.1823
+      ],
+      "injected_map_err_cm": [
+        0.24,
+        4.5
+      ],
+      "wrist_aligned_xy_m": [
+        0.0873,
+        0.1853
+      ],
+      "wrist_align_err_mm": 4.76,
+      "held_cup_z_cm": 10.68,
+      "final_cup_xyz_m": [
+        0.1016,
+        0.2103,
+        0.1068
+      ],
+      "cup_upright_cos": 0.896,
+      "cup_mass_g": 44.9,
+      "cup_friction": 0.881,
+      "servo_lag_ms": 30.2,
+      "exposure_gain": 1.093,
+      "video": null
+    },
+    {
+      "trial": 77,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.75,
+      "true_cup_xy_m": [
+        -0.1124,
+        0.2436
+      ],
+      "injected_map_err_cm": [
+        6.95,
+        -3.38
+      ],
+      "wrist_aligned_xy_m": [
+        -0.117,
+        0.2396
+      ],
+      "wrist_align_err_mm": 6.12,
+      "held_cup_z_cm": 10.41,
+      "final_cup_xyz_m": [
+        -0.1288,
+        0.2694,
+        0.1041
+      ],
+      "cup_upright_cos": 0.889,
+      "cup_mass_g": 36.1,
+      "cup_friction": 0.738,
+      "servo_lag_ms": 52.1,
+      "exposure_gain": 1.021,
+      "video": null
+    },
+    {
+      "trial": 78,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.4,
+      "true_cup_xy_m": [
+        -0.0405,
+        0.2789
+      ],
+      "injected_map_err_cm": [
+        5.25,
+        -1.51
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0327,
+        0.2799
+      ],
+      "wrist_align_err_mm": 7.85,
+      "held_cup_z_cm": 10.74,
+      "final_cup_xyz_m": [
+        -0.0343,
+        0.3083,
+        0.1074
+      ],
+      "cup_upright_cos": 0.894,
+      "cup_mass_g": 55.7,
+      "cup_friction": 0.777,
+      "servo_lag_ms": 39.1,
+      "exposure_gain": 1.071,
+      "video": null
+    },
+    {
+      "trial": 79,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.1,
+      "true_cup_xy_m": [
+        -0.1054,
+        0.2301
+      ],
+      "injected_map_err_cm": [
+        -7.08,
+        1.14
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1206,
+        0.2258
+      ],
+      "wrist_align_err_mm": 15.77,
+      "held_cup_z_cm": 10.77,
+      "final_cup_xyz_m": [
+        -0.13,
+        0.2565,
+        0.1077
+      ],
+      "cup_upright_cos": 0.882,
+      "cup_mass_g": 39.6,
+      "cup_friction": 0.855,
+      "servo_lag_ms": 22.7,
+      "exposure_gain": 0.972,
+      "video": null
+    },
+    {
+      "trial": 80,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.8,
+      "true_cup_xy_m": [
+        -0.089,
+        0.2337
+      ],
+      "injected_map_err_cm": [
+        -3.78,
+        -1.12
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1033,
+        0.2311
+      ],
+      "wrist_align_err_mm": 14.58,
+      "held_cup_z_cm": 10.73,
+      "final_cup_xyz_m": [
+        -0.112,
+        0.2588,
+        0.1073
+      ],
+      "cup_upright_cos": 0.894,
+      "cup_mass_g": 36.8,
+      "cup_friction": 0.687,
+      "servo_lag_ms": 21.5,
+      "exposure_gain": 0.942,
+      "video": null
+    },
+    {
+      "trial": 81,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.0,
+      "true_cup_xy_m": [
+        -0.0738,
+        0.3586
+      ],
+      "injected_map_err_cm": [
+        -4.24,
+        -1.27
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0833,
+        0.3579
+      ],
+      "wrist_align_err_mm": 9.56,
+      "held_cup_z_cm": 11.54,
+      "final_cup_xyz_m": [
+        -0.0902,
+        0.3982,
+        0.1154
+      ],
+      "cup_upright_cos": 0.782,
+      "cup_mass_g": 44.1,
+      "cup_friction": 0.671,
+      "servo_lag_ms": 46.5,
+      "exposure_gain": 1.069,
+      "video": null
+    },
+    {
+      "trial": 82,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.85,
+      "true_cup_xy_m": [
+        -0.1,
+        0.2831
+      ],
+      "injected_map_err_cm": [
+        -0.98,
+        0.48
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1089,
+        0.2809
+      ],
+      "wrist_align_err_mm": 9.19,
+      "held_cup_z_cm": 10.61,
+      "final_cup_xyz_m": [
+        -0.1161,
+        0.3086,
+        0.1061
+      ],
+      "cup_upright_cos": 0.897,
+      "cup_mass_g": 46.6,
+      "cup_friction": 0.822,
+      "servo_lag_ms": 48.5,
+      "exposure_gain": 0.971,
+      "video": null
+    },
+    {
+      "trial": 83,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.7,
+      "true_cup_xy_m": [
+        0.1974,
+        0.2898
+      ],
+      "injected_map_err_cm": [
+        0.01,
+        -1.04
+      ],
+      "wrist_aligned_xy_m": [
+        0.2015,
+        0.2868
+      ],
+      "wrist_align_err_mm": 5.11,
+      "held_cup_z_cm": 9.9,
+      "final_cup_xyz_m": [
+        0.2223,
+        0.3091,
+        0.099
+      ],
+      "cup_upright_cos": 0.846,
+      "cup_mass_g": 52.8,
+      "cup_friction": 0.982,
+      "servo_lag_ms": 35.9,
+      "exposure_gain": 0.888,
+      "video": null
+    },
+    {
+      "trial": 84,
+      "success": false,
+      "pick_hold_5cm_3s_ok": false,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "lift_or_hold_short (z=-0.0cm, vis=True)",
+      "sim_seconds": 20.65,
+      "true_cup_xy_m": [
+        0.0189,
+        0.1511
+      ],
+      "injected_map_err_cm": [
+        9.49,
+        -3.88
+      ],
+      "wrist_aligned_xy_m": [
+        0.0841,
+        0.145
+      ],
+      "wrist_align_err_mm": 65.46,
+      "held_cup_z_cm": -0.0,
+      "final_cup_xyz_m": [
+        0.018,
+        0.1514,
+        -0.0
+      ],
+      "cup_upright_cos": 1.0,
+      "cup_mass_g": 57.6,
+      "cup_friction": 0.691,
+      "servo_lag_ms": 50.6,
+      "exposure_gain": 0.989,
+      "video": "results/failure_videos/trial_084.mp4"
+    },
+    {
+      "trial": 85,
+      "success": false,
+      "pick_hold_5cm_3s_ok": false,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "lift_or_hold_short (z=-0.0cm, vis=True)",
+      "sim_seconds": 29.55,
+      "true_cup_xy_m": [
+        0.0322,
+        0.301
+      ],
+      "injected_map_err_cm": [
+        -2.86,
+        8.7
+      ],
+      "wrist_aligned_xy_m": [
+        0.0114,
+        0.385
+      ],
+      "wrist_align_err_mm": 86.55,
+      "held_cup_z_cm": -0.0,
+      "final_cup_xyz_m": [
+        0.0206,
+        0.3336,
+        -0.0
+      ],
+      "cup_upright_cos": 1.0,
+      "cup_mass_g": 53.1,
+      "cup_friction": 0.727,
+      "servo_lag_ms": 36.6,
+      "exposure_gain": 1.128,
+      "video": "results/failure_videos/trial_085.mp4"
+    },
+    {
+      "trial": 86,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.95,
+      "true_cup_xy_m": [
+        0.0416,
+        0.2039
+      ],
+      "injected_map_err_cm": [
+        -1.06,
+        -2.6
+      ],
+      "wrist_aligned_xy_m": [
+        0.0362,
+        0.2052
+      ],
+      "wrist_align_err_mm": 5.62,
+      "held_cup_z_cm": 10.66,
+      "final_cup_xyz_m": [
+        0.0429,
+        0.233,
+        0.1066
+      ],
+      "cup_upright_cos": 0.897,
+      "cup_mass_g": 53.2,
+      "cup_friction": 0.621,
+      "servo_lag_ms": 22.0,
+      "exposure_gain": 0.997,
+      "video": null
+    },
+    {
+      "trial": 87,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.05,
+      "true_cup_xy_m": [
+        -0.1221,
+        0.3381
+      ],
+      "injected_map_err_cm": [
+        -0.85,
+        1.87
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1276,
+        0.3374
+      ],
+      "wrist_align_err_mm": 5.52,
+      "held_cup_z_cm": 10.27,
+      "final_cup_xyz_m": [
+        -0.1333,
+        0.3614,
+        0.1027
+      ],
+      "cup_upright_cos": 0.848,
+      "cup_mass_g": 39.5,
+      "cup_friction": 0.986,
+      "servo_lag_ms": 20.8,
+      "exposure_gain": 1.135,
+      "video": null
+    },
+    {
+      "trial": 88,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 20.35,
+      "true_cup_xy_m": [
+        0.1064,
+        0.1557
+      ],
+      "injected_map_err_cm": [
+        -2.14,
+        -4.76
+      ],
+      "wrist_aligned_xy_m": [
+        0.1022,
+        0.1582
+      ],
+      "wrist_align_err_mm": 4.93,
+      "held_cup_z_cm": 10.43,
+      "final_cup_xyz_m": [
+        0.1217,
+        0.1831,
+        0.1043
+      ],
+      "cup_upright_cos": 0.89,
+      "cup_mass_g": 46.6,
+      "cup_friction": 0.874,
+      "servo_lag_ms": 46.5,
+      "exposure_gain": 1.045,
+      "video": null
+    },
+    {
+      "trial": 89,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.3,
+      "true_cup_xy_m": [
+        0.114,
+        0.3256
+      ],
+      "injected_map_err_cm": [
+        1.17,
+        1.85
+      ],
+      "wrist_aligned_xy_m": [
+        0.1187,
+        0.3245
+      ],
+      "wrist_align_err_mm": 4.8,
+      "held_cup_z_cm": 10.94,
+      "final_cup_xyz_m": [
+        0.1339,
+        0.3556,
+        0.1094
+      ],
+      "cup_upright_cos": 0.845,
+      "cup_mass_g": 42.7,
+      "cup_friction": 0.864,
+      "servo_lag_ms": 40.6,
+      "exposure_gain": 0.942,
+      "video": null
+    },
+    {
+      "trial": 90,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.95,
+      "true_cup_xy_m": [
+        0.0553,
+        0.262
+      ],
+      "injected_map_err_cm": [
+        1.05,
+        -1.56
+      ],
+      "wrist_aligned_xy_m": [
+        0.0592,
+        0.261
+      ],
+      "wrist_align_err_mm": 3.96,
+      "held_cup_z_cm": 10.59,
+      "final_cup_xyz_m": [
+        0.0679,
+        0.2883,
+        0.1059
+      ],
+      "cup_upright_cos": 0.897,
+      "cup_mass_g": 57.8,
+      "cup_friction": 0.682,
+      "servo_lag_ms": 16.1,
+      "exposure_gain": 1.043,
+      "video": null
+    },
+    {
+      "trial": 91,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.8,
+      "true_cup_xy_m": [
+        -0.1142,
+        0.3485
+      ],
+      "injected_map_err_cm": [
+        3.33,
+        1.57
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1123,
+        0.3499
+      ],
+      "wrist_align_err_mm": 2.4,
+      "held_cup_z_cm": 11.66,
+      "final_cup_xyz_m": [
+        -0.1211,
+        0.3857,
+        0.1166
+      ],
+      "cup_upright_cos": 0.792,
+      "cup_mass_g": 41.1,
+      "cup_friction": 0.638,
+      "servo_lag_ms": 34.1,
+      "exposure_gain": 0.943,
+      "video": null
+    },
+    {
+      "trial": 92,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.4,
+      "true_cup_xy_m": [
+        0.1317,
+        0.2711
+      ],
+      "injected_map_err_cm": [
+        -2.89,
+        -1.49
+      ],
+      "wrist_aligned_xy_m": [
+        0.1308,
+        0.2714
+      ],
+      "wrist_align_err_mm": 1.04,
+      "held_cup_z_cm": 10.62,
+      "final_cup_xyz_m": [
+        0.1453,
+        0.2964,
+        0.1062
+      ],
+      "cup_upright_cos": 0.897,
+      "cup_mass_g": 58.2,
+      "cup_friction": 0.899,
+      "servo_lag_ms": 16.9,
+      "exposure_gain": 1.153,
+      "video": null
+    },
+    {
+      "trial": 93,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.9,
+      "true_cup_xy_m": [
+        -0.115,
+        0.3624
+      ],
+      "injected_map_err_cm": [
+        7.01,
+        1.64
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1083,
+        0.3652
+      ],
+      "wrist_align_err_mm": 7.25,
+      "held_cup_z_cm": 12.12,
+      "final_cup_xyz_m": [
+        -0.1173,
+        0.4032,
+        0.1212
+      ],
+      "cup_upright_cos": 0.754,
+      "cup_mass_g": 50.7,
+      "cup_friction": 0.65,
+      "servo_lag_ms": 38.3,
+      "exposure_gain": 0.908,
+      "video": null
+    },
+    {
+      "trial": 94,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.2,
+      "true_cup_xy_m": [
+        -0.1231,
+        0.2933
+      ],
+      "injected_map_err_cm": [
+        1.45,
+        2.35
+      ],
+      "wrist_aligned_xy_m": [
+        -0.1242,
+        0.2937
+      ],
+      "wrist_align_err_mm": 1.16,
+      "held_cup_z_cm": 11.13,
+      "final_cup_xyz_m": [
+        -0.1379,
+        0.3373,
+        0.1113
+      ],
+      "cup_upright_cos": 0.856,
+      "cup_mass_g": 50.5,
+      "cup_friction": 0.847,
+      "servo_lag_ms": 30.2,
+      "exposure_gain": 1.039,
+      "video": null
+    },
+    {
+      "trial": 95,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.6,
+      "true_cup_xy_m": [
+        0.1492,
+        0.2602
+      ],
+      "injected_map_err_cm": [
+        4.27,
+        -5.53
+      ],
+      "wrist_aligned_xy_m": [
+        0.1583,
+        0.2541
+      ],
+      "wrist_align_err_mm": 10.96,
+      "held_cup_z_cm": 10.65,
+      "final_cup_xyz_m": [
+        0.175,
+        0.2787,
+        0.1065
+      ],
+      "cup_upright_cos": 0.894,
+      "cup_mass_g": 40.4,
+      "cup_friction": 0.832,
+      "servo_lag_ms": 54.7,
+      "exposure_gain": 0.966,
+      "video": null
+    },
+    {
+      "trial": 96,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.6,
+      "true_cup_xy_m": [
+        0.1173,
+        0.1922
+      ],
+      "injected_map_err_cm": [
+        3.29,
+        4.74
+      ],
+      "wrist_aligned_xy_m": [
+        0.1231,
+        0.1906
+      ],
+      "wrist_align_err_mm": 5.99,
+      "held_cup_z_cm": 10.7,
+      "final_cup_xyz_m": [
+        0.1411,
+        0.214,
+        0.107
+      ],
+      "cup_upright_cos": 0.894,
+      "cup_mass_g": 41.1,
+      "cup_friction": 0.84,
+      "servo_lag_ms": 50.6,
+      "exposure_gain": 1.117,
+      "video": null
+    },
+    {
+      "trial": 97,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 18.45,
+      "true_cup_xy_m": [
+        -0.0273,
+        0.2999
+      ],
+      "injected_map_err_cm": [
+        0.92,
+        0.36
+      ],
+      "wrist_aligned_xy_m": [
+        -0.0257,
+        0.2999
+      ],
+      "wrist_align_err_mm": 1.54,
+      "held_cup_z_cm": 10.67,
+      "final_cup_xyz_m": [
+        -0.0249,
+        0.3292,
+        0.1067
+      ],
+      "cup_upright_cos": 0.895,
+      "cup_mass_g": 39.4,
+      "cup_friction": 0.801,
+      "servo_lag_ms": 29.2,
+      "exposure_gain": 0.97,
+      "video": null
+    },
+    {
+      "trial": 98,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 20.75,
+      "true_cup_xy_m": [
+        0.0525,
+        0.1983
+      ],
+      "injected_map_err_cm": [
+        3.93,
+        -3.83
+      ],
+      "wrist_aligned_xy_m": [
+        0.0616,
+        0.1954
+      ],
+      "wrist_align_err_mm": 9.55,
+      "held_cup_z_cm": 10.64,
+      "final_cup_xyz_m": [
+        0.0724,
+        0.2225,
+        0.1064
+      ],
+      "cup_upright_cos": 0.896,
+      "cup_mass_g": 51.2,
+      "cup_friction": 0.841,
+      "servo_lag_ms": 37.4,
+      "exposure_gain": 1.015,
+      "video": null
+    },
+    {
+      "trial": 99,
+      "success": true,
+      "pick_hold_5cm_3s_ok": true,
+      "aborted": false,
+      "stage": "done_hold",
+      "failure_reason": "",
+      "sim_seconds": 19.15,
+      "true_cup_xy_m": [
+        -0.1343,
+        0.3463
+      ],
+      "injected_map_err_cm": [
+        -4.3,
+        2.02
+      ],
+      "wrist_aligned_xy_m": [
+        -0.142,
+        0.3437
+      ],
+      "wrist_align_err_mm": 8.13,
+      "held_cup_z_cm": 11.76,
+      "final_cup_xyz_m": [
+        -0.1546,
+        0.3787,
+        0.1176
+      ],
+      "cup_upright_cos": 0.781,
+      "cup_mass_g": 59.5,
+      "cup_friction": 0.927,
+      "servo_lag_ms": 29.2,
+      "exposure_gain": 0.953,
+      "video": null
+    }
+  ]
+}

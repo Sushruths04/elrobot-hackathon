@@ -1,8 +1,13 @@
-# Issues (IDs 101+ = Sushruth's rig; 001..015 = Bart's macOS session, listed at the bottom). Next ID: ISSUE-113
+# Issues (IDs 101+ = Sushruth's rig; 001..015 = Bart's macOS session, listed at the bottom). Next ID: ISSUE-116
+
+### ISSUE-115 - `calibration/table_front.json` corners were touched from behind the robot (180-deg swapped)
+- **Status:** fix ready (`calibration/table_front_180fix.json`, original file kept untouched)
+- **Evidence:** reprojecting robot base `(0, 0, 0.05)` through `table_front.json` lands at pixel `(169, 463)` (bottom-left empty table) instead of `(304, 134)` (top-center robot base in `board_frame_front.jpg`). Matching the 4 touched jaw-tip positions in `touch_points_front.json` with a 180-deg perspective swap (`TL<->BR`, `TR<->BL`) onto the outer `10x7` pattern border drops mean corner residual from **26.4 mm to 6.1 mm**, reprojects the base to `(304, 134)`, and reprojects the `real_snapshot.json` jaw tip to `(262, 204)` (inside the cup rim in `now_arm.jpg`).
+- **Next:** verify with plan-only Step 4 of `docs/REAL_RUNBOOK.md` on live camera before `--go`.
 
 ### ISSUE-101 - Station default torque caps may make arms weak / trip overload
-- **Status:** open (verified registers, effect suspected)
-- **Evidence:** all 16 motors: max torque 500/1000, torque limit 1000, P16 I0 D0, protection current 500, overload torque 25, protective torque 20. Leader motor 4 showed status `0x20` (Overload) once.
+- **Status:** reproduced in calibrated MuJoCo twin; fix ready in `scripts/servo_diag_and_fix.py`
+- **Evidence:** all 16 motors: max torque 500/1000, torque limit 1000, P16 I0 D0, protection current 500, overload torque 25, protective torque 20. Leader motor 4 showed status `0x20` (Overload) once. In MuJoCo twin (`results/twin_validation.json`), `ELROBOT_PID` (`P=16, I=0, D=0`) produces `< 0.68 N*m` on `-40` ticks (`dj3=4, dj4=13` vs real `0, 13`), while `P=36, I=12, D=20, MaxTorque=850, TorqueLimit=850, OverloadTorque=85` restores full `44/43`-tick tracking.
 - **Cause:** Station writes these defaults at freeze (`drivers/st3215/src/presets.rs`). Not changed by us.
 - **Next:** decide with a human before writing EEPROM.
 
