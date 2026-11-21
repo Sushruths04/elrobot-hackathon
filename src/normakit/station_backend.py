@@ -238,7 +238,7 @@ class StationBackend(Backend):
         vals = {}
         for i, g in goals_norm.items():
             j = st.joints[i]
-            vals[i] = int(round(j.lo + g * (j.hi - j.lo))).to_bytes(2, "little")
+            vals[i] = (int(round(j.lo + g * ((j.hi - j.lo) % 4096))) % 4096).to_bytes(2, "little")
         self._sync(REG_GOAL_POS, vals)
 
     def halt(self):

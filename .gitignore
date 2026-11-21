@@ -14,8 +14,9 @@ __pycache__/
 *.pyc
 .env
 
-# competitive strategy docs: kept local for now
-docs/02_TASK_PREDICTIONS.md
-docs/03_WINNING_ANGLES.md
-docs/06_CRAZY_PROJECT.md
-docs/07_VISION_LIVING_DESK.md
+
+# self-made print sheets (the official OpenCV board in calibration/official/ is the one to use)
+calibration/PRINT_*.pdf
+calibration/ARUCO_markers_A4.pdf
+calibration/aruco_page*.png
+calibration/checkerboard_*.png

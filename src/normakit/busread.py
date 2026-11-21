@@ -34,7 +34,7 @@ async def snapshot(host="localhost:8888", client=None, queue=None):
             s = bytes(m.get_state())
             lo, hi = m.get_range_min(), m.get_range_max()
             pos = sb._pos(s)
-            d[m.get_id()] = dict(pos=pos, lo=lo, hi=hi, norm=norm_of(pos, lo, hi), torque=s[0x28], temp=s[0x3F], frozen=bool(m.get_range_freezed()),
+            d[m.get_id()] = dict(pos=pos, lo=lo, hi=hi, norm=norm_of(pos, lo, hi), torque=s[0x28], temp=s[0x3F], frozen=bool(m.get_range_freezed()), status=s[0x41],
                                  cur=int.from_bytes(s[0x45:0x47], "little"))
         out[bus.get_bus().get_serial_number()] = d
     return out, client, q

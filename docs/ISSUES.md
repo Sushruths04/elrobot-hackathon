@@ -23,3 +23,19 @@
 
 ### ISSUE-105 - Station camera frames 299x224
 - **Status:** open. `usb-video.resize_target: 224` in the original config; `run/station.yaml` now sets `resolution: auto`, `resize_target: 0` (needs Station restart, not yet applied).
+
+### ISSUE-106 - Cameras drop off USB / Station cannot open them (-3)
+- **Status:** open (blocker)
+- **Evidence:** one KD camera (`2c7f:4a60`) of two is missing; the other re-enumerates with new device numbers (11, 13, 26, 27, 30) and is then not writable (`Failed to open device ... -3`). At 14:10 `lsusb` showed 0 KD cameras. Camera 0 when it did stream: brightness 13-16/255 (almost black); its queue grew, the other queue stayed flat.
+- **Cause:** suspected loose/damaged cable or overloaded shared hub (unverified). Permission part is certain (device node root-owned).
+- **Next:** direct laptop ports, one camera at a time; udev rule `SUBSYSTEM=="usb", ATTR{idVendor}=="2c7f", ATTR{idProduct}=="4a60", MODE="0666"`.
+
+### ISSUE-107 - Leader/follower motion may be opposite on some joints (unverified)
+- **Status:** open, needs a human to look
+- **Detail:** Station mirroring maps percent -> percent, so a servo mounted reversed gives opposite physical motion. Calibration records only min/max ticks, not direction. URDF prediction when ticks increase: tip goes down for joints 2, 3, 4 and 6; joint 1 yaws +. Gripper direction not derivable.
+- **Next:** move each joint slowly and record same/opposite (incl. trigger vs gripper); then custom teleop with invert flags.
+
+### ISSUE-108 - Follower joint 2 lags the leader while moving
+- **Status:** investigating
+- **Evidence:** 40 s sample: leader j2 54-62% (14 deg), follower 65-82% (31 deg), mean lag 18 points; no faults, current 4 mA, no protection-block lines in that window. Gap closed to ~1 point at rest.
+- **Cause:** unknown (delay/speed vs start offset). Re-test with slow single-joint moves.

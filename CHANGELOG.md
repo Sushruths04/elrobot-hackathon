@@ -13,3 +13,13 @@
 ### Hardware
 - 2026-11-21 - Follower `5B8E114691` auto-calibrated and frozen. Leader `5B79016336` calibrated manually; joints 5 and 7 short (see ISSUE-103)
 - 2026-11-21 - Roles confirmed by movement test: leader `5B79016336` (/dev/ttyACM0), follower `5B8E114691` (/dev/ttyACM1)
+
+## [Unreleased] - 2026-11-21 afternoon
+### Added
+- `calibration/official/`: OpenCV's official 9x6 chessboard (`pattern.png`, unmodified, 25 mm squares) + A4 print PDF
+- `scripts/calibrate_camera.py` (lens + table homography, `--ruler-mm` print-scale correction), `snap_cams.py`, `first_motion.py` (guarded, needs `--yes`), `make_checkerboard.py`, `make_aruco.py`
+- `docs/NEXT_STEPS.md`, `docs/SETUP.md`; strategy docs 02, 03, 06, 07 added to the repo at the owner's request
+### Fixed
+- `StationBackend.send_goals`: goal wraps modulo 4096
+### Changed
+- `run/station.yaml`: `resolution: auto`, `resize_target: 0` (not applied until Station restart)
