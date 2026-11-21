@@ -26,3 +26,4 @@ Claim a task by writing your name next to it. Ask a human before any arm motion 
 - 2026-11-21 15:58 — **Bart's Mac has the arms** (both buses + 1 camera b309a703). Both arms NOT SAVED here (ISSUE-109) → recalibrating: follower auto, leader manual (`tools/calibrate.py`) — in progress, Bart + Claude.
 - 2026-11-21 15:45 — Follower calibrated on Bart's Mac (all 8 saved, spans match reference; m1 now 1972 ≈ URDF 2021). **Leader manual calibration next** (needs a human sweeping every joint). Local link `vendor/norma-core-src -> ../repo/norma-core` makes Sushruth's scripts work on the Mac.
 - 2026-11-21 15:52 — Leader manual sweep abandoned (hard to tell joints apart); team switching to **web-UI Auto Calibrate for the leader**. Watch for ISSUE-003 (erratic leader auto-cal earlier today).
+- 2026-11-21 15:55 — Leader auto-cal done but joints 3/4/5 short (ISSUE-111). **Do not start mirroring.** Next: manual leader calibration.

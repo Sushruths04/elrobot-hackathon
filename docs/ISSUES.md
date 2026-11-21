@@ -1,4 +1,4 @@
-# Issues (IDs 101+ = Sushruth's rig; 001..015 = Bart's macOS session, listed at the bottom). Next ID: ISSUE-111
+# Issues (IDs 101+ = Sushruth's rig; 001..015 = Bart's macOS session, listed at the bottom). Next ID: ISSUE-112
 
 ### ISSUE-101 - Station default torque caps may make arms weak / trip overload
 - **Status:** open (verified registers, effect suspected)
@@ -59,6 +59,16 @@
 - **Cause (known):** Station adds the EEPROM offset only while collecting an UNSAVED range (`port_meta.rs` ~l.410); once saved, ranges are in Present-Position space (the servo applies the offset itself). The 12:25 "fix" generalised that wrongly.
 - **Impact:** `--move-test` would have computed its goal from the wrong position (up to ~1900 steps off). It was never run.
 - **Fix:** frozen motors use raw Present Position; unsaved motors keep raw + offset.
+
+
+### ISSUE-111 - Leader auto-calibration stops early on joints 3, 4, 5 (false stalls)
+- **Status:** open
+- **Found:** 2026-11-21 15:53 by Claude (web-UI Auto Calibrate on Bart's Mac, completed "successfully" 14:52:00Z)
+- **Where:** leader `5B79016336`
+- **Evidence:** saved spans m3 1526, m4 996, m5 **436** (vs follower 2322 / 2326 / 3836; Sushruth's manual leader cal 2274 / 1918 / 1758). Log: `Motor 3 - Stalled at position 4002` in the same second it started; `Motor 5 - Stalled at position 3750` after ~1 s, then `Motor 5 in error state, recovering`. Auto-cal sets current limits m5 = 15, m7 = 15, m6 = 20, m8 = 10.
+- **Cause (suspected):** the 7.4 V low-gear leader servos with the handle hit the low stall-current threshold from load/gravity before the real hard stop. Unverified. Related: ISSUE-003, ISSUE-103.
+- **Impact:** with mirroring, leader m5's 38 deg range maps onto the follower's full m5 range (~9x gain) -> jerky / unexpected follower wrist motion. Don't mirror until fixed.
+- **Fix / workaround:** calibrate the leader by hand (`tools/calibrate.py reset` + `watch` with the `<<< MOVING` marker, then `save`).
 
 ---
 
