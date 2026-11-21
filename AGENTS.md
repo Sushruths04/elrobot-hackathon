@@ -27,3 +27,6 @@ otherwise the shell CLI: `python -m normakit.robotctl <verb>` (images land in `r
 - Calibration (grip depth, jaw opening) in JSON from teleop demos; object positions measured live, never hardcoded.
 - Grasp: close fully, wait for the jaw to stop, +2 s, then lift. Ask the owner for a teleop demo when geometry is unclear.
 - Report evidence before editing code that worked; never delete irreplaceable data; keep replies terse.
+9. macOS laptop: read-only check `python3 tools/verify_station.py`; HOLD `python3 tools/estop.py` (see docs/SETUP.md, macOS section).
+10. Calibration without the web UI: `python3 tools/calibrate.py watch|reset|save|auto|stop --bus leader|follower` (reset/auto: human at the table, support the arm).
+11. Object detection (read-only): `.venv/bin/python tools/detect_live.py [--prompts "red bull can,cup"] [--source station|webcam|files]`; in code `normakit.detect.Detector(...).find(jpeg, "cup")`. Prompts: short nouns work best.

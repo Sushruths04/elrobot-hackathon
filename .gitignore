@@ -28,3 +28,10 @@ run/pose_pairs.json
 run/station.yaml.bak*
 run/*.npz
 run/touch*.log
+# Bart (macOS) tools
+repo/
+snapshots/
+
+# YOLO weights (downloaded on first run)
+models/
+*.pt

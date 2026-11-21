@@ -1,0 +1,25 @@
+--- a/software/station/examples/st3215-remote-teleop-py/main.py
++++ b/software/station/examples/st3215-remote-teleop-py/main.py
+@@ -291,7 +291,10 @@
+         follower_motor_ids,
+     )
+ 
+-    config = MotorConfig()
++    config = MotorConfig(max_speed=args.max_speed, max_accel=args.max_accel,
++                         min_speed=min(MotorConfig.min_speed, args.max_speed),
++                         min_accel=min(MotorConfig.min_accel, args.max_accel))
++    logging.info("Speed cap: max_speed=%d max_accel=%d", config.max_speed, config.max_accel)
+ 
+     await set_torque(follower_client, follower_serial, follower_motor_ids, enable=True)
+ 
+@@ -329,6 +332,10 @@
+     parser.add_argument("--leader-bus", default="auto", help='Leader bus serial, or "auto" for single-bus station')
+     parser.add_argument("--follower-server", required=True, help="Station address for the follower bus")
+     parser.add_argument("--follower-bus", default="auto", help='Follower bus serial, or "auto" for single-bus station')
++    parser.add_argument("--max-speed", type=int, default=800,
++                        help="cap follower speed in steps/s (upstream default 3300 = near full speed)")
++    parser.add_argument("--max-accel", type=int, default=30,
++                        help="cap follower acceleration (upstream default 100)")
+     args = parser.parse_args()
+ 
+     try:
