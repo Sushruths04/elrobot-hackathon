@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+- 2026-11-21 15:40 - Merged Bart's macOS work onto this repo: `tools/` (verify_station, estop, reset_calibration, speed_limit), `start_station.sh`, `restart_station.sh`, `patches/teleop-max-speed.patch`, `docs/CONCEPTS.md`; ISSUE-001..015 appended to `docs/ISSUES.md`; macOS section in `docs/SETUP.md`; tools now find upstream at `vendor/norma-core-src`; `.gitignore` += `repo/`, `snapshots/` - Bart + Claude
 - 2026-11-21 - `scripts/twin_view.py`: renders both real arms from live joint data (`run/twin.png`), using the Station viewer's mapping
 - 2026-11-21 - `scripts/identify_arm.py`, `set_home.py`, `dump_buses.py`, `monitor_calib.py`, `backup_calibration.py`, `mirror_state.py`; `./norma` shortcuts
 - 2026-11-21 - `src/normakit/busread.py` read-only bus snapshot; `StationBackend` reads follower bus from `run/buses.json`

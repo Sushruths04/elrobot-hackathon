@@ -1,4 +1,4 @@
-# Issues (IDs start at 101 to avoid clashing with the teammate repo's ISSUE-001..015)
+# Issues (IDs 101+ = Sushruth's rig; 001..015 = Bart's macOS session, listed at the bottom). Next ID: ISSUE-109
 
 ### ISSUE-101 - Station default torque caps may make arms weak / trip overload
 - **Status:** open (verified registers, effect suspected)
@@ -39,3 +39,118 @@
 - **Status:** investigating
 - **Evidence:** 40 s sample: leader j2 54-62% (14 deg), follower 65-82% (31 deg), mean lag 18 points; no faults, current 4 mA, no protection-block lines in that window. Gap closed to ~1 point at rest.
 - **Cause:** unknown (delay/speed vs start offset). Re-test with slow single-joint moves.
+
+---
+
+## ISSUE-001..015 — from Bart's macOS repo (bpachniewsk1/normacore-hackathon), merged 2026-11-21
+Original IDs kept (no clash with 101+). Some overlap with 101+: 002 ~ 106 (cameras), 008 is superseded by the follower auto-calibration in this repo.
+
+| ID | Title | Status |
+|---|---|---|
+| 001 | Servo boards didn't enumerate on USB | resolved |
+| 002 | Camera `386869c0` sends black frames | open |
+| 003 | Leader auto-calibration moved erratically | open |
+| 004 | Leader saved calibration inconsistent with servo offsets | resolved |
+| 005 | Leader motor 6 error status `0x08` (latched) | open |
+| 006 | Leader servos stopped responding after power cycle | open |
+| 007 | Torque went off after `estop.py` HOLD on leader | investigating |
+| 008 | Follower never calibrated | open |
+| 009 | Station has no dedicated e-stop | won't fix (workaround) |
+| 010 | Opening web-UI calibration page silently resets the bus | known gotcha |
+| 011 | Speed caps are hard-coded in Station (mirroring 3300, auto-cal 365) | workaround |
+| 012 | All USB devices share one bus-powered hub (~1.3 A) | risk |
+| 013 | Stored camera frames only 299×224 | open |
+| 014 | No documented start pose for ElRobot auto-calibration | open (ask staff) |
+| 015 | Our `repo/norma-core` copy has no `.git` | known |
+
+---
+
+### ISSUE-001 — Servo boards didn't enumerate on USB
+- **Status:** resolved
+- **Found:** 2026-11-21 ~11:50 by Bart
+- **Where:** both servo boards
+- **Symptom:** no `/dev/cu.usbmodem*`, Station log `joints=0`.
+- **Cause:** suspected cable/port/power (not confirmed which).
+- **Fix:** after re-cabling, both boards show as `1a86:55d3` (CH343) → `/dev/cu.usbmodem5B790163361` (leader), `/dev/cu.usbmodem5B8E1146911` (follower).
+
+### ISSUE-002 — Camera `386869c0` sends black frames
+- **Status:** open
+- **Found:** 2026-11-21 12:10 by Claude
+- **Where:** USB camera, Station queue `usbvideo/386869c07ab99f1d5b103f3b6a381f2f`
+- **Symptom:** streams 30 fps but every JPEG is a constant 2489 B, solid black (`snapshots/cam_386869c0.jpg`). Camera `191fd589` works.
+- **Cause:** unknown — lens cap / covered / faulty sensor suspected.
+- **Fix / workaround:** check physically; `verify_station.py` warns on black frames.
+
+### ISSUE-003 — Leader auto-calibration moved erratically
+- **Status:** open
+- **Found:** 2026-11-21 ~12:05 by team
+- **Where:** leader `5B79016336`, web-UI Auto Calibrate
+- **Symptom:** "moving weird and uncontrolled". Station restarted afterwards, so the progress state was lost.
+- **Cause (suspected, from code reading):** (a) the single ElRobot routine (`drivers/st3215/src/auto_calibrate/elrobot.rs`) drives into hard stops and releases torque on some joints between steps by design; (b) the leader is a different build (handle + trigger, no gripper) but gets the same fixed shift offsets; (c) the leader's low-ratio 7.4 V servos are back-drivable, so gravity confuses stall detection (velocity < 10) at the reduced torque limit 300.
+- **Fix / workaround:** manual calibration (Reset → move each joint to both stops → Save). See SETUP.md. Blocked by ISSUE-005/006.
+
+### ISSUE-004 — Leader saved calibration inconsistent with servo offsets
+- **Status:** resolved
+- **Found:** 2026-11-21 12:15 by Claude
+- **Symptom:** ranges saved (centred on 2048) but servo offsets = 0 → 6/8 motors outside their range. Motors 3 and 5 had torque on with goals far from position (3398→244, 2366→157), straining.
+- **Fix:** reset via `tools/reset_calibration.py` at 12:26 → NOT SAVED.
+
+### ISSUE-005 — Leader motor 6 error status `0x08` (latched)
+- **Status:** open
+- **Found:** 2026-11-21 12:35 by Claude (log: `Motor 6 has errors: [Range], skip calibration data`, ~47×/s)
+- **Where:** leader `5B79016336`, motor 6
+- **Evidence:** status byte (0x41) = `0x08` while torque = 0, current = 0, load = 0, temp 30 °C. Its goal was 2905 while other leader motors showed 0 after reset. Follower motor 6 is clean.
+- **Cause (suspected):** Station labels bit 3 "Range"; on Feetech STS servos bit 3 is usually over-current → probably latched from earlier strain. Unverified.
+- **Impact:** Station skips motor 6 data → range stuck `[0,0]` → **leader can't be calibrated** (auto or manual).
+- **Fix / workaround:** power-cycle the servo supply; if it persists at rest, check the joint mechanically / swap servo (ask staff).
+
+### ISSUE-006 — Leader servos stopped responding after power cycle
+- **Status:** open
+- **Found:** 2026-11-21 12:40 by Claude
+- **Symptom:** leader board opens (`Successfully opened ST3215 port`) but 0 motors answer, even after 2 Station restarts. No error lines. Follower re-detected fine after its power cycle.
+- **Cause (suspected):** leader servo power not reconnected (PSU, barrel jack, board→servo cable). Unverified — leader then disconnected.
+- **Fix / workaround:** check 7.4 V PSU LED, barrel jack, servo LED blink on power-up, 3-pin cable. Station re-detects motors automatically, no restart needed.
+
+### ISSUE-007 — Torque went off after `estop.py` HOLD on leader
+- **Status:** investigating
+- **Found:** 2026-11-21 12:22 by Claude
+- **Symptom:** HOLD wrote goal = current position correctly, but ~1 s later all leader motors had torque 0 and the arm sagged (shoulder ~83°, wrist ~90°).
+- **Evidence:** HOLD sends no torque write. `current-threshold` only applies inside mirroring (`motors-mirroring/src/inference/mirror.rs`).
+- **Cause:** unknown — suspects: Station's stop-mirror handling, or servo overload protection after the earlier strain.
+- **Fix / workaround:** treat HOLD as possibly dropping the arm until understood; power plug is the real e-stop. Re-test on a healthy, calibrated arm.
+
+### ISSUE-008 — Follower never calibrated
+- **Status:** open
+- **Where:** follower `5B8E114691` (12 V)
+- **Symptom:** ranges are only "seen so far" (e.g. `[114,114]`), `NOT SAVED`; Station inference skips every frame (`invalid_range`).
+- **Fix:** calibrate (auto or manual). Support the arm — reset turns torque off.
+
+### ISSUE-009 — Station has no dedicated e-stop
+- **Status:** won't fix (workaround)
+- **Detail:** only "Stop Calibration" (torque off during auto-cal) and mirroring current threshold. Workaround: `tools/estop.py` + physical power plug within reach.
+
+### ISSUE-010 — Opening web-UI calibration page silently resets the bus
+- **Status:** known gotcha
+- **Evidence:** `station-viewer/src/pages/St3215BusCalibrationPage.tsx` sends stop-mirror + `resetCalibration` in a `useEffect` on page open → torque off, calibration cleared.
+- **Workaround:** only open it when you intend to (re)calibrate; support the arm first.
+
+### ISSUE-011 — Speed caps hard-coded in Station
+- **Status:** workaround
+- **Detail:** web-UI mirroring max_speed 3300 / accel 100 (`motors-mirroring/src/config.rs`, not in station.yaml); auto-cal speed 365 / accel 50 (`st3215/src/presets.rs`). Writing Goal Speed ourselves is overwritten by these.
+- **Workaround:** use Python teleop example with `--max-speed` (our patch); own tools write speed before moves. Changing Station requires a Rust rebuild.
+
+### ISSUE-012 — All USB devices on one bus-powered hub
+- **Status:** risk
+- **Detail:** Mac USB-C → WCH adapter (1a86:8095) → Genesys USB 2.0 hub → 2 servo boards (138 mA each) + 2 cameras (500 mA each) ≈ 1.3 A, 480 Mb/s shared. Works now; if devices drop out under load, power the hub or split cameras to another port.
+
+### ISSUE-013 — Stored camera frames only 299×224
+- **Status:** open
+- **Detail:** `usb-video.resize_target: 224` in station.yaml → ~2.7 mm/px over 60 cm. Raise for perception if needed (more disk + CPU).
+
+### ISSUE-014 — No documented start pose for ElRobot auto-calibration
+- **Status:** open (ask NormaCore staff)
+- **Detail:** code sweeps each joint ≤ ~360° from wherever it is until stall, so pose only matters for not hitting table/frame first. Our recommendation (unverified): folded compact rest pose, base centred, wrist straight, gripper half open.
+
+### ISSUE-015 — Our `repo/norma-core` copy has no `.git`
+- **Status:** known
+- **Detail:** session move didn't copy `.git`. Fine for running examples; to update, re-clone (see SETUP.md). Our only upstream edit is the teleop `--max-speed` patch (CHANGELOG).

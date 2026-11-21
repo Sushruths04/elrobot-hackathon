@@ -10,3 +10,12 @@
 - **3D viewer mapping** (`station-viewer .../elrobot/config.ts`): joints 1-7 linear over URDF limits; gripper (motor 8) flipped.
 - **Official board:** `calibration/official/opencv_pattern_9x6_25mm_A4_*` = OpenCV's `doc/pattern.png`, 9x6 inner corners, 25.00 mm squares (measured), A4 landscape.
 - **Read-only tools:** `./norma status|identify|backup|smoke`, `scripts/dump_buses.py`, `monitor_calib.py`, `twin_view.py`, `snap_cams.py`. Moving tools: `first_motion.py` (needs `--yes`).
+
+## macOS laptop (Bart) — merged from bpachniewsk1/normacore-hackathon
+- Serial ports appear as `/dev/cu.usbmodem<bus-serial>1` (leader `/dev/cu.usbmodem5B790163361`, follower `/dev/cu.usbmodem5B8E1146911`), not `/dev/ttyACM*`. `./norma` and `run/buses.json` assume Linux.
+- Station binary (macOS arm64 zip) lives in `~/Downloads` by default: `./restart_station.sh` (background, log `logs/station-latest.log`), `./restart_station.sh stop`, `./start_station.sh` (foreground). Override with `STATION_DIR=/path`.
+- `tools/` finds the upstream Python client at `vendor/norma-core-src`, else `repo/norma-core`, else `$NORMA_CORE`.
+- Read-only: `python3 tools/verify_station.py [--watch]` (USB, Station, per-motor pos=raw+offset / torque / current / temp / voltage / range / saved flag / error status, cameras + black-frame check).
+- Moving / torque: `tools/estop.py` (HOLD = stop mirroring + goal = current; `--limp` = torque off), `tools/reset_calibration.py --bus SN` (= web-UI Reset, torque off), `tools/speed_limit.py` (Goal Speed 0x2E + Acc 0x29; never applied on hardware).
+- `patches/teleop-max-speed.patch`: adds `--max-speed`/`--max-accel` to upstream `st3215-remote-teleop-py` (apply with `git -C vendor/norma-core-src apply ../../patches/teleop-max-speed.patch`; untested on hardware).
+- Auto-calibration (`elrobot.rs`): only for exactly 8 motors IDs 1–8; stall-sweeps each joint up to ~360° from the current pose at fixed speed 365 / accel 50 / torque limit 300 — clear the workspace. Mirroring max speed is hard-coded (3300) in `motors-mirroring/src/config.rs`.

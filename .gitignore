@@ -20,3 +20,7 @@ calibration/PRINT_*.pdf
 calibration/ARUCO_markers_A4.pdf
 calibration/aruco_page*.png
 calibration/checkerboard_*.png
+
+# Bart (macOS) tools
+repo/
+snapshots/

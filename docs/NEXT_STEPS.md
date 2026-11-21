@@ -20,3 +20,6 @@ Claim a task by writing your name next to it. Ask a human before any arm motion 
 | 6 | Redo leader joints 5 and 7 (manual sweep) - ISSUE-103 | spans >= ~3500 ticks | open |
 | 7 | First motion test `scripts/first_motion.py --joint 8 --delta 0.03 --yes` (mirroring OFF, human present) | joint moves ~3% and returns | open |
 | 8 | Table camera -> robot mapping (`calibrate_camera.py --table`), then Claude tool loop (`src/normakit/mcp_server.py`, `elrobot-real`) | pick a block by pixel | open |
+
+## Notes
+- 2026-11-21 15:40 — Bart's macOS repo merged in (tools/, start/restart scripts, ISSUE-001..015). Bart's repo `bpachniewsk1/normacore-hackathon` is superseded by this one.

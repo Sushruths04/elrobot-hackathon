@@ -20,3 +20,4 @@ otherwise the shell CLI: `python -m normakit.robotctl <verb>` (images land in `r
 6. Opening a bus's calibration page in the web UI auto-resets that bus. Only open it to recalibrate.
 7. Never run two writers on the same bus (web-UI mirroring, Python teleop, MCP/agent). Two opposite mirrors can run at once and fight.
 8. Document every change: `CHANGELOG.md`; every problem: `docs/ISSUES.md` (label guesses as guesses).
+9. macOS laptop: read-only check `python3 tools/verify_station.py`; HOLD `python3 tools/estop.py` (see docs/SETUP.md, macOS section).
