@@ -41,10 +41,18 @@ def drv(c):
     return commands.DriverCommand(type=drivers.StationCommandType.STC_ST3215_COMMAND, body=c.encode())
 
 
+_queues = {}
+
+
 async def read_state(client, timeout=3.0):
-    q = asyncio.Queue()
-    client.follow("st3215/inference", q)
+    # subscribe ONCE per client (a new follow() per call piles up subscriptions -> timeouts)
+    q = _queues.get(id(client))
+    if q is None:
+        q = _queues[id(client)] = asyncio.Queue()
+        client.follow("st3215/inference", q)
     e = await asyncio.wait_for(q.get(), timeout)
+    while not q.empty():          # skip to the newest entry
+        e = q.get_nowait()
     st = st3215.InferenceStateReader(memoryview(bytes(e.Data)))
     out = {}
     for b in st.get_buses() or []:
@@ -64,6 +72,9 @@ async def read_state(client, timeout=3.0):
     return out
 
 
+_prev = {}
+
+
 def render(state, only, ref):
     lines = []
     for sn, (motors, auto) in sorted(state.items()):
@@ -74,7 +85,11 @@ def render(state, only, ref):
             s, r = span(lo, hi), ref.get(mid)
             pct = f"{100 * s / r:4.0f}%" if r else "   -"
             flag = "SAVED" if frozen else ("ok" if r and s >= 0.95 * r else "keep moving")
-            lines.append(f"  m{mid}: range=[{lo:4d},{hi:4d}] span={s:4d} ref={r or '-':>4} {pct}  {flag}")
+            old = _prev.get((sn, mid), pos)
+            moved = min((pos - old) % 4096, (old - pos) % 4096)
+            _prev[(sn, mid)] = pos
+            mark = "   <<< MOVING" if moved > 3 else ""
+            lines.append(f"  m{mid}: pos={pos:4d} range=[{lo:4d},{hi:4d}] span={s:4d} ref={r or '-':>4} {pct}  {flag}{mark}")
     return "\n".join(lines)
 
 
