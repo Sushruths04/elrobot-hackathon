@@ -1,4 +1,4 @@
-# Issues (IDs 101+ = Sushruth's rig; 001..015 = Bart's macOS session, listed at the bottom). Next ID: ISSUE-109
+# Issues (IDs 101+ = Sushruth's rig; 001..015 = Bart's macOS session, listed at the bottom). Next ID: ISSUE-110
 
 ### ISSUE-101 - Station default torque caps may make arms weak / trip overload
 - **Status:** open (verified registers, effect suspected)
@@ -40,6 +40,15 @@
 - **Evidence:** 40 s sample: leader j2 54-62% (14 deg), follower 65-82% (31 deg), mean lag 18 points; no faults, current 4 mA, no protection-block lines in that window. Gap closed to ~1 point at rest.
 - **Cause:** unknown (delay/speed vs start offset). Re-test with slow single-joint moves.
 
+
+### ISSUE-109 - Calibration does not follow the arms to another laptop
+- **Status:** open (verified)
+- **Found:** 2026-11-21 15:55 by Claude
+- **Where:** station (both buses)
+- **Symptom:** arms moved from Sushruth's laptop (both frozen) to Bart's Mac: `verify_station.py` shows all 16 motors `NOT SAVED`, ranges are partial leftovers (e.g. follower m2 [2142,2142], m4 [497,3284] = 120% of reference).
+- **Cause (known):** min/max/frozen live in Station's `st3215/meta` under the local `station_data/`, not in the servos (docs/SETUP.md). EEPROM offsets from the old calibration are still in the motors, so seen ranges mix old offsets with new tracking.
+- **Fix / workaround:** recalibrate on whichever laptop runs Station (reset -> sweep -> save, `tools/calibrate.py`). Keep one Station laptop for the rest of the hackathon, or copy its `station_data/` along with the arms (untested).
+
 ---
 
 ## ISSUE-001..015 — from Bart's macOS repo (bpachniewsk1/normacore-hackathon), merged 2026-11-21
@@ -51,8 +60,8 @@ Original IDs kept (no clash with 101+). Some overlap with 101+: 002 ~ 106 (camer
 | 002 | Camera `386869c0` sends black frames | open |
 | 003 | Leader auto-calibration moved erratically | open |
 | 004 | Leader saved calibration inconsistent with servo offsets | resolved |
-| 005 | Leader motor 6 error status `0x08` (latched) | open |
-| 006 | Leader servos stopped responding after power cycle | open |
+| 005 | Leader motor 6 error status `0x08` (latched) | resolved |
+| 006 | Leader servos stopped responding after power cycle | resolved |
 | 007 | Torque went off after `estop.py` HOLD on leader | investigating |
 | 008 | Follower never calibrated | open |
 | 009 | Station has no dedicated e-stop | won't fix (workaround) |
@@ -96,7 +105,7 @@ Original IDs kept (no clash with 101+). Some overlap with 101+: 002 ~ 106 (camer
 - **Fix:** reset via `tools/reset_calibration.py` at 12:26 → NOT SAVED.
 
 ### ISSUE-005 — Leader motor 6 error status `0x08` (latched)
-- **Status:** open
+- **Status:** resolved (2026-11-21 15:55, Claude: `verify_station.py` shows no error bits on leader m6 and its range is tracking [1636,3813]; cleared by the later power cycles, exact moment unknown)
 - **Found:** 2026-11-21 12:35 by Claude (log: `Motor 6 has errors: [Range], skip calibration data`, ~47×/s)
 - **Where:** leader `5B79016336`, motor 6
 - **Evidence:** status byte (0x41) = `0x08` while torque = 0, current = 0, load = 0, temp 30 °C. Its goal was 2905 while other leader motors showed 0 after reset. Follower motor 6 is clean.
@@ -105,7 +114,7 @@ Original IDs kept (no clash with 101+). Some overlap with 101+: 002 ~ 106 (camer
 - **Fix / workaround:** power-cycle the servo supply; if it persists at rest, check the joint mechanically / swap servo (ask staff).
 
 ### ISSUE-006 — Leader servos stopped responding after power cycle
-- **Status:** open
+- **Status:** resolved (2026-11-21 15:55, Claude: all 8 leader motors answer at 7.5–7.7 V on Bart's Mac)
 - **Found:** 2026-11-21 12:40 by Claude
 - **Symptom:** leader board opens (`Successfully opened ST3215 port`) but 0 motors answer, even after 2 Station restarts. No error lines. Follower re-detected fine after its power cycle.
 - **Cause (suspected):** leader servo power not reconnected (PSU, barrel jack, board→servo cable). Unverified — leader then disconnected.
