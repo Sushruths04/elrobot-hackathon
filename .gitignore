@@ -46,3 +46,5 @@ run/ui_run.log
 
 # 117 MB dataset video: kept on disk only (GitHub rejects files > 100 MB)
 datasets/
+
+showcase_bundle.zip
