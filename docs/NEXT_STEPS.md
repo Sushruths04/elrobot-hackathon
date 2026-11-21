@@ -18,7 +18,7 @@ Claim a task by writing your name next to it. Ask a human before any arm motion 
    `python3 scripts/first_motion.py --joint N --delta D --yes` with D ~= 50/span (j1 0.025, j2 0.025, j3 0.022, j4 0.021, j5 0.013, j6 0.024, j7 0.013, j8 0.031). Moves +~4 deg slowly and back; refuses >60 ticks or start/target outside 2-98 %. **Lift joint 2 ~10 deg by hand first** (it rests at 1.5 %). Torque stays ON on tested joints.
    Record per joint: which part moved and which way on "+" (e.g. "elbow up", "gripper closes") -> table in `docs/SETUP.md`; compare with the URDF signs assumed in `src/normakit/core.py` (`URDF_LIMITS`, `norm_to_rad`).
 2. **Camera calibration** - mount the camera fixed, print `calibration/official/opencv_pattern_9x6_25mm_A4_PRINT.pdf` (check 25 mm squares), run `scripts/calibrate_camera.py` (lens) and `--table` (pixel -> table plane). Consider restarting Station for full-res frames (`run/station.yaml`, ISSUE-105) - back up calibration first.
-3. **YOLO cup detection** on `usbvideo/b309a703` frames -> pixel -> table XY via step 2.
+3. **YOLO cup detection** - built (`src/normakit/detect.py`, `tools/detect_live.py`, branch `bart/yolo-detect`), tested on sample images + Mac webcam. Left: run on Station frames (`--source station`), then pixel (`bottom_px`) -> table XY via step 2. — Bart
 4. **Pick and place**: `src/normakit/kin.py` (IK) + `arm.py` skills through `StationBackend`; first runs slow, over an empty table.
 
 ## Tasks

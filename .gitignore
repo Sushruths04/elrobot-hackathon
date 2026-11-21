@@ -24,3 +24,7 @@ calibration/checkerboard_*.png
 # Bart (macOS) tools
 repo/
 snapshots/
+
+# YOLO weights (downloaded on first run)
+models/
+*.pt

@@ -3,7 +3,7 @@
 Setup notes: `bin/`, `vendor/` and `.venv` are NOT in git.
 - Station binary: https://github.com/norma-core/norma-core/releases/tag/v0.1.0-beta.10 -> `bin/station`
 - Upstream source (URDF, protobufs): `git clone https://github.com/norma-core/norma-core vendor/norma-core-src`
-- Python: `python3 -m venv --system-site-packages .venv && .venv/bin/pip install 'mcp<2' anthropic pybullet pillow numpy`
+- Python: `python3 -m venv --system-site-packages .venv && .venv/bin/pip install 'mcp<2' anthropic pybullet pillow numpy ultralytics`
 - Shortcuts for the rig: `./norma help`. Calibration backups: `calibration/`. Findings: `docs/ISSUES.md`.
 
 # HackLab Berlin 21-22 Nov 2026 - NormaCore track starter kit
