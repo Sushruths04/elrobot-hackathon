@@ -21,6 +21,8 @@ COCO_MODEL = "yolo11n.pt"
 OPEN_VOCAB_MODEL = "yolov8s-worldv2.pt"
 
 # Our demo objects (whitelist): label=synonym|synonym. Tune the phrases, not the labels.
+# Measured 2026-11-21 (tape-measure photo): every extra class/phrase LOWERS scores (alone 0.43 ->
+# with 'bottle' 0.11). Appearance phrases ('black device' 0.59) beat names. Keep lists short.
 DEMO_OBJECTS = [
     "duplo=lego duplo brick|toy building block|plastic toy brick|lego",
     "can=soda can|aluminum can|energy drink can|drink can|tin can",
