@@ -1,0 +1,12 @@
+{
+ "teleop_pick1": {
+  "success": false,
+  "note": "operator placed the object wrongly (user said so); keep as a FAILURE example, do not train on it as a success",
+  "marked": "2026-11-21 21:00:46"
+ },
+ "teleop_pick2": {
+  "success": true,
+  "note": "marker ended inside the white box (seen in the final camera frame, run/after_take2.jpg); operator said done",
+  "marked": "2026-11-21 21:02:16"
+ }
+}

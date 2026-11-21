@@ -1,0 +1,34 @@
+pybullet build time: Jan 29 2025 23:16:28
+Gemini ER-2 (1.97 s): cup at pixel (251,261)
+cup -> table x=0.026 y=0.274 m (mapping accuracy about +-3 cm)
+gripper now: x=0.016 y=0.209 z=0.220
+b3Warning[src/BulletInverseDynamics/MultiBodyTree.cpp,266]:
+axis of motion not a unit axis ([0.000000 -0.008727 0.999962]), will use normalized vector
+b3Warning[src/BulletInverseDynamics/MultiBodyTree.cpp,266]:
+axis of motion not a unit axis ([-0.999962 -0.000076 0.008726]), will use normalized vector
+b3Warning[src/BulletInverseDynamics/MultiBodyTree.cpp,266]:
+axis of motion not a unit axis ([-0.999848 -0.000152 0.017452]), will use normalized vector
+b3Warning[src/BulletInverseDynamics/MultiBodyTree.cpp,266]:
+axis of motion not a unit axis ([-0.999810 0.008574 0.017527]), will use normalized vector
+b3Warning[src/BulletInverseDynamics/MultiBodyTree.cpp,266]:
+axis of motion not a unit axis ([-0.008573 -0.999963 0.000151]), will use normalized vector
+b3Warning[src/BulletInverseDynamics/MultiBodyTree.cpp,266]:
+axis of motion not a unit axis ([-0.999697 0.017300 0.017525]), will use normalized vector
+b3Warning[src/BulletInverseDynamics/MultiBodyTree.cpp,266]:
+axis of motion not a unit axis ([-0.017144 -0.999812 0.009029]), will use normalized vector
+b3Warning[src/BulletInverseDynamics/MultiBodyTree.cpp,266]:
+axis of motion not a unit axis ([0.017144 0.999812 -0.009029]), will use normalized vector
+b3Warning[src/BulletInverseDynamics/MultiBodyTree.cpp,266]:
+axis of motion not a unit axis ([-0.999697 0.017300 0.017525]), will use normalized vector
+b3Warning[src/BulletInverseDynamics/MultiBodyTree.cpp,266]:
+axis of motion not a unit axis ([-0.999697 0.017300 0.017525]), will use normalized vector
+  IK z=0.250: 1.3 cm, 33.1 deg
+  IK z=0.230: 0.7 cm, 31.8 deg
+  IK z=0.210: 1.2 cm, 27.0 deg
+  IK z=0.190: 1.5 cm, 20.5 deg
+  IK z=0.170: 1.4 cm, 13.1 deg
+  path lift (straight up): lowest EE height 0.220 m (needs >= 0.210) -> ok
+  path lift -> hover: lowest EE height 0.238 m (needs >= 0.235) -> ok
+PLAN OK (planning took 4.8 s)
+TORQUE ON - moving
+  TIMEOUT at lift (worst joint 449 ticks off) - holding and STOPPING

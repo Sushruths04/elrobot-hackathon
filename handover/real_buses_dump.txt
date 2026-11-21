@@ -1,0 +1,18 @@
+BUS 5B79016336 port /dev/ttyACM0
+  motor 1: range=[1125,2971] frozen=True pos=2152 torque=0 status=0x00 load=0 volt=7.7V temp=28C cur=0
+  motor 2: range=[998,3098] frozen=True pos=3096 torque=0 status=0x00 load=0 volt=7.6V temp=28C cur=0
+  motor 3: range=[912,3184] frozen=True pos=976 torque=0 status=0x00 load=0 volt=7.6V temp=29C cur=0
+  motor 4: range=[1404,2692] frozen=True pos=1261 torque=0 status=0x00 load=0 volt=7.6V temp=29C cur=0
+  motor 5: range=[678,3418] frozen=True pos=2139 torque=0 status=0x00 load=0 volt=7.6V temp=29C cur=0
+  motor 6: range=[1115,2981] frozen=True pos=1128 torque=0 status=0x00 load=0 volt=7.5V temp=29C cur=0
+  motor 7: range=[1137,2959] frozen=True pos=140 torque=0 status=0x00 load=0 volt=7.6V temp=30C cur=0
+  motor 8: range=[1437,2659] frozen=True pos=2088 torque=0 status=0x00 load=0 volt=7.6V temp=31C cur=0
+BUS 5B8E114691 port /dev/ttyACM1
+  motor 1: range=[1059,3037] frozen=True pos=2133 torque=1 status=0x00 load=0 volt=12.5V temp=33C cur=0
+  motor 2: range=[1031,3065] frozen=True pos=2190 torque=1 status=0x00 load=0 volt=12.5V temp=37C cur=0
+  motor 3: range=[886,3210] frozen=True pos=1760 torque=1 status=0x00 load=0 volt=12.4V temp=36C cur=0
+  motor 4: range=[884,3212] frozen=True pos=2412 torque=1 status=0x00 load=0 volt=12.4V temp=37C cur=0
+  motor 5: range=[134,3962] frozen=True pos=241 torque=1 status=0x00 load=0 volt=12.4V temp=35C cur=0
+  motor 6: range=[1022,3074] frozen=True pos=1046 torque=1 status=0x00 load=0 volt=12.4V temp=35C cur=0
+  motor 7: range=[115,3981] frozen=True pos=3939 torque=1 status=0x00 load=0 volt=12.4V temp=37C cur=0
+  motor 8: range=[1243,2853] frozen=True pos=2180 torque=1 status=0x00 load=0 volt=12.4V temp=37C cur=0

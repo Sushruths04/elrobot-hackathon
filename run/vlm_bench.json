@@ -1,0 +1,65 @@
+[
+ {
+  "provider": "nebius",
+  "model": "nvidia/Nemotron-3.5-Super-VL",
+  "yesno": "3/3",
+  "point_err_px_mean": 4.2,
+  "latency_s_median": 1.2,
+  "failures": 0,
+  "last_error": ""
+ },
+ {
+  "provider": "nebius",
+  "model": "Qwen/Qwen3.8-27B",
+  "yesno": "3/3",
+  "point_err_px_mean": 7.0,
+  "latency_s_median": 1.25,
+  "failures": 0,
+  "last_error": ""
+ },
+ {
+  "provider": "nebius",
+  "model": "google/gemma-3-27b-it",
+  "yesno": "3/3",
+  "point_err_px_mean": 136.3,
+  "latency_s_median": 1.56,
+  "failures": 0,
+  "last_error": ""
+ },
+ {
+  "provider": "gemini",
+  "model": "gemini-robotics-er-2-preview",
+  "yesno": "0/0",
+  "point_err_px_mean": null,
+  "latency_s_median": null,
+  "failures": 6,
+  "last_error": "Gemini HTTP 429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current"
+ },
+ {
+  "provider": "nebius",
+  "model": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+  "yesno": "0/0",
+  "point_err_px_mean": null,
+  "latency_s_median": null,
+  "failures": 6,
+  "last_error": "api.tokenfactory.nebius.com HTTP 400: {\"error\":{\"type\":\"invalid_request_error\",\"message\":\""
+ },
+ {
+  "provider": "nebius",
+  "model": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+  "yesno": "0/0",
+  "point_err_px_mean": null,
+  "latency_s_median": null,
+  "failures": 6,
+  "last_error": "api.tokenfactory.nebius.com HTTP 400: {\"error\":{\"type\":\"invalid_request_error\",\"message\":\""
+ },
+ {
+  "provider": "nebius",
+  "model": "Qwen/Qwen3-Embedding-8B",
+  "yesno": "0/0",
+  "point_err_px_mean": null,
+  "latency_s_median": null,
+  "failures": 6,
+  "last_error": "api.tokenfactory.nebius.com HTTP 400: {\"error\":{\"type\":\"invalid_request_error\",\"message\":\""
+ }
+]

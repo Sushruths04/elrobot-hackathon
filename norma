@@ -17,6 +17,9 @@ case "$1" in
   smoke)    $PY scripts/smoke_station.py ;;
   mcp)      exec env PYTHONPATH=src $PY -m normakit.mcp_server --backend "${2:-station}" ;;
   simtest)  $PY scripts/selftest_sim.py ;;
+  up)       $0 start; pgrep -f scripts/ui.py >/dev/null && echo "ui: already running" || { (nohup $PY scripts/ui.py > logs/ui.log 2>&1 &); sleep 12; echo "ui: http://127.0.0.1:8890"; }; pgrep -f scripts/armd.py >/dev/null && echo "armd: already running" || { (nohup $PY scripts/armd.py > logs/armd.log 2>&1 &); sleep 12; echo "armd: http://127.0.0.1:8891 (fast arm daemon)"; }; $PY scripts/stack_check.py | tail -n 16 ;;
+  down)     pkill -f scripts/ui.py; pkill -f scripts/armd.py; echo "ui + armd stopped (Station left running)" ;;
+  check)    $PY scripts/stack_check.py "${@:2}" ;;
   web)      echo "http://localhost:8889  (use Firefox: Chrome WebGL is disabled here)" ;;
   *)        echo "usage: ./norma {status|start|stop|restart|logs|monitor|backup|identify [s]|home-set leader|follower|smoke|mcp [sim|station]|simtest|web}" ;;
 esac

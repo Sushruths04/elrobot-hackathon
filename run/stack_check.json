@@ -1,0 +1,70 @@
+{
+ "time": "2026-11-21 21:10:18",
+ "rows": [
+  {
+   "check": "station process",
+   "status": "PASS",
+   "detail": "./norma start"
+  },
+  {
+   "check": "station ports 8888/8889",
+   "status": "PASS",
+   "detail": "tcp 8888=True web 8889=True"
+  },
+  {
+   "check": "bus follower (5B8E114691)",
+   "status": "PASS",
+   "detail": "8 motors, uncalibrated=[], fault status=[], torque on 8/8, max temp 37 C"
+  },
+  {
+   "check": "bus leader (5B79016336)",
+   "status": "PASS",
+   "detail": "8 motors, uncalibrated=[], fault status=[], torque on 0/8, max temp 31 C"
+  },
+  {
+   "check": "cameras",
+   "status": "PASS",
+   "detail": "2 streaming, front = cam4"
+  },
+  {
+   "check": "kinematics pybullet == MuJoCo (EE link)",
+   "status": "PASS",
+   "detail": "diff 0.0 mm; jaw tip [-0.103, 0.192, 0.266]"
+  },
+  {
+   "check": "IK round trip (jaw tip, 7-DoF)",
+   "status": "PASS",
+   "detail": "position error mm at 3 targets: [0.1, 0.3, 0.1]"
+  },
+  {
+   "check": "table mapping pixel->robot xy",
+   "status": "WARN",
+   "detail": "only the OLD table_front.json: x is MIRRORED vs the kinematics (marker-run incident) -> run scripts/calib_tip_map.py --go or use taught poses"
+  },
+  {
+   "check": "Gemini ER-2 key",
+   "status": "PASS",
+   "detail": "set (value not shown)"
+  },
+  {
+   "check": "web UI :8890",
+   "status": "PASS",
+   "detail": "http 200"
+  },
+  {
+   "check": "armd :8891 (fast arm daemon)",
+   "status": "PASS",
+   "detail": "tip [0.1997, 0.0616, 0.0976] armed 0 s"
+  },
+  {
+   "check": "MCP elrobot-ui",
+   "status": "PASS",
+   "detail": "20 tools: ['status', 'look', 'detect_cup', 'jog', 'run_task', 'proceed', 'stop', 'log', 'record', 'arm_state', 'move_tip', 'gripper_to', 'go_home', 'hold_now', 'list_demos', 'record_demo', 'mark_demo', 'play_demo', 'verify', 'run_skill_and_verify']"
+  },
+  {
+   "check": "pybullet sim backend",
+   "status": "PASS",
+   "detail": "8 joints"
+  }
+ ]
+}

@@ -1,0 +1,4 @@
+{"run": 1, "pen_xy": [-0.052, 0.329], "seconds": 11.7, "completed": false, "model_says_inside": null, "stopped": "ABORT: tip and marker are far apart in the image - mapping or detection is wrong"}
+{"run": 2, "pen_xy": [-0.011, 0.299], "seconds": 24.9, "completed": false, "model_says_inside": null, "stopped": null}
+{"run": 1, "pen_xy": [-0.022, 0.326], "seconds": 23.8, "completed": false, "model_says_inside": null, "stopped": "not held by any gripper."}
+{"run": 1, "pen_xy": [-0.081, 0.264], "seconds": 20.4, "completed": false, "model_says_inside": null, "stopped": "not held - stopping before the drop"}

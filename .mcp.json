@@ -23,6 +23,16 @@
       "env": {
         "PYTHONPATH": "src"
       }
+    },
+    "elrobot-ui": {
+      "command": ".venv/bin/python",
+      "args": [
+        "-m",
+        "normakit.mcp_ui"
+      ],
+      "env": {
+        "PYTHONPATH": "src"
+      }
     }
   }
 }

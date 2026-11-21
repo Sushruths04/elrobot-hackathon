@@ -1,0 +1,1 @@
+original P=16 D=0 I=0 on j1-4 (follower); lock=1

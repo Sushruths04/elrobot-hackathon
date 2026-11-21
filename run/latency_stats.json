@@ -1,0 +1,25 @@
+{
+ "time": "2026-11-21 20:53:13",
+ "ms": {
+  "python import (numpy,cv2,backend)": 219.8,
+  "backend start() to first full state": 241.9,
+  "command write latency median": 22.8,
+  "state() read (cached)": 0.0,
+  "state update changes seen in 2 s": "1",
+  "step +60 ticks: write+first motion": 161.6,
+  "step -60 ticks: write+first motion": 14.1,
+  "front camera new frames per second": "30.5",
+  "jpeg decode": 24.6,
+  "blob detector": 29.8,
+  "Kin() load pybullet": 568.0,
+  "pybullet fk": 0.0,
+  "MuJoCo model load + first fk": 771.9,
+  "jaw_tip_pose fk": 0.0,
+  "ik_jaw_tip (7-DoF, multi-seed)": 821.0,
+  "ik_jaw_tip warm seed (nearby)": 0.7,
+  "Gemini ER-2 point #1": "FAILED",
+  "web UI /api/state": 1.3,
+  "web UI /frame.jpg": 33.2,
+  "this whole script": 14392.2
+ }
+}

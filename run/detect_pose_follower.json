@@ -1,0 +1,19 @@
+{
+ "raw": {
+  "1": 1818,
+  "2": 1053,
+  "3": 3186,
+  "4": 935,
+  "5": 1331,
+  "6": 1056,
+  "7": 3205,
+  "8": 2750
+ },
+ "tip": [
+  0.0443,
+  -0.1286,
+  0.287
+ ],
+ "saved": "2026-11-21 21:29:51",
+ "note": "DETECTION pose: arm folded up and back, out of the table camera's view; the whole table is visible"
+}

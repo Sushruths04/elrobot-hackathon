@@ -1,0 +1,5 @@
+{
+ "provider": "nebius",
+ "model": "nvidia/Nemotron-3.5-Super-VL",
+ "why": "vlm_bench 2026-11-21: yes/no 3/3, pointing error 4.2 px, 1.2 s (Qwen/Qwen3.8-27B: 3/3, 7.0 px, 1.25 s; Gemini ER-2 was rate limited)"
+}

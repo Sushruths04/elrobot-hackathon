@@ -1,0 +1,26 @@
+# PROMPT FOR CODEX (paste everything below the line)
+
+---
+
+You are working on a robotics hackathon repo: https://github.com/Sushruths04/normacore-hackathon (local working copy may differ, check `git status`; there are uncommitted changes from several agents). Goal: **the NormaCore ElRobot follower arm picks a pen/marker from a table (and a black cup) using a camera and puts it into a white box**, perceiving with Gemini Robotics-ER 2, planning with the repo's inverse kinematics, executing on the real arm. Read first: `AGENTS.md`, `docs/STACK.md` (architecture, kinematics in detail, known problems), `docs/HANDOVER.md` (status + incident log), `docs/DEVIN_PROMPT.md` (a parallel agent, Devin, builds the MuJoCo twin and the 100-trial benchmark: do not duplicate that work and do not edit `src/normakit/mujoco_backend.py`, `scripts/build_mujoco_assets.py`, `scripts/validate_twin.py`).
+
+## Bring-up (do this first)
+`./norma check` (read-only) -> expect PASS except: table mapping WARN, Gemini 429 FAIL. `./norma up` starts Station + the web UI at http://127.0.0.1:8890. All real-arm motion must go through the safety patterns below.
+
+## Hard rules
+- **Real arm safety.** Never run anything that moves the arm unless the human wrote an explicit "go" for that run and confirmed: hands clear, power plug in reach, arm supported. Every moving script must have a plan-only mode and, on timeout or current > 700 mA, hold and STOP the whole sequence (never continue). One agent commands the arm at a time (Devin works in the same folder: ask the human whether it is idle; consider adding `run/arm.lock`). Torque limit of j2-j4: keep <= 800 (the human approved 800; 1000 was blocked). Never leave the arm in a sagged hold: `hold()` (goal = present) locks in droop.
+- **Secrets.** Gemini key only via `~/.gemini_er_key` or `$GEMINI_API_KEY`; never print or commit it. The key currently hits HTTP 429: ask the human for a paid key or budget your calls (cache results, 1 call per decision).
+- **Git.** Small commits, no AI attribution lines or co-author trailers (owner's rule). Do not commit `run/`, `handover/` pictures with people in them, or calibration backups unless asked.
+- Be terse, evidence first (look at the camera frame before theorising), no long diagnostic chains: if something fails twice, report it and switch approach.
+
+## Tasks, in order
+1. **Fix the pixel -> robot mapping or bypass it.** Known: `calibration/table_front.json` has x mirrored vs the kinematics (see STACK.md problem 1). Review `scripts/calib_tip_map.py` (plan-only passes, 18/18 reachable), fix anything wrong, write the real-run runbook for the human, and add an automatic **consistency gate** used by every task script: command the tip over 2 known points at safe height, ER-2 locates it, abort if the mapping disagrees by > 3 cm.
+2. **Verify the joint-sign/zero assumptions (ISSUE-107)** with a runbook of small single-joint moves: for each joint compare `kin.jaw_tip_pose` before/after with the tip seen by ER-2. Report which of joints 1-7 need a sign flip or offset and fix `core.py`/`kin.py` if needed.
+3. **Make the lift/home sequence reliable** (`scripts/go_home.py`): elbow-first staged lift with gentle acceleration (speed 100, acc 10 for j2-j4), progress watchdog, no combined proportional move that stalls j3; keep tip z >= 0.09 over the box region; record the home pose from the demo's first pose (`run/home_follower.json`). Test via a runbook; the arm must reach home without human help.
+4. **Teach-and-replay pick/place as the primary path** (fast and robust; the IK route failed on hardware): finish `scripts/demo_record.py`/`replay_traj.py` into one tool: record a leader-arm demonstration (pick + drop into the box), replay on the follower with wrap-aware interpolation and the same safety rules, then ER-2 verification (`er2.ask`: held? inside box?). Extend to several taught positions with a pixel-space fit (affine/bilinear from ER-2 object pixel -> joint pose), as in the June repo `tejavadlamudi03/norma-robot` (`claude-supervisor/grasp_model.py`: bilinear interpolation of a taught 3x3 grid, plus fixed offset corrections). No robot-frame calibration needed.
+5. **IK path (secondary, only after 1-2 are verified):** `scripts/grab_marker.py` (ER-2 -> mapping -> `ik_jaw_tip` with wrist roll across the marker -> FK path checks -> visual alignment loop -> PROCEED gates -> place). Required fixes: the alignment loop must abort when the pixel offset grows after a correction and limit steps to 3 cm; box = obstacle (tip z >= 0.10 within 8 cm of it); no run if the consistency gate (task 1) fails.
+6. **Tests + CI-style checks** that run without hardware: kinematics round trips (`stack_check.py` logic), plan-only runs against recorded frames (`handover/real_front_cam.jpg`), parser tests for `er2.point` (malformed JSON), wrap-around math. `./norma check` must stay green except hardware-dependent items.
+7. Update `docs/STACK.md`/`docs/HANDOVER.md` with what you verified (numbers, not claims) and commit in small steps.
+
+## Definition of done
+`./norma up` brings the whole stack up; a human says "go" once and the arm, without further help, lifts, picks the pen, drops it in the box, ER-2 confirms, and returns home - in under ~30 s of motion - repeated 3 times at different pen positions, with logs and a recording in `run/recordings/`.

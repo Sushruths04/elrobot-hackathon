@@ -35,3 +35,11 @@ snapshots/
 # YOLO weights (downloaded on first run)
 models/
 *.pt
+
+# runtime state and large recordings
+run/recordings/
+run/arm_until
+run/proceed
+run/rec_leader_stop
+run/demo_stop
+run/ui_run.log
