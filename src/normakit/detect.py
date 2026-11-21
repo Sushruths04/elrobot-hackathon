@@ -20,6 +20,13 @@ MODELS = Path(__file__).resolve().parents[2] / "models"
 COCO_MODEL = "yolo11n.pt"
 OPEN_VOCAB_MODEL = "yolov8s-worldv2.pt"
 
+# Our demo objects (whitelist): label=synonym|synonym. Tune the phrases, not the labels.
+DEMO_OBJECTS = [
+    "duplo=lego duplo brick|toy building block|plastic toy brick|lego",
+    "can=soda can|aluminum can|energy drink can|drink can|tin can",
+    "bottle=bottle|plastic bottle|water bottle",
+]
+
 
 @dataclass
 class Detection:
@@ -29,6 +36,7 @@ class Detection:
     center_px: list[float]  # box centre (x, y) in pixels
     bottom_px: list[float]  # bottom-centre: where the object touches the table (better for homography)
     area_frac: float        # box area / image area
+    phrase: str = ""         # which prompt phrase fired (for tuning synonyms)
 
     def to_dict(self):
         return {k: (round(v, 3) if isinstance(v, float) else [round(x, 1) for x in v] if isinstance(v, list) else v)
@@ -54,7 +62,17 @@ class Detector:
                  conf: float = 0.35, model: str | None = None, imgsz: int = 640):
         from ultralytics import YOLO
         MODELS.mkdir(exist_ok=True)
-        self.prompts = [p.strip() for p in prompts or [] if p.strip()]
+        # prompts: "label=phrase1|phrase2" -> several phrases, one output label (whitelist)
+        self.alias = {}
+        for p in prompts or []:
+            p = p.strip()
+            if not p:
+                continue
+            label, _, phrases = p.partition("=") if "=" in p else (p, "", p)
+            for ph in phrases.split("|"):
+                if ph.strip():
+                    self.alias[ph.strip()] = label.strip()
+        self.prompts = list(self.alias)
         name = model or (OPEN_VOCAB_MODEL if self.prompts else COCO_MODEL)
         self.model = YOLO(str(MODELS / name) if not Path(name).exists() else name)  # downloads into models/
         self.device, self.conf, self.imgsz = _device(), conf, imgsz
@@ -77,10 +95,11 @@ class Detector:
                                device=self.device, verbose=False)[0]
         out = []
         for (x1, y1, x2, y2), c, k in zip(r.boxes.xyxy.tolist(), r.boxes.conf.tolist(), r.boxes.cls.tolist()):
-            out.append(Detection(label=r.names[int(k)], conf=float(c), box=[x1, y1, x2, y2],
+            name = r.names[int(k)]
+            out.append(Detection(label=self.alias.get(name, name), phrase=name, conf=float(c), box=[x1, y1, x2, y2],
                                  center_px=[(x1 + x2) / 2, (y1 + y2) / 2], bottom_px=[(x1 + x2) / 2, y2],
                                  area_frac=float((x2 - x1) * (y2 - y1) / (w * h))))
-        return sorted(out, key=lambda d: -d.conf)
+        return _dedupe(sorted(out, key=lambda d: -d.conf))
 
     def find(self, img, label: str) -> dict:
         """Best detection of `label`, as compact JSON with a readable error (AGENTS.md §6)."""
@@ -90,6 +109,22 @@ class Detector:
             return {"ok": True, **hits[0].to_dict()}
         seen = sorted({d.label for d in dets})
         return {"ok": False, "error": f"no '{label}' found; visible: {', '.join(seen) or 'nothing'}"}
+
+
+def _iou(a, b):
+    x1, y1, x2, y2 = max(a[0], b[0]), max(a[1], b[1]), min(a[2], b[2]), min(a[3], b[3])
+    inter = max(0, x2 - x1) * max(0, y2 - y1)
+    area = lambda r: (r[2] - r[0]) * (r[3] - r[1])
+    return inter / (area(a) + area(b) - inter + 1e-9)
+
+
+def _dedupe(dets, thr=0.6):
+    """Synonym prompts can box the same object twice under one label: keep the most confident."""
+    keep = []
+    for d in dets:
+        if all(not (k.label == d.label and _iou(k.box, d.box) > thr) for k in keep):
+            keep.append(d)
+    return keep
 
 
 def annotate(rgb: np.ndarray, dets: list[Detection]) -> np.ndarray:

@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+- 2026-11-21 17:05 - `detect.py`: whitelist with synonyms (`label=phrase1|phrase2`, deduped per label), `DEMO_OBJECTS` (duplo, can, bottle), `phrase` field; `detect_live.py --demo`. Note: a whitelist forces look-alikes into a class (sample photo with no can -> `can` 0.41), so keep `--conf` >= ~0.3 and check on the real scene - Bart + Claude
 - 2026-11-21 16:50 - `src/normakit/detect.py`: YOLO detector, JPEG/ndarray -> JSON (`label, conf, box, center_px, bottom_px, area_frac`); COCO YOLO11n (`cup`, `bottle`) or open-vocabulary YOLO-World text prompts (`red bull can`); `find(img, label)` returns a readable error. Benchmarked on M3 Pro MPS @640x480: 17 ms (COCO), 24 ms (World) - Bart + Claude
 - 2026-11-21 16:50 - `tools/detect_live.py`: live detection from Mac webcam / image files / Station camera (`--source station`), window with boxes, JSONL log in `logs/detections-*.jsonl`. Read-only, never moves the arm - Bart + Claude
 - 2026-11-21 16:50 - Dependency `ultralytics` 8.4.216 (+ torch 2.9.0) in `.venv` (`python3 -m venv --system-site-packages .venv && .venv/bin/pip install ultralytics`) - why: YOLO detection on Apple MPS. On first YOLO-World run ultralytics auto-installs `clip` + `ftfy` and downloads CLIP ViT-B/32 (338 MB) to `~/.cache/clip`. Weights in `models/` (gitignored) - Claude

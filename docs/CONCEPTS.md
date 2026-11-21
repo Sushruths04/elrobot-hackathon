@@ -61,3 +61,4 @@ pauses + notifies a human). Stretch: fine-tune SmolVLA on the collected data.
 | 2026-11-21 | Agentic workflow: AGENTS.md protocol, every change in CHANGELOG | many agents/people in parallel | Bart |
 | 2026-11-21 | Project idea: **TBA** → superseded 16:25 (below) | — | team |
 | 2026-11-21 16:25 | Use **only the follower** arm; project = **YOLO-based pick and place (e.g. a cup)**. Leader left uncalibrated. | Leader calibration kept failing (flaky bus ISSUE-112, false stalls ISSUE-111, accidental reset). Follower is calibrated and matches the reference. | Bart |
+| 2026-11-21 17:05 | Objects: **Lego Duplo brick, Red Bull can, bottle**, detected with YOLO-World text prompts (whitelist + synonyms, `detect_live.py --demo`) | COCO YOLO has bottle but no can / Duplo; "red bull can" prompt alone found nothing | Bart |

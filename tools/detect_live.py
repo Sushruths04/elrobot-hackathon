@@ -3,7 +3,8 @@
 Live object detection (YOLO) - read-only, never moves the arm.
 
   .venv/bin/python tools/detect_live.py                                  # Mac webcam, COCO cup+bottle
-  .venv/bin/python tools/detect_live.py --prompts "red bull can,cup,bottle"   # open-vocabulary (YOLO-World)
+  .venv/bin/python tools/detect_live.py --demo                           # our objects: duplo, can, bottle
+  .venv/bin/python tools/detect_live.py --prompts "can=soda can|drink can,cup"   # open-vocabulary (YOLO-World)
   .venv/bin/python tools/detect_live.py --source photo1.jpg photo2.jpg    # files -> snapshots/det_*.jpg
   .venv/bin/python tools/detect_live.py --source station [--camera cam0]  # Station camera (usbvideo queue)
   add --no-show for headless (JSON lines only)
@@ -16,7 +17,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "src"))
-from normakit.detect import Detector, annotate, to_rgb  # noqa: E402
+from normakit.detect import DEMO_OBJECTS, Detector, annotate, to_rgb  # noqa: E402
 
 
 def frames(a):
@@ -54,7 +55,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--source", nargs="*", default=["webcam"], help="webcam[:N] | station | image files")
     ap.add_argument("--classes", default="cup,bottle", help="COCO class names (closed-set YOLO11n)")
-    ap.add_argument("--prompts", default="", help="comma-separated text prompts -> open-vocabulary YOLO-World")
+    ap.add_argument("--prompts", default="", help="comma-separated prompts -> open-vocabulary YOLO-World; "
+                    "'label=phrase1|phrase2' maps synonyms to one label")
+    ap.add_argument("--demo", action="store_true", help="our 3 objects: duplo, can, bottle (detect.DEMO_OBJECTS)")
     ap.add_argument("--conf", type=float, default=0.35)
     ap.add_argument("--model", help="override weights file")
     ap.add_argument("--camera", default="cam0", help="station camera (cam0 or usbvideo/<id>)")
@@ -62,7 +65,7 @@ def main():
     ap.add_argument("--no-show", action="store_true")
     a = ap.parse_args()
 
-    prompts = [p for p in a.prompts.split(",") if p.strip()]
+    prompts = DEMO_OBJECTS if a.demo else [p for p in a.prompts.split(",") if p.strip()]
     det = Detector(classes=None if prompts else a.classes.split(","), prompts=prompts, conf=a.conf, model=a.model)
     (REPO / "logs").mkdir(exist_ok=True)
     log = open(REPO / "logs" / f"detections-{time.strftime('%Y%m%d-%H%M%S')}.jsonl", "a")
@@ -78,7 +81,7 @@ def main():
         log.write(json.dumps(rec) + "\n"); log.flush()
         n += 1
         if is_files or a.no_show or n % 15 == 1:
-            print(json.dumps({k: rec[k] for k in ("src", "ms")} | {"dets": [(d.label, round(d.conf, 2)) for d in dets]}))
+            print(json.dumps({k: rec[k] for k in ("src", "ms")} | {"dets": [(d.label, round(d.conf, 2), d.phrase) for d in dets]}))
         if is_files:
             out = REPO / "snapshots" / f"det_{Path(name).stem}.jpg"
             out.parent.mkdir(exist_ok=True)
