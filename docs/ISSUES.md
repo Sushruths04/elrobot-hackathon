@@ -1,4 +1,4 @@
-# Issues (IDs 101+ = Sushruth's rig; 001..015 = Bart's macOS session, listed at the bottom). Next ID: ISSUE-112
+# Issues (IDs 101+ = Sushruth's rig; 001..015 = Bart's macOS session, listed at the bottom). Next ID: ISSUE-113
 
 ### ISSUE-101 - Station default torque caps may make arms weak / trip overload
 - **Status:** open (verified registers, effect suspected)
@@ -69,6 +69,16 @@
 - **Cause (suspected):** the 7.4 V low-gear leader servos with the handle hit the low stall-current threshold from load/gravity before the real hard stop. Unverified. Related: ISSUE-003, ISSUE-103.
 - **Impact:** with mirroring, leader m5's 38 deg range maps onto the follower's full m5 range (~9x gain) -> jerky / unexpected follower wrist motion. Don't mirror until fixed.
 - **Fix / workaround:** calibrate the leader by hand (`tools/calibrate.py reset` + `watch` with the `<<< MOVING` marker, then `save`).
+
+
+### ISSUE-112 - Leader bus drops / shifts replies (timeouts, "Motor ID mismatch")
+- **Status:** open
+- **Found:** 2026-11-21 16:05 by Claude
+- **Where:** leader bus `5B79016336` (CH343 board -> USB hub -> WCH adapter on Bart's Mac)
+- **Symptom:** a ResetCalibration at 15:05:13Z finished on only 3 of 8 motors: `Failed to reset calibration for motor 1: Timeout`, `motor 3: Motor ID mismatch: expected 3, got 1`, `motor 5 ... expected 5, got 3`, `motor 6 ... expected 6, got 5`, `motor 8: Timeout`. Station then keeps the bus frozen (meta reset needs a fully successful command), leaving a half-reset calibration.
+- **Evidence:** 20 such failures, all in that one command; the next 3 resets were clean (all offsets 0, NOT SAVED). Leader latency in `verify_station.py` ~14 ms vs follower ~1 ms.
+- **Cause (suspected):** after one timeout, replies arrive one motor late (each mismatch reports the previous ID). Possibly a marginal cable / hub / 7.4 V supply. Unverified. **Suspected to also cause the leader's false auto-cal stalls (ISSUE-111, ISSUE-003).**
+- **Fix / workaround:** after any reset, check every offset is 0 and the bus shows NOT SAVED; resend the reset if not (it is idempotent). Try the leader board directly on a laptop port.
 
 ---
 
