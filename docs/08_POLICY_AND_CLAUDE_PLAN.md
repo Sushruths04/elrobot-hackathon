@@ -9,7 +9,7 @@
 | 1. Camera calibration (official OpenCV board) | `scripts/calibrate_camera.py` | script ready; needs camera + printed board |
 | 2. Record demos (leader->follower mirroring ON) | `scripts/record_demo.py` | dataset writing TESTED with synthetic data; real recording untested |
 | 3. Train a policy | `lerobot-train` (LeRobot 0.4.4 installed) | NOT run; see decode problem below |
-| 4. Run policy on the follower + Guard | to write: `scripts/run_policy.py` | not written |
+| 4. Run policy on the follower + Guard | `scripts/run_policy.py` | written; dry-run tested on sim with dummy server (`scripts/test_policy_client.py`); real arm untested |
 | 5. Claude API agent (tool use, looks at camera, picks task, verifies) | `src/normakit/agent.py` | written, never run (needs `ANTHROPIC_API_KEY` in the shell env, never in files) |
 | 6. MCP for Claude Code / Agent SDK | `src/normakit/mcp_server.py`, `.mcp.json` `elrobot-real` | registered, motion untested; `claude_agent_sdk` not installed |
 

@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+- 2026-11-22 - `src/normakit/policy_client.py` (HTTP client, token from `POLICY_API_TOKEN`), `scripts/run_policy.py` (state+camera -> A100 -> action chunk -> `Guard.move`; station mode needs `--i-have-a-human`) and `scripts/test_policy_client.py` (dummy server + SimBackend, no hardware; PASS). Real-arm run untested - Claude
 - 2026-11-22 - `server/` A100 policy server (FastAPI, LeRobot policy loader, `--dummy` mode, Dockerfile, run.sh, bench.py) and `src/normakit/policy_api.py` schema. Dummy mode tested; LeRobot GPU path untested - Claude
 - 2026-11-22 - `docs/10_MODEL_AND_A100_PLAN.md`: model comparison for a remote A100 (ACT picked, SmolVLA/GR00T as upgrade), latency budget, risks, user steps. Docs only, no motion - Claude
 - 2026-11-21 17:30 - `calibration/markers.json`: team marker sheet (DICT_4X4_50, 40 mm): IDs 0-3 corners FL/FR/BR/BL, 4/5/6 zones A/B/C, 7 bowl; **zone C (ID 6) = DROP**; corner table positions still to measure. `markers.py`: names from the file, `find_role(markers, 'drop'|'A')` - Bart + Claude
