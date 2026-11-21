@@ -11,11 +11,19 @@ from normakit import vision
 from normakit.arm import Arm
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--backend", choices=["sim", "station"], default="sim"); ap.add_argument("--vision", choices=["color", "dark", "yolo", "claude"], default="color")
-ap.add_argument("--object", default="red block"); ap.add_argument("--target", default="blue tray"); ap.add_argument("--cam")
+ap.add_argument("--backend", choices=["sim", "mujoco", "station"], default="mujoco")
+ap.add_argument("--sim", choices=["none", "mujoco", "pybullet"], default="none", help="alias for --backend")
+ap.add_argument("--vision", choices=["color", "dark", "yolo", "claude", "er2"], default="dark")
+ap.add_argument("--object", default="black cup"); ap.add_argument("--target", default="blue tray"); ap.add_argument("--cam")
 ap.add_argument("--table-calib", default="calibration/table_front.json", help="pixel->robot table mapping (station backend)")
 ap.add_argument("--yolo-classes", default="cup,bottle", help="COCO classes for --vision yolo (weights download on first use)")
+ap.add_argument("--viewer", action="store_true", help="open MuJoCo viewer when using mujoco backend")
+ap.add_argument("--video", default="", help="save MP4 video when using mujoco backend")
 ap.add_argument("--retries", type=int, default=2); ap.add_argument("--i-am-at-the-estop", action="store_true"); a = ap.parse_args()
+if a.sim == "mujoco":
+    a.backend = "mujoco"
+elif a.sim == "pybullet":
+    a.backend = "sim"
 if a.backend == "station" and not a.i_am_at_the_estop: sys.exit("refusing to move the real arm: add --i-am-at-the-estop once a person is at the table and the power plug is in reach")
 if a.vision == "claude":
     import anthropic; client = anthropic.Anthropic(); MODEL = os.environ.get("NORMA_MODEL", "claude-sonnet-5-5")
@@ -57,6 +65,42 @@ def locate(jpg, what):
 def verify(jpg, question):
     if a.vision != "claude": return None                       # colour mode cannot judge a grasp: reported as unverified, never guessed
     return bool(ask(jpg, f"{question} Return {{\"answer\": true/false, \"note\": \"<short>\"}}").get("answer"))
+
+if a.backend == "mujoco":
+    from normakit.mujoco_backend import MujocoBackend
+    from normakit.cup_skill import run_cup_pick_and_place
+    from normakit.kin import Kin
+    be = MujocoBackend(realtime=a.viewer, viewer=a.viewer)
+    be.start()
+    vid_path = Path(a.video) if a.video else (out / "autorun_mujoco.mp4")
+    be.start_video(vid_path)
+    calib = ROOT / "calibration/table_mujoco_front.json"
+    v_map = {"dark": "blob", "color": "blob", "yolo": "yolo", "er2": "er2", "claude": "claude"}
+    result = "failed"
+    try:
+        for attempt in range(1, a.retries + 2):
+            step("attempt", n=attempt)
+            (out / f"{attempt:02d}_before.jpg").write_bytes(be.frame_jpeg("front"))
+            res = run_cup_pick_and_place(
+                be, kin=Kin(), table_calib_path=calib,
+                vision_mode=v_map[a.vision], approach="auto", wrist_align=True,
+                do_place=True, go=True, claude_ask_fn=(ask if a.vision == "claude" else None),
+                verbose=True,
+            )
+            (out / f"{attempt:02d}_after.jpg").write_bytes(be.frame_jpeg("front"))
+            step("cup_skill", ok=res.ok, stage=res.stage, reason=res.reason, held=res.visual_held, placed=res.visual_placed, aligned_xy=res.aligned_xy)
+            if res.ok:
+                result = "success"
+                break
+            if res.aborted and ("HIGH CURRENT" in res.reason or "TIMEOUT" in res.reason):
+                break
+    finally:
+        be.stop_video(save=True)
+        be.stop_backend()
+        log.update(result=result, seconds=round(time.time() - t_start, 2), video=str(vid_path.relative_to(ROOT)))
+        (out / "trial.json").write_text(json.dumps(log, indent=1))
+        print(f"RESULT: {result}  ({log['seconds']} s, {log['claude_calls']} Claude calls)  logs: {out.relative_to(ROOT)}", flush=True)
+        os._exit(0 if result == "success" else 1)
 
 if a.backend == "sim":
     from normakit.sim_backend import SimBackend; be = SimBackend(); be.start(); calib = ROOT / "run/sim_H.json"

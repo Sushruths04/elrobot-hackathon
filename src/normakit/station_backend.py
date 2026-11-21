@@ -114,6 +114,9 @@ class StationBackend(Backend):
         self._client.follow("st3215/inference", q)
         while True:
             entry = await q.get()
+            while not q.empty():                      # SPEED: only the newest message matters; parsing all ~800 msg/s saturated this loop and delayed every command by seconds
+                try: entry = q.get_nowait()
+                except Exception: break
             if entry is None:
                 continue
             try:
@@ -153,6 +156,9 @@ class StationBackend(Backend):
         followed = set()
         while True:
             entry = await q.get()
+            while not q.empty():                      # SPEED: only the newest message matters; parsing all ~800 msg/s saturated this loop and delayed every command by seconds
+                try: entry = q.get_nowait()
+                except Exception: break
             if entry is None:
                 continue
             try:
@@ -175,6 +181,9 @@ class StationBackend(Backend):
         self._client.follow(qid, q)
         while True:
             entry = await q.get()
+            while not q.empty():                      # SPEED: only the newest message matters; parsing all ~800 msg/s saturated this loop and delayed every command by seconds
+                try: entry = q.get_nowait()
+                except Exception: break
             if entry is None:
                 continue
             try:
@@ -245,3 +254,49 @@ class StationBackend(Backend):
     def halt(self):
         st = self.state()
         self._sync(REG_GOAL_POS, {i: int(j.raw).to_bytes(2, "little") for i, j in st.joints.items()})
+
+
+def front_camera(be) -> str:
+    """Station renumbers cameras at every restart/replug. The FRONT (table overview) camera is the live one whose bottom-centre is bright (white table);
+    the wrist camera has the dark gripper jaws there."""
+    import io
+    import numpy as np
+    from PIL import Image
+    best = None
+    for c in be.cameras():
+        if not c.startswith("cam"):
+            continue
+        try:
+            g = np.asarray(Image.open(io.BytesIO(be.frame_jpeg(c))).convert("L"), float)
+        except Exception:
+            continue
+        h, w = g.shape; score = g[int(h * 0.80):, int(w * 0.30):int(w * 0.70)].mean()
+        if best is None or score > best[0]:
+            best = (score, c)
+    if best is None:
+        raise RuntimeError("no camera with frames")
+    return best[1]
+
+
+def wrist_camera(be) -> str | None:
+    """Discover the wrist camera (dark gripper jaws at bottom-centre, non-black scene in upper half)."""
+    import io
+    import numpy as np
+    from PIL import Image
+    fcam = front_camera(be)
+    best = None
+    for c in be.cameras():
+        if not c.startswith("cam") or c == fcam:
+            continue
+        try:
+            g = np.asarray(Image.open(io.BytesIO(be.frame_jpeg(c))).convert("L"), float)
+        except Exception:
+            continue
+        if g.mean() < 8.0:  # skip dead/solid-black USB streams (ISSUE-002)
+            continue
+        h, w = g.shape
+        bot = g[int(h * 0.80):, int(w * 0.30):int(w * 0.70)].mean()
+        if best is None or bot < best[0]:
+            best = (bot, c)
+    return best[1] if best else None
+

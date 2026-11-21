@@ -1,0 +1,16 @@
+{
+  "source": "calibrated from run/demo_traj_pick1.json and STL jaw geometry",
+  "cup_height_m": 0.096,
+  "cup_top_radius_m": 0.0355,
+  "cup_bot_radius_m": 0.0280,
+  "rim_pinch_radius_m": 0.0340,
+  "hover_tip_z_m": 0.145,
+  "grasp_tip_z_m": 0.064,
+  "lift_tip_z_m": 0.168,
+  "place_tip_z_m": 0.075,
+  "open_norm": 0.92,
+  "closed_norm": 0.00,
+  "post_close_wait_s": 2.0,
+  "hold_verify_s": 3.0,
+  "max_arm_current_ma": 900
+}

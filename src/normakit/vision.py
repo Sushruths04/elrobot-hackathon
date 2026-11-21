@@ -106,7 +106,7 @@ class Homography:
         return cls(np.array(d))
 
 
-def find_dark_object(arr: np.ndarray, roi=(60, 185, 620, 470), v_max=70, min_area=150, max_area=20000, open_px=9):
+def find_dark_object(arr: np.ndarray, roi=(60, 185, 500, 470), v_max=70, min_area=150, max_area=20000, open_px=9, max_dim=135):
     """Black object on a light table (RGB frame in). Thin cables vanish in the morphological opening; returns
     {"center_px", "bottom_px", "box", "area"} for the largest remaining dark blob inside roi=(u0,v0,u1,v1), or None.
     Needs no model download: the table is white, the object is black."""
@@ -118,6 +118,7 @@ def find_dark_object(arr: np.ndarray, roi=(60, 185, 620, 470), v_max=70, min_are
     best = None
     for i in range(1, n):
         x, y, w, h, a = st[i]
-        if min_area <= a <= max_area and (best is None or a > best["area"]):
+        fill = a / float(w * h); aspect = w / float(h)
+        if min_area <= a <= max_area and fill >= 0.48 and 0.45 <= aspect <= 2.2 and max(w, h) <= max_dim and (best is None or a > best["area"]):   # compact blob: not a cable or a long shadow
             best = {"center_px": [float(cen[i][0]), float(cen[i][1])], "bottom_px": [float(x + w / 2), float(y + h)], "box": [int(x), int(y), int(x + w), int(y + h)], "area": int(a)}
     return best
