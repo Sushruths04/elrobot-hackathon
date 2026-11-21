@@ -1,0 +1,11 @@
+{
+  "policy": "models/throw/policy.npz",
+  "episodes": 100,
+  "successes": 85,
+  "success_rate": 0.85,
+  "mean_reward": 8.469689501510466,
+  "mean_miss_distance_m": 0.03031049848953544,
+  "seconds": 7.1,
+  "sim_only": true,
+  "baseline_zero_policy_success_rate": 0.0
+}

@@ -1,6 +1,6 @@
 # Throw a small object into a box (sim first)
 
-Written 2026-11-22. Status: sim environment exists (`src/normakit/throw_env.py`, `assets/mujoco/throw_scene.xml`, `scripts/throw_smoke.py`). No policy is trained yet. Nothing here has touched the real arm.
+Written 2026-11-22. Status: sim environment exists (`src/normakit/throw_env.py`, `assets/mujoco/throw_scene.xml`, `scripts/throw_smoke.py`). A CEM-trained policy exists (sim only, see Results). Nothing here has touched the real arm.
 
 ## Assumptions (the request was "throw a small object inside the box, something like that")
 No reference clip, photo or description of "that" exists in the repo. These are guesses, change them if wrong:
@@ -31,7 +31,30 @@ The owner must approve this before any real-arm test. Until then the policy trai
 2. Distil the best behaviour into a conditioned policy: generate successful episodes across random box positions and train ACT (or an MLP) on (state, box position) to action chunks. ACT is already the chosen model in `docs/10_MODEL_AND_A100_PLAN.md`; serve it with `server/policy_server.py`. The throw needs no camera if the box position comes from the table calibration. A camera input can be added later.
 3. Train on the A100 (the laptop GPU is broken). The sim runs on CPU, so run rollouts on the A100 host cores and the network update on its GPU.
 
+## Results (measured, sim only)
+Method: CEM over a 27-number box-conditioned release trajectory (`src/normakit/throw_policy.py`), 40 iterations x 64 candidates x 4 episodes (10,240 sim episodes, 340 s on 16 CPU cores, no GPU). Command: `.venv/bin/python scripts/train_throw.py --iters 40 --pop 64 --eps-per-cand 4 --workers 16 --out models/throw/`.
+- Held-out eval (`scripts/eval_throw.py --episodes 100 --baseline`, random box positions, seeds not used in training): **85 of 100 in the box (85%)**, mean miss distance 3.0 cm. An untrained zero policy gets 0%.
+- Training-time success averaged only about 40% because CEM samples noisy candidates; 85% is the final selected mean policy.
+- Dataset: 176 of 200 rollouts succeeded, 3,971 (obs, action) frames in `models/throw/throw_dataset.npz` (keys obs, action, episode; obs is the 16-dim env observation, action the 8 normalised joint targets). Converting to LeRobot format for ACT is not done: write a small script that builds a LeRobotDataset with `observation.state` = first 8 obs values and `action`. Without a camera image, ACT needs a dummy or rendered frame, so an MLP on (state, box xy) may be the simpler distillation.
+- Limits, honestly: this is the sim number. The ball release speed comes from jaw contact impulses that are probably inflated (see Feasibility), the policy is open loop, and nothing was tried on the real arm. Expect the real success rate to be far lower, possibly zero, until the sim ball/jaw contact is compared with a real toss.
+
+## Scripts
+- `scripts/train_throw.py [--smoke]`: CEM training, writes `models/throw/policy.npz`, `train_log.json`, `throw_dataset.npz`. `--smoke` runs in about 15 s on CPU.
+- `scripts/eval_throw.py --episodes N`: success rate, writes `results/throw_eval.json`.
+- `scripts/run_throw.py`: default is a sim dry run and never touches hardware. `--real` requires `--i-have-a-human`, then does a one-motor test (joint 1, +0.05 and back, speed 0.2) and asks for a typed `yes`. The toss then goes through `Guard.move` at 10 Hz and 0.35 step cap, so it is a slow, gentle version of the sim motion and will not throw the ball as in sim. The gripper stays put unless `--with-ball`. `--unsafe-fast` is refused; a faster mode needs an owner-approved Guard change (ISSUE-016). `--export-plan f.json` writes the open-loop (60, 8) plan for one box position; serving it through `server/policy_server.py` needs a small adapter (the server loads LeRobot ACT checkpoints), not written.
+
+## A100 instructions
+CEM needs CPU cores, not a GPU, so use the host's cores; the GPU matters only for ACT distillation.
+```
+export A100_HOST=<host>            # no secrets in the repo
+export POLICY_API_TOKEN=<token>    # only for serving, set in your shell
+scp -r src scripts assets/mujoco <user>@$A100_HOST:~/normacore/
+ssh <user>@$A100_HOST 'cd ~/normacore && python scripts/train_throw.py --device cuda --iters 100 --pop 128 --workers 32 --out models/throw/'
+scp <user>@$A100_HOST:~/normacore/models/throw/* models/throw/
+```
+`assets/mujoco/elrobot_scene.xml` and `hulls/` are needed on the host (untracked in git here). Then run `eval_throw.py` locally.
+
 ## Next steps
-- Add a CEM/PPO training script and a held-out evaluation over random box positions (success rate with 100 episodes).
-- Domain randomisation: ball mass/friction, box position, servo lag.
+- Compare sim ball release speed with a real toss, then fix contact parameters before trusting 85%.
+- Domain randomisation (ball mass/friction, servo lag), closed-loop policy, ACT distillation.
 - Owner decision on the real-arm throw mode and a reference of the intended throw ("something like that").

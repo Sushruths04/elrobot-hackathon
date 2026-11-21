@@ -212,3 +212,7 @@ Original IDs kept (no clash with 101+). Some overlap with 101+: 002 ~ 106 (camer
 ### ISSUE-016 — Guard (10 Hz, 0.35 step cap) cannot execute a throw
 - **Status:** open (needs owner decision)
 - **Detail:** a ballistic throw needs fast large joint moves and a release timed finer than 100 ms. Proposed opt-in throw mode is in `docs/11_THROW_INTO_BOX.md`; `core.py` not changed. Sim ball-speed numbers from the twin are likely inflated by contact impulses (guess).
+
+### ISSUE-017 - Throw policy is sim-only and untested on the real arm
+- **Status:** open
+- **Detail:** CEM policy reaches 85/100 in-box in the twin (`docs/11_THROW_INTO_BOX.md`). Sim ball speed from jaw contacts is probably inflated (guess), the policy is open loop, and `run_throw.py --real` can only play a slow Guard-limited version (ISSUE-016), so real success is expected to be low. The real path has never been run.
