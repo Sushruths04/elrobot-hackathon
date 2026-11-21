@@ -38,10 +38,15 @@ def to_detection():
     if np.hypot(tp[0] - det_tip[0], tp[1] - det_tip[1]) < 0.04 and abs(tp[2] - det_tip[2]) < 0.04: return        # already there: no detour (saves ~5 s)
     low = A("/state")["tip"][2] < 0.05                                          # starting at the grasp height (e.g. after a stopped run): the path check would refuse, the move is upward
     must(A("/move_tip", {**WP, "low_ok": True} if low else WP), "waypoint"); must(A("/move_joints", {"ticks": det, "speed": a.speed, "low_ok": True, "timeout": 25}), "detection pose"); time.sleep(0.3)
+import concurrent.futures as cf
 def detect():
     for _ in range(3):
-        jp = frame(); m = er2.point(jp, "the two ends of the single pen lying loose on the table OUTSIDE the white box (ignore any pen inside the box; one point per end)", 640, 480)["points"]; b = er2.point(jp, "the center of the white box", 640, 480)["points"]
-        if len(m) >= 2 and b: return m[:2], b[0]
+        jp = frame()
+        with cf.ThreadPoolExecutor(4) as ex:
+            fm = ex.submit(er2.point, jp, "the two ends of the single pen lying loose on the table OUTSIDE the white box (ignore any pen inside the box; one point per end)", 640, 480)
+            fb = [ex.submit(er2.point, jp, "the center of the open white box", 640, 480) for _ in range(3)]      # 3 parallel asks: the box point varied by 4 cm between single calls
+            m = fm.result()["points"]; bs = [f.result()["points"][0] for f in fb if f.result()["points"]]
+        if len(m) >= 2 and bs: return m[:2], (bs[0][0], float(np.median([q[1] for q in bs])), float(np.median([q[2] for q in bs])))
     return None, None
 def wait_for_pen(secs=150):
     t0 = time.time(); last = None; stable = 0
@@ -82,8 +87,9 @@ for k, aa in enumerate(seq[:a.max]):
         log("   it slipped out during the lift - counting as a miss")
     must(A("/gripper", {"to": "open"}), "open after miss"); must(A("/move_tip", {"x": float(tgt[0]), "y": float(tgt[1]), "z": a.grasp_z + a.hover, **{**T, "speed": 400}, "low_ok": True}), "lift after miss")
 if not got: log(f"gave up after {min(a.max, len(seq))} attempts"); A("/stop", {}); sys.exit(6)
-bx, by = float(bxy[0]), float(bxy[1]); log(f"carrying to the box at ({bx:+.3f},{by:.3f})")
-must(A("/move_tip", {"x": bx, "y": by, "z": 0.19, "roll": 0.0, "speed": a.speed, "timeout": 20}), "over the box (high, clears the walls)"); must(A("/move_tip", {"x": bx, "y": by, "z": 0.145, "roll": 0.0, "speed": 500, "timeout": 15}), "lower into the box (stays above the rim)")
+bx, by = float(bxy[0]), float(bxy[1]); psi_b = math.atan2(bx, by); roll_rel = (-math.pi / 4 + psi_b + math.pi / 2) % math.pi - math.pi / 2     # jaw axis = pen axis + 90 deg; pen on the box diagonal (45 deg)
+log(f"carrying to the box at ({bx:+.3f},{by:.3f}), release roll {math.degrees(roll_rel):.0f} deg (pen along the diagonal)")
+must(A("/move_tip", {"x": bx, "y": by, "z": 0.19, "roll": roll_rel, "speed": a.speed, "timeout": 20}), "over the box (high, clears the walls)"); must(A("/move_tip", {"x": bx, "y": by, "z": 0.145, "roll": roll_rel, "speed": 500, "timeout": 15}), "lower into the box (stays above the rim)")
 must(A("/gripper", {"to": "open"}), "release"); time.sleep(0.4); must(A("/move_tip", {"x": bx, "y": by, "z": 0.19, "roll": 0.0, "speed": a.speed, "timeout": 15}), "lift away"); to_detection()
 try: v = er2.ask(frame(), 'Is the marker (pen) inside the white box now? Reply {"inside": true or false}'); log("model check inside box:", v.get("inside"))
 except Exception as e: log("final check failed:", str(e)[:70])
