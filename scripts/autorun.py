@@ -11,8 +11,10 @@ from normakit import vision
 from normakit.arm import Arm
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--backend", choices=["sim", "station"], default="sim"); ap.add_argument("--vision", choices=["color", "claude"], default="color")
+ap.add_argument("--backend", choices=["sim", "station"], default="sim"); ap.add_argument("--vision", choices=["color", "dark", "yolo", "claude"], default="color")
 ap.add_argument("--object", default="red block"); ap.add_argument("--target", default="blue tray"); ap.add_argument("--cam")
+ap.add_argument("--table-calib", default="calibration/table_front.json", help="pixel->robot table mapping (station backend)")
+ap.add_argument("--yolo-classes", default="cup,bottle", help="COCO classes for --vision yolo (weights download on first use)")
 ap.add_argument("--retries", type=int, default=2); ap.add_argument("--i-am-at-the-estop", action="store_true"); a = ap.parse_args()
 if a.backend == "station" and not a.i_am_at_the_estop: sys.exit("refusing to move the real arm: add --i-am-at-the-estop once a person is at the table and the power plug is in reach")
 if a.vision == "claude":
@@ -33,8 +35,16 @@ def ask(jpeg: bytes, prompt: str) -> dict:
 def look(arm, tag):
     jpg = arm.look(a.cam); n_img[0] += 1; (out / f"{n_img[0]:02d}_{tag}.jpg").write_bytes(jpg); return jpg
 
+_DET = []
 def locate(jpg, what):
     img = vision.decode(jpg); h, w = img.shape[:2]
+    if a.vision == "dark":                                               # black object on the light table: no model needed
+        d = vision.find_dark_object(img); return ((d["bottom_px"][0], d["bottom_px"][1]), "dark blob") if d else (None, "no dark object in the table region")
+    if a.vision == "yolo":                                               # teammate's detector (src/normakit/detect.py); bottom_px = where the object touches the table
+        from normakit.detect import Detector
+        if not _DET: _DET.append(Detector(classes=a.yolo_classes.split(",")))
+        label = next((c for c in a.yolo_classes.split(",") if c in what.lower()), a.yolo_classes.split(",")[0]); r = _DET[0].find(jpg, label)
+        return ((r["bottom_px"][0], r["bottom_px"][1]), f"{label} {r['conf']:.2f}") if r.get("ok") else (None, r.get("error", "not found"))
     if a.vision == "color":
         for word in what.lower().split():
             if word in vision.NAMED_COLORS:
@@ -51,7 +61,7 @@ def verify(jpg, question):
 if a.backend == "sim":
     from normakit.sim_backend import SimBackend; be = SimBackend(); be.start(); calib = ROOT / "run/sim_H.json"
 else:
-    from normakit.station_backend import StationBackend; be = StationBackend("localhost:8888"); be.start(); calib = ROOT / f"calibration/table_{a.cam or 'cam0'}.json"
+    from normakit.station_backend import StationBackend; be = StationBackend("localhost:8888"); be.start(); calib = ROOT / a.table_calib
 if not calib.exists(): sys.exit(f"no camera calibration at {calib} - run scripts/calibrate_camera.py first (positions are never hardcoded)")
 arm = Arm(be, calib_path=calib); result = "failed"
 try:

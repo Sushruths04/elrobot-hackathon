@@ -104,3 +104,20 @@ class Homography:
         if isinstance(d, dict):                       # calibration/table_<cam>.json from scripts/calibrate_camera.py
             d = d["H_pixel_to_robot_xy_m"]
         return cls(np.array(d))
+
+
+def find_dark_object(arr: np.ndarray, roi=(60, 185, 620, 470), v_max=70, min_area=150, max_area=20000, open_px=9):
+    """Black object on a light table (RGB frame in). Thin cables vanish in the morphological opening; returns
+    {"center_px", "bottom_px", "box", "area"} for the largest remaining dark blob inside roi=(u0,v0,u1,v1), or None.
+    Needs no model download: the table is white, the object is black."""
+    hsv = cv2.cvtColor(arr, cv2.COLOR_RGB2HSV)
+    mask = (hsv[..., 2] < v_max).astype(np.uint8) * 255
+    roi_m = np.zeros_like(mask); u0, v0, u1, v1 = roi; roi_m[v0:v1, u0:u1] = 255; mask &= roi_m
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (open_px, open_px)))
+    n, lab, st, cen = cv2.connectedComponentsWithStats(mask)
+    best = None
+    for i in range(1, n):
+        x, y, w, h, a = st[i]
+        if min_area <= a <= max_area and (best is None or a > best["area"]):
+            best = {"center_px": [float(cen[i][0]), float(cen[i][1])], "bottom_px": [float(x + w / 2), float(y + h)], "box": [int(x), int(y), int(x + w), int(y + h)], "area": int(a)}
+    return best

@@ -39,3 +39,9 @@
 - `StationBackend.send_goals`: goal wraps modulo 4096
 ### Changed
 - `run/station.yaml`: `resolution: auto`, `resize_target: 0` (not applied until Station restart)
+
+## [Unreleased] - 2026-11-21 evening (Sushruth's laptop)
+### Added
+- `vision.find_dark_object`: model-free black-object detector for the white table (cables removed by opening); tested live on the front camera: box (224,215)-(260,253), contact point (242,253)
+- `scripts/autorun.py --vision dark|yolo`: the single-process loop now uses the dark-blob detector or Bart's `normakit.detect.Detector` (YOLO) on the Station front camera; `--table-calib` selects the pixel->robot mapping
+- Merged teammates' work (YOLO detect, ArUco markers, tools/, calibration backups) from origin/main
