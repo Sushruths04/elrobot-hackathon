@@ -62,6 +62,7 @@ def main():
     ap.add_argument("--model", help="override weights file")
     ap.add_argument("--camera", default="cam0", help="station camera (cam0 or usbvideo/<id>)")
     ap.add_argument("--host", default="localhost:8888")
+    ap.add_argument("--markers", action="store_true", help="also detect ArUco/AprilTag markers (dictionary auto-detected)")
     ap.add_argument("--no-show", action="store_true")
     a = ap.parse_args()
 
@@ -71,6 +72,10 @@ def main():
     log = open(REPO / "logs" / f"detections-{time.strftime('%Y%m%d-%H%M%S')}.jsonl", "a")
     is_files = a.source and a.source[0] not in ("station",) and not a.source[0].startswith("webcam")
     import cv2
+    md = None
+    if a.markers:
+        from normakit.markers import MarkerDetector, draw as draw_markers
+        md = MarkerDetector()
     n, t0 = 0, time.time()
     for name, rgb in frames(a):
         t = time.time()
@@ -78,10 +83,15 @@ def main():
         ms = (time.time() - t) * 1000
         rec = {"t": round(t, 3), "src": name, "shape": list(rgb.shape[:2]), "ms": round(ms, 1),
                "dets": [d.to_dict() for d in dets]}
+        markers = md.detect(rgb) if md else []
+        if md:
+            rec["markers"] = [{"id": m["id"], "role": md.role(m["id"]), "center_px": m["center_px"]} for m in markers]
+            rec["dictionary"] = md.dictionary
         log.write(json.dumps(rec) + "\n"); log.flush()
         n += 1
         if is_files or a.no_show or n % 15 == 1:
-            print(json.dumps({k: rec[k] for k in ("src", "ms")} | {"dets": [(d.label, round(d.conf, 2), d.phrase) for d in dets]}))
+            print(json.dumps({k: rec[k] for k in ("src", "ms")} | {"dets": [(d.label, round(d.conf, 2), d.phrase) for d in dets]}
+                             | ({"markers": [(m["id"], md.role(m["id"])) for m in markers], "dict": md.dictionary} if md else {})))
         if is_files:
             out = REPO / "snapshots" / f"det_{Path(name).stem}.jpg"
             out.parent.mkdir(exist_ok=True)
@@ -90,7 +100,11 @@ def main():
             continue
         if not a.no_show:
             img = annotate(rgb, dets)
+            if md:
+                draw_markers(img, markers, md)
             summary = "  ".join(f"{d.label} {d.conf:.2f}" for d in dets) or "nothing"
+            if md:
+                summary += f" | markers {[m['id'] for m in markers]} {md.dictionary or ''}"
             cv2.putText(img, f"{n / (time.time() - t0):.1f} fps {ms:.0f} ms | {summary}", (8, img.shape[0] - 12),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 0), 2)
             cv2.imshow("detect_live (q = quit)", img)
