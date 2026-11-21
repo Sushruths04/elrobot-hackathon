@@ -132,10 +132,17 @@ def _dedupe(dets, thr=0.6):
 def annotate(rgb: np.ndarray, dets: list[Detection]) -> np.ndarray:
     """Draw boxes + labels; returns a BGR image for cv2.imshow / imwrite."""
     import cv2
-    img = np.ascontiguousarray(rgb[:, :, ::-1])
+    img = rgb[:, :, ::-1].copy()  # always a copy: never draw into the caller's frame
+    colors = {}
+    palette = [(0, 220, 0), (255, 140, 0), (0, 200, 255), (255, 0, 200), (200, 200, 0)]
+    scale = max(0.6, img.shape[1] / 1000)
     for d in dets:
+        col = colors.setdefault(d.label, palette[len(colors) % len(palette)])
         x1, y1, x2, y2 = map(int, d.box)
-        cv2.rectangle(img, (x1, y1), (x2, y2), (0, 220, 0), 2)
-        cv2.circle(img, tuple(map(int, d.bottom_px)), 4, (0, 0, 255), -1)
-        cv2.putText(img, f"{d.label} {d.conf:.2f}", (x1, max(12, y1 - 5)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 220, 0), 1)
+        cv2.rectangle(img, (x1, y1), (x2, y2), col, max(2, int(scale * 2)))
+        cv2.circle(img, tuple(map(int, d.center_px)), int(4 * scale), (0, 0, 255), -1)
+        text = f"{d.label} {d.conf:.2f}"
+        ty = y1 - 8 if y1 > 40 * scale else y1 + int(28 * scale)  # inside the box if it touches the top
+        cv2.putText(img, text, (x1 + 4, ty), cv2.FONT_HERSHEY_SIMPLEX, 0.6 * scale, (0, 0, 0), int(5 * scale))
+        cv2.putText(img, text, (x1 + 4, ty), cv2.FONT_HERSHEY_SIMPLEX, 0.6 * scale, col, int(2 * scale))
     return img

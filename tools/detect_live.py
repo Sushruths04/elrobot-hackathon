@@ -9,7 +9,7 @@ Live object detection (YOLO) - read-only, never moves the arm.
   .venv/bin/python tools/detect_live.py --source station [--camera cam0]  # Station camera (usbvideo queue)
   add --no-show for headless (JSON lines only)
 
-Every frame's detections are appended to logs/detections-<time>.jsonl. Press q in the window to quit.
+Every frame's detections are appended to logs/detections-<time>.jsonl. Press q in the window to quit, s to save the raw frame to snapshots/.
 Webcam: dev only, while we have no Station camera (AGENTS.md: on the rig, cameras go through Station).
 """
 import argparse, json, sys, time
@@ -90,11 +90,18 @@ def main():
             continue
         if not a.no_show:
             img = annotate(rgb, dets)
-            cv2.putText(img, f"{n / (time.time() - t0):.1f} fps  {ms:.0f} ms", (8, 20),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+            summary = "  ".join(f"{d.label} {d.conf:.2f}" for d in dets) or "nothing"
+            cv2.putText(img, f"{n / (time.time() - t0):.1f} fps {ms:.0f} ms | {summary}", (8, img.shape[0] - 12),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 0), 2)
             cv2.imshow("detect_live (q = quit)", img)
-            if cv2.waitKey(1) & 0xFF == ord("q"):
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord("q"):
                 break
+            if key == ord("s"):  # save the raw frame (for offline debugging / training data)
+                out = REPO / "snapshots" / f"frame_{time.strftime('%H%M%S')}.jpg"
+                out.parent.mkdir(exist_ok=True)
+                cv2.imwrite(str(out), rgb[:, :, ::-1])
+                print("saved", out, flush=True)
     print("log:", log.name)
 
 

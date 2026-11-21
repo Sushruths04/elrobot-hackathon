@@ -16,6 +16,7 @@
 - 2026-11-21 - MCP server `elrobot-real` entry in `.mcp.json` (station backend, untested for motion)
 - 2026-11-21 - `calibration/`: per-bus calibration files (min, max, midpoint, span, frozen)
 ### Fixed
+- 2026-11-21 17:05 - `detect.annotate` drew into the caller's frame (saved frames had boxes baked in); labels hidden when a box touched the top edge. Now copies, colours per class, label inside the box at the edge; live view lists all detections at the bottom; `s` saves the raw frame - Claude
 - 2026-11-21 15:50 - `tools/calibrate.py watch`: subscribe once (it re-subscribed every refresh and crashed with TimeoutError after a few minutes); shows `pos` and `<<< MOVING` on the joint being moved - Claude
 - 2026-11-21 15:45 - `tools/verify_station.py`: saved motors use raw Present Position (offset was counted twice -> false `OUTSIDE`, wrong `--move-test` start) - Claude [ISSUE-110]
 - 2026-11-21 - `StationBackend`: wrapped ranges (max < min) and positions just outside the range no longer break normalisation
