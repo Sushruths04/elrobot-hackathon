@@ -24,3 +24,15 @@
 - Auto-calibration (`elrobot.rs`): only for exactly 8 motors IDs 1–8; stall-sweeps each joint up to ~360° from the current pose at fixed speed 365 / accel 50 / torque limit 300 — clear the workspace. Mirroring max speed is hard-coded (3300) in `motors-mirroring/src/config.rs`.
 - Calibration over TCP (`tools/calibrate.py`): `st3215.Command` has `reset_calibration` (14), `freeze_calibration` (15, freeze=True without arcs = web-UI Save), `auto_calibrate` (17), `stop_auto_calibrate` (18); progress in `BusState.auto_calibration` (`protobufs/drivers/st3215/st3215.proto`). Moving the arms to another laptop loses the saved ranges (ISSUE-109).
 - **Table markers** (`calibration/markers.json`, sheet `aruco_markers_A4.pdf`): DICT_4X4_50, 40 mm. ID 0 corner front-left, 1 front-right, 2 back-right, 3 back-left, 4 zone A, 5 zone B, **6 zone C = DROP**, 7 bowl. Live check: `.venv/bin/python tools/detect_live.py --classes cup,bottle --markers`.
+
+## Camera + table calibration state (2026-11-21 evening, Sushruth's laptop) - all files in `calibration/`
+- **Cameras (Station numbering changes at every restart - identify by picture):** front = table overview, wrist = on the follower's gripper (its picture is rotated 90 deg). Station config `usb-video.formats: 640x480@30fps,mjpeg`, `resize_target: 0`.
+- **Front lens:** `camera_front.json` (15 views, rms 0.39 px, fx 308 fy 320, ~92 deg HFOV). Valid for that physical camera at 640x480.
+- **Wrist lens:** `camera_wrist.json` = v2 (22 of 30 views kept, rms 0.44 px, fx=fy=302, ~93 deg). `camera_wrist_v1_rms1p49.json` is the earlier fallback; `camera_wrist_v2_points.npz` the corner data.
+- **Table mapping (front pixel -> robot x,y metres):** `table_front.json`, made by hand-touching the 4 inner corners of the printed OpenCV board with the follower's gripper tip (`scripts/touch_capture.py record <corner>` x4, then `scripts/touch_fit.py`). Raw touches: `touch_points_front.json`; the board picture used: `board_frame_front.jpg`.
+  - Model: rigid, mirrored (robot x,y is a mirror of the board axes), scale fit 1.003.
+  - **Honest accuracy: mean 26.4 mm, max 32.9 mm residual at the 4 corners** (the exact 4-point homography reported 0 mm, which is meaningless). Expect about +-3 cm. Fine for hovering above an object, NOT yet for a reliable grasp of a small object.
+  - Forward kinematics gives EE z ~ 0.107 m when the tip is on the table (mean of the 4 touches), so the table reference for `Kin` targets is z = 0.107, not `TABLE_Z` = 0.02 in `arm.py`.
+  - Measured corner spacing from the arm: top 20.4 cm (true 20), sides 8-10 cm (true 12.5), bottom 24.6 cm (true 20): hand placement / FK error of 2-4 cm.
+- **Do not move the front camera or the robot base** after this; otherwise redo the touches. The board can be removed.
+- **Ideas to tighten it:** more touch points (middle of the sheet), keep the gripper pointing straight down for every touch, and close the loop with the camera (see where the gripper is in the picture and correct the last centimetres).
