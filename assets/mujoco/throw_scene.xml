@@ -1,0 +1,21 @@
+<!-- Throw-into-box variant. Includes the unmodified twin scene and adds an open-top box (mocap, so it can be moved
+     per episode) and a small ball. elrobot_scene.xml is not changed. Used by src/normakit/throw_env.py. -->
+<mujoco model="elrobot_throw">
+  <include file="elrobot_scene.xml" />
+  <worldbody>
+    <!-- Box inner floor 0.12 x 0.12 m, walls 0.06 m high, 5 mm thick. Body origin = centre of the inner floor. -->
+    <body name="throw_box" mocap="true" pos="0.0 0.32 0.0">
+      <geom name="box_floor" type="box" pos="0 0 0.0025" size="0.065 0.065 0.0025" rgba="0.75 0.55 0.25 1" contype="1" conaffinity="3" condim="4" friction="0.8 0.01 0.001" />
+      <geom name="box_wall_n" type="box" pos="0 0.0625 0.0325" size="0.065 0.0025 0.03" rgba="0.75 0.55 0.25 1" contype="1" conaffinity="3" condim="4" friction="0.8 0.01 0.001" />
+      <geom name="box_wall_s" type="box" pos="0 -0.0625 0.0325" size="0.065 0.0025 0.03" rgba="0.75 0.55 0.25 1" contype="1" conaffinity="3" condim="4" friction="0.8 0.01 0.001" />
+      <geom name="box_wall_e" type="box" pos="0.0625 0 0.0325" size="0.0025 0.06 0.03" rgba="0.75 0.55 0.25 1" contype="1" conaffinity="3" condim="4" friction="0.8 0.01 0.001" />
+      <geom name="box_wall_w" type="box" pos="-0.0625 0 0.0325" size="0.0025 0.06 0.03" rgba="0.75 0.55 0.25 1" contype="1" conaffinity="3" condim="4" friction="0.8 0.01 0.001" />
+    </body>
+    <!-- 25 mm diameter, 8 g ball (foam/rubber ball class). -->
+    <body name="throw_ball" pos="0.0 0.2 0.3">
+      <freejoint name="ball_freejoint" />
+      <inertial pos="0 0 0" mass="0.008" diaginertia="4.2e-07 4.2e-07 4.2e-07" />
+      <geom name="ball_geom" type="sphere" size="0.0125" rgba="0.9 0.15 0.15 1" contype="1" conaffinity="3" condim="4" friction="0.9 0.01 0.001" solref="0.004 1" />
+    </body>
+  </worldbody>
+</mujoco>

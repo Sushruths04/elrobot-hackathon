@@ -208,3 +208,7 @@ Original IDs kept (no clash with 101+). Some overlap with 101+: 002 ~ 106 (camer
 ### ISSUE-015 — Our `repo/norma-core` copy has no `.git`
 - **Status:** known
 - **Detail:** session move didn't copy `.git`. Fine for running examples; to update, re-clone (see SETUP.md). Our only upstream edit is the teleop `--max-speed` patch (CHANGELOG).
+
+### ISSUE-016 — Guard (10 Hz, 0.35 step cap) cannot execute a throw
+- **Status:** open (needs owner decision)
+- **Detail:** a ballistic throw needs fast large joint moves and a release timed finer than 100 ms. Proposed opt-in throw mode is in `docs/11_THROW_INTO_BOX.md`; `core.py` not changed. Sim ball-speed numbers from the twin are likely inflated by contact impulses (guess).
