@@ -49,14 +49,22 @@ class MarkerDetector:
         gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
         if self._det:
             return self._run(self._det, gray)
-        best = (None, [])  # auto: try each dictionary, keep the one that finds most markers, then lock it
+        best = (None, [])  # auto: try each dictionary, keep the one that finds most markers
         for name in CANDIDATES:
             found = self._run(_detector(name), gray)
             if len(found) > len(best[1]):
                 best = (name, found)
-        if best[0]:
-            self.dictionary, self._det = best[0], _detector(best[0])
+        if best[0]:  # lock only after the same dictionary wins 5 frames (one stray match must not lock it)
+            self._votes = getattr(self, "_votes", {})
+            self._votes[best[0]] = self._votes.get(best[0], 0) + 1
+            if self._votes[best[0]] >= 5:
+                self.dictionary, self._det = best[0], _detector(best[0])
         return best[1]
+
+    @property
+    def candidate(self):
+        votes = getattr(self, "_votes", {})
+        return self.dictionary or (max(votes, key=votes.get) + "?" if votes else None)
 
     # -------- roles
     def role(self, marker_id: int) -> str:

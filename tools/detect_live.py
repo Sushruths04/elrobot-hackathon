@@ -86,12 +86,12 @@ def main():
         markers = md.detect(rgb) if md else []
         if md:
             rec["markers"] = [{"id": m["id"], "role": md.role(m["id"]), "center_px": m["center_px"]} for m in markers]
-            rec["dictionary"] = md.dictionary
+            rec["dictionary"] = md.candidate
         log.write(json.dumps(rec) + "\n"); log.flush()
         n += 1
         if is_files or a.no_show or n % 15 == 1:
             print(json.dumps({k: rec[k] for k in ("src", "ms")} | {"dets": [(d.label, round(d.conf, 2), d.phrase) for d in dets]}
-                             | ({"markers": [(m["id"], md.role(m["id"])) for m in markers], "dict": md.dictionary} if md else {})))
+                             | ({"markers": [(m["id"], md.role(m["id"])) for m in markers], "dict": md.candidate} if md else {})))
         if is_files:
             out = REPO / "snapshots" / f"det_{Path(name).stem}.jpg"
             out.parent.mkdir(exist_ok=True)
@@ -104,7 +104,7 @@ def main():
                 draw_markers(img, markers, md)
             summary = "  ".join(f"{d.label} {d.conf:.2f}" for d in dets) or "nothing"
             if md:
-                summary += f" | markers {[m['id'] for m in markers]} {md.dictionary or ''}"
+                summary += f" | markers {[m['id'] for m in markers]} {md.candidate or ''}"
             cv2.putText(img, f"{n / (time.time() - t0):.1f} fps {ms:.0f} ms | {summary}", (8, img.shape[0] - 12),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 0), 2)
             cv2.imshow("detect_live (q = quit)", img)
