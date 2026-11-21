@@ -59,5 +59,5 @@ pauses + notifies a human). Stretch: fine-tune SmolVLA on the collected data.
 | 2026-11-21 | No ROS 2 — Station API only | ROS is "planned" in Station, not supported | pre-event |
 | 2026-11-21 | Camera self-calibration out of scope; calibrate once manually | too hard for the time | pre-event |
 | 2026-11-21 | Agentic workflow: AGENTS.md protocol, every change in CHANGELOG | many agents/people in parallel | Bart |
-| 2026-11-21 | Project idea: **TBA** | — | team |
-| 2026-11-21 16:25 | Use **only the follower** arm; project = **YOLO-based pick and place (e.g. a cup)**. Leader left uncalibrated. | Leader calibration kept failing (flaky bus ISSUE-112, false stalls ISSUE-111, accidental reset). Follower is calibrated and matches the reference. |
+| 2026-11-21 | Project idea: **TBA** → superseded 16:25 (below) | — | team |
+| 2026-11-21 16:25 | Use **only the follower** arm; project = **YOLO-based pick and place (e.g. a cup)**. Leader left uncalibrated. | Leader calibration kept failing (flaky bus ISSUE-112, false stalls ISSUE-111, accidental reset). Follower is calibrated and matches the reference. | Bart |
