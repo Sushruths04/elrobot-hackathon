@@ -1,12 +1,15 @@
 """Parametric throw policy conditioned on the box position (SIM tooling, no hardware access).
 
-theta has 3 * 9 = 27 numbers: a base vector plus two slopes for (box_x, box_y), each of length 9:
-  0..5  target norms of joints 1..6 (sigmoid of the raw value)
-  6     gripper norm after release (sigmoid)
-  7     move duration in control steps (1..14)
-  8     release step (2..30)
-The action at step t is the start pose moved linearly towards the target over `duration` steps,
-gripper held at START until the release step, then set to the release value.
+Two phases: a windup to pose A, then a swing to pose B with the gripper opening at a chosen step of the swing.
+theta has 3 * N_P numbers: a base vector plus two slopes for (box_x, box_y), each of length N_P = 16:
+  0..5   windup pose A, joints 1..6 (sigmoid)
+  6..11  swing end pose B, joints 1..6 (sigmoid)
+  12     gripper norm after release (sigmoid)
+  13     windup duration in control steps (1..10)
+  14     swing duration in control steps (1..10)
+  15     release step counted from the start of the swing (0..swing duration + 2)
+The action at step t moves linearly START -> A, then A -> B; the gripper stays at START until the release step.
+All targets are clipped to Guard's 0.02..0.98 clamp.
 """
 from __future__ import annotations
 
@@ -14,9 +17,10 @@ import numpy as np
 
 from .throw_env import START_NORMS
 
-N_P = 9
+N_P = 16
 THETA_DIM = 3 * N_P
 BOX_X_SCALE, BOX_Y_MID, BOX_Y_SCALE = 0.12, 0.315, 0.065
+GUARD_LO, GUARD_HI = 0.02, 0.98   # same clamp Guard.move applies on the real arm, so sim sees what the arm would get
 START = np.array([START_NORMS[i] for i in range(1, 9)], dtype=np.float64)
 
 
@@ -25,26 +29,29 @@ def _sig(x):
 
 
 def decode(theta, box_xy):
+    """Returns (pose_a, pose_b, grip, windup_steps, swing_steps, release_step_absolute)."""
     th = np.asarray(theta, dtype=np.float64).reshape(3, N_P)
     f = np.array([1.0, box_xy[0] / BOX_X_SCALE, (box_xy[1] - BOX_Y_MID) / BOX_Y_SCALE])
     raw = f @ th
-    target = _sig(raw[:6])
-    grip = float(_sig(raw[6]))
-    dur = 1.0 + 13.0 * float(_sig(raw[7]))
-    rel = int(round(2 + 28 * float(_sig(raw[8]))))
-    return target, grip, dur, rel
+    pa, pb = _sig(raw[:6]), _sig(raw[6:12])
+    grip = float(_sig(raw[12]))
+    d1 = int(round(1 + 9 * float(_sig(raw[13]))))
+    d2 = int(round(1 + 9 * float(_sig(raw[14]))))
+    rel = d1 + int(round((d2 + 2) * float(_sig(raw[15]))))
+    return pa, pb, grip, d1, d2, rel
 
 
-def plan(theta, box_xy, steps: int = 60) -> np.ndarray:
+def plan(theta, box_xy, steps: int = 30) -> np.ndarray:
     """Open-loop (steps, 8) action sequence for this box position."""
-    target, grip, dur, rel = decode(theta, box_xy)
+    pa, pb, grip, d1, d2, rel = decode(theta, box_xy)
     out = np.tile(START, (steps, 1))
     for t in range(steps):
-        a = min(1.0, (t + 1) / dur)
-        out[t, :6] = START[:6] + (target - START[:6]) * a
-        out[t, 6] = START[6]
+        if t < d1:
+            out[t, :6] = START[:6] + (pa - START[:6]) * (t + 1) / d1
+        else:
+            out[t, :6] = pa + (pb - pa) * min(1.0, (t - d1 + 1) / d2)
         out[t, 7] = grip if t >= rel else START[7]
-    return out
+    return np.clip(out, GUARD_LO, GUARD_HI)
 
 
 def rollout(env, theta, seed=None, record=False):

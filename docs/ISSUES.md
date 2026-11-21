@@ -220,4 +220,4 @@ Original IDs kept (no clash with 101+). Some overlap with 101+: 002 ~ 106 (camer
 
 ### ISSUE-017 - Throw policy is sim-only and untested on the real arm
 - **Status:** open
-- **Detail:** CEM policy reaches 85/100 in-box in the twin (`docs/11_THROW_INTO_BOX.md`). Sim ball speed from jaw contacts is probably inflated (guess), the policy is open loop, and `run_throw.py --real` can only play a slow Guard-limited version (ISSUE-016), so real success is expected to be low. The real path has never been run.
+- **Detail:** the earlier 85/100 was a placement (review 2026-11-21) and is withdrawn. With a strict throw success (release at least 8 cm from the box centre, ball at rest in the box) the retrained CEM policy reaches 72/100 in the twin (`docs/11_THROW_INTO_BOX.md`). The plan ignores Guard's 0.35 step cap and sweeps the jaw low, so `run_throw.py --real` refuses most box positions at its keep-out check. Sim ball speed from jaw contacts is probably inflated (guess), the policy is open loop, and `run_throw.py --real` can only play a slow Guard-limited version (ISSUE-016), so real success is expected to be low. The real path has never been run.

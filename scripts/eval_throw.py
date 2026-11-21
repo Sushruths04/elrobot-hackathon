@@ -29,7 +29,8 @@ def _work(args):
     out = []
     for s in seeds:
         ok, r, err, _ = rollout(_env, theta, seed=s)
-        out.append((ok, r, err, [float(v) for v in _env.box_xy]))
+        out.append((ok, r, err, [float(v) for v in _env.box_xy], _env.release_dist, _env.release_speed,
+                    bool(_env.in_box()), bool(_env.is_throw())))
     return out
 
 
@@ -55,6 +56,12 @@ def main():
         "policy": a.policy, "episodes": len(res), "successes": int(succ.sum()),
         "success_rate": float(succ.mean()), "mean_reward": float(np.mean([r[1] for r in res])),
         "mean_miss_distance_m": float(np.mean([r[2] for r in res])),
+        "median_miss_distance_m": float(np.median([r[2] for r in res])),
+        "in_box_total": int(sum(r[6] for r in res)),
+        "in_box_but_not_a_throw": int(sum(r[6] and not r[7] for r in res)),
+        "mean_release_dist_m": float(np.mean([r[4] for r in res])),
+        "mean_release_speed_ms": float(np.mean([r[5] for r in res])),
+        "success_definition": "released from gripper, release >= 0.08 m from box centre, ball rests in box",
         "seconds": round(time.time() - t0, 1), "sim_only": True,
     }
     if a.baseline:

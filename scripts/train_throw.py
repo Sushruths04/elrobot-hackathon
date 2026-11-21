@@ -4,7 +4,7 @@
   .venv/bin/python scripts/train_throw.py --smoke
   .venv/bin/python scripts/train_throw.py --iters 25 --pop 48 --eps-per-cand 4 --workers 16 --out models/throw/
 
-The policy is a 27-number parametric release trajectory linear in the box position (src/normakit/throw_policy.py).
+The policy is a 48-number two-phase (windup, swing + release) trajectory linear in the box position (src/normakit/throw_policy.py).
 The simulator runs on CPU; --device is accepted for A100 hosts but CEM needs no GPU (see docs/11_THROW_INTO_BOX.md).
 Outputs in --out: policy.npz (best theta), train_log.json, throw_dataset.npz (successful rollouts: obs, action,
 episode id; convert to LeRobot format later, see docs/11).
@@ -46,6 +46,8 @@ def main():
     ap.add_argument("--workers", type=int, default=max(1, min(16, (mp.cpu_count() or 2) - 2)))
     ap.add_argument("--dataset-episodes", type=int, default=100, help="rollouts tried for the successful-rollout dataset")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--init", help="warm start: policy.npz whose theta is the initial CEM mean")
+    ap.add_argument("--sd0", type=float, default=1.5, help="initial CEM standard deviation")
     ap.add_argument("--out", default="models/throw/")
     a = ap.parse_args()
     if a.smoke:
@@ -56,7 +58,8 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
 
     rng = np.random.default_rng(a.seed)
-    mu, sd = np.zeros(THETA_DIM), np.full(THETA_DIM, 1.5)
+    mu = np.load(a.init)["theta"].astype(float) if a.init else np.zeros(THETA_DIM)
+    sd = np.full(THETA_DIM, a.sd0)
     n_el = max(2, int(a.pop * a.elite_frac))
     best_theta, best_score, log = mu.copy(), -1e9, []
     t0 = time.time()

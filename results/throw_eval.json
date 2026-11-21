@@ -1,11 +1,17 @@
 {
   "policy": "models/throw/policy.npz",
   "episodes": 100,
-  "successes": 85,
-  "success_rate": 0.85,
-  "mean_reward": 8.469689501510466,
-  "mean_miss_distance_m": 0.03031049848953544,
-  "seconds": 7.1,
+  "successes": 72,
+  "success_rate": 0.72,
+  "mean_reward": 8.494464849236387,
+  "mean_miss_distance_m": 0.13359300054337453,
+  "median_miss_distance_m": 0.051516630872037866,
+  "in_box_total": 92,
+  "in_box_but_not_a_throw": 20,
+  "mean_release_dist_m": 0.09840008611204831,
+  "mean_release_speed_ms": 0.8388068330210671,
+  "success_definition": "released from gripper, release >= 0.08 m from box centre, ball rests in box",
+  "seconds": 6.2,
   "sim_only": true,
   "baseline_zero_policy_success_rate": 0.0
 }

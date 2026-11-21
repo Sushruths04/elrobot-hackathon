@@ -5,7 +5,10 @@ normal MujocoBackend, so the ST3215 servo model (speed/accel profile, torque cap
 
 Action: 8 normalised joint targets in 0..1 (joints 1..8, 8 = gripper), absolute, one set per control step.
 Observation (16): 8 joint norms, ball xyz, ball linear velocity xyz, box xy.
-Reward: 0 while in flight; at the end of the throw -distance(ball, box centre) in metres, +10 if the ball is in the box.
+Success (strict): the ball has LEFT the gripper (> RELEASE_DIST from the jaw tip), it was released at least MIN_THROW_DIST
+(horizontal) from the box centre, and when the episode ends (ball at rest after release, or horizon) it lies inside the box.
+A ball carried over the box and dropped (placement) or still held is NOT a success; the episode does not stop at first contact.
+Reward: 0 while in flight; at the end -distance(ball, box centre) in metres, +10 on success, +2 to +8 if in the box but not a throw (shaped by release distance).
 No Guard here: this is a simulator. A real-arm throw needs its own approved safety path (docs/11_THROW_INTO_BOX.md).
 """
 from __future__ import annotations
@@ -22,6 +25,8 @@ THROW_SCENE = mb.ROOT / "assets/mujoco/throw_scene.xml"
 BALL_R = 0.0125
 BOX_INNER_HALF = 0.06        # inner half width (m)
 BOX_WALL_H = 0.06            # rim height above table (m)
+RELEASE_DIST = 0.03          # ball further than this from the jaw tip counts as released (m)
+MIN_THROW_DIST = 0.08        # release must be at least this far from the box centre in xy (m): a toss, not a placement
 # Park the cup and bottle of the base scene out of the way.
 _CUP_PARK = (0.40, 0.75)
 _BOTTLE_PARK = (-0.40, 0.75)
@@ -32,7 +37,7 @@ START_NORMS = {1: 0.50, 2: 0.25, 3: 0.28, 4: 0.72, 5: 0.50, 6: 0.65, 7: 0.50, 8:
 class ThrowIntoBoxEnv(gym.Env):
     metadata = {"render_modes": []}
 
-    def __init__(self, control_dt: float = 0.05, max_steps: int = 60, seed: int = 0,
+    def __init__(self, control_dt: float = 0.10, max_steps: int = 30, seed: int = 0,
                  box_x: tuple[float, float] = (-0.12, 0.12), box_y: tuple[float, float] = (0.25, 0.38),
                  servo_preset: str = "calibrated_fix"):
         super().__init__()
@@ -84,9 +89,18 @@ class ThrowIntoBoxEnv(gym.Env):
         j = [st.joints[i].norm for i in JOINT_IDS]
         return np.array([*j, *self.ball_pos(), *self.ball_vel(), *self.box_xy], dtype=np.float32)
 
-    def _landed(self) -> bool:
+    def _at_rest(self) -> bool:
         p, v = self.ball_pos(), self.ball_vel()
-        return bool(p[2] < BALL_R + 0.004 and np.linalg.norm(v) < 0.05)
+        return bool(p[2] < BALL_R + 0.015 and np.linalg.norm(v) < 0.05)
+
+    def _track_release(self) -> None:
+        if self._release_xy is None and np.linalg.norm(self.ball_pos() - self.b.jaw_tip_pos()) > RELEASE_DIST:
+            self._release_xy = self.ball_pos()[:2].copy()
+            self.release_dist = float(np.linalg.norm(self._release_xy - self.box_xy))
+            self.release_speed = float(np.linalg.norm(self.ball_vel()))
+
+    def is_throw(self) -> bool:
+        return self._release_xy is not None and self.release_dist >= MIN_THROW_DIST
 
     # ---------------------------------------------------------------- gym API
     def reset(self, *, seed=None, options=None):
@@ -102,7 +116,9 @@ class ThrowIntoBoxEnv(gym.Env):
         self.set_ball(b.jaw_tip_pos() + np.array([0.0, -0.012, 0.0]))
         b.step_seconds(0.3)  # let the grip settle
         self._t = 0
-        self._released = False
+        self._release_xy = None
+        self.release_dist = 0.0
+        self.release_speed = 0.0
         return self._obs(), {"box_xy": self.box_xy.copy()}
 
     def step(self, action):
@@ -110,13 +126,19 @@ class ThrowIntoBoxEnv(gym.Env):
         self.b.send_goals({i: float(a[i - 1]) for i in JOINT_IDS}, speed=1.0)
         self.b.step_seconds(self.control_dt)
         self._t += 1
-        success = self.in_box()
-        landed = self._landed()
-        terminated = success or landed
+        self._track_release()
+        inbox = self.in_box()
+        terminated = self._release_xy is not None and self._at_rest()
+        success = bool(terminated and inbox and self.is_throw())
         truncated = (not terminated) and self._t >= self.max_steps
+        if truncated:
+            success = bool(inbox and self.is_throw())
         reward = 0.0
         if terminated or truncated:
             dist = float(np.linalg.norm(self.ball_pos()[:2] - self.box_xy))
             reward = -dist + (10.0 if success else 0.0)
-        info = {"success": success, "ball_xy_err": float(np.linalg.norm(self.ball_pos()[:2] - self.box_xy))}
+            if inbox and not success:  # placement/held: small credit, grows with release distance (shaping towards a toss)
+                reward += 2.0 + 6.0 * min(1.0, self.release_dist / MIN_THROW_DIST) * float(self._release_xy is not None)
+        info = {"success": success, "released": self._release_xy is not None,
+                "release_dist": self.release_dist, "release_speed": self.release_speed, "in_box": inbox, "ball_xy_err": float(np.linalg.norm(self.ball_pos()[:2] - self.box_xy))}
         return self._obs(), reward, terminated, truncated, info
