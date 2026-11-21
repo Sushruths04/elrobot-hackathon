@@ -1,4 +1,4 @@
-# Issues (IDs 101+ = Sushruth's rig; 001..015 = Bart's macOS session, listed at the bottom). Next ID: ISSUE-110
+# Issues (IDs 101+ = Sushruth's rig; 001..015 = Bart's macOS session, listed at the bottom). Next ID: ISSUE-111
 
 ### ISSUE-101 - Station default torque caps may make arms weak / trip overload
 - **Status:** open (verified registers, effect suspected)
@@ -42,12 +42,23 @@
 
 
 ### ISSUE-109 - Calibration does not follow the arms to another laptop
-- **Status:** open (verified)
+- **Status:** workaround (follower recalibrated on Bart's Mac 15:40; leader pending)
 - **Found:** 2026-11-21 15:55 by Claude
 - **Where:** station (both buses)
 - **Symptom:** arms moved from Sushruth's laptop (both frozen) to Bart's Mac: `verify_station.py` shows all 16 motors `NOT SAVED`, ranges are partial leftovers (e.g. follower m2 [2142,2142], m4 [497,3284] = 120% of reference).
 - **Cause (known):** min/max/frozen live in Station's `st3215/meta` under the local `station_data/`, not in the servos (docs/SETUP.md). EEPROM offsets from the old calibration are still in the motors, so seen ranges mix old offsets with new tracking.
 - **Fix / workaround:** recalibrate on whichever laptop runs Station (reset -> sweep -> save, `tools/calibrate.py`). Keep one Station laptop for the rest of the hackathon, or copy its `station_data/` along with the arms (untested).
+
+
+### ISSUE-110 - `verify_station.py` added the servo offset twice on saved motors
+- **Status:** resolved (2026-11-21 15:45, Claude)
+- **Found:** 2026-11-21 15:43 by Claude
+- **Where:** `tools/verify_station.py` (also feeds `--move-test`)
+- **Symptom:** right after the follower auto-cal, 5 of 8 motors showed `! pos OUTSIDE range` (e.g. m8 pos=4021, range [1243,2853]).
+- **Evidence:** raw Present Position m2=1066 (= 1% of [1042,3054]) and m4=3096 (= 95% of [885,3211]) match the last auto-cal steps "Move to 1%" / "Move to 95%". raw + offset did not.
+- **Cause (known):** Station adds the EEPROM offset only while collecting an UNSAVED range (`port_meta.rs` ~l.410); once saved, ranges are in Present-Position space (the servo applies the offset itself). The 12:25 "fix" generalised that wrongly.
+- **Impact:** `--move-test` would have computed its goal from the wrong position (up to ~1900 steps off). It was never run.
+- **Fix:** frozen motors use raw Present Position; unsaved motors keep raw + offset.
 
 ---
 

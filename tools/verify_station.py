@@ -42,7 +42,7 @@ def parse_motor(b):
     g = lambda a, n: (struct.unpack("<H", b[a:a + 2])[0] if n == 2 else b[a]) if len(b) >= a + n else 0
     off = struct.unpack("<h", b[OFFSET:OFFSET + 2])[0] if len(b) >= OFFSET + 2 else 0
     raw = norm_pos(g(POS, 2))
-    # Station applies the EEPROM offset: calibrated pos = raw + offset (port_meta.rs)
+    # while a range is NOT saved, Station tracks raw + offset (port_meta.rs); saved -> raw (see collect_motors)
     return dict(pos=(raw + off + 4096) % 4096, raw=raw, off=off, status=g(0x41, 1), torque=g(0x28, 1), volt=g(VOLT, 1) / 10, temp=g(TEMP, 1), cur=g(CURR, 2))
 
 
@@ -89,7 +89,13 @@ async def collect_motors(client, seconds):
             motors = {}
             for m in bs.get_motors() or []:
                 s = m.get_state()
-                motors[m.get_id()] = dict(parse_motor(s) if s else {}, rmin=m.get_range_min(), rmax=m.get_range_max(), frozen=m.get_range_freezed())
+                d = dict(parse_motor(s) if s else {}, rmin=m.get_range_min(), rmax=m.get_range_max(), frozen=m.get_range_freezed())
+                # Saved (frozen) ranges are in Present-Position space: the servo already applies its EEPROM
+                # offset. Station adds the offset only while collecting an unsaved range (port_meta.rs).
+                # Verified 2026-11-21 after follower auto-cal (m2 at 1%, m4 at 95% of range = last auto-cal moves).
+                if d.get("raw") is not None and d["frozen"]:
+                    d["pos"] = d["raw"]
+                motors[m.get_id()] = d
             buses[bi.get_serial_number()] = dict(port=bi.get_port_name(), motors=motors,
                                                 lat_ms=(time.time_ns() - bs.get_system_stamp_ns()) / 1e6)
     return n, buses

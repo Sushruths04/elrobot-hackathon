@@ -10,9 +10,11 @@
 - 2026-11-21 - MCP server `elrobot-real` entry in `.mcp.json` (station backend, untested for motion)
 - 2026-11-21 - `calibration/`: per-bus calibration files (min, max, midpoint, span, frozen)
 ### Fixed
+- 2026-11-21 15:45 - `tools/verify_station.py`: saved motors use raw Present Position (offset was counted twice -> false `OUTSIDE`, wrong `--move-test` start) - Claude [ISSUE-110]
 - 2026-11-21 - `StationBackend`: wrapped ranges (max < min) and positions just outside the range no longer break normalisation
 - 2026-11-21 - `monitor_calib.py`: no longer crashes on short motor reads
 ### Hardware
+- 2026-11-21 15:40 - Follower `5B8E114691` reset + auto-calibrated on Bart's Mac (`tools/calibrate.py`, 32 steps, 156 s, all 8 saved; spans m1 1972, m2 2012, m3 2322, m4 2326, m5 3836, m6 2050, m7 3874, m8 1610; torque off afterwards). Backup `calibration/5B8E114691_follower_20261121_154324.json` - Bart + Claude [ISSUE-109]
 - 2026-11-21 - Follower `5B8E114691` auto-calibrated and frozen. Leader `5B79016336` calibrated manually; joints 5 and 7 short (see ISSUE-103)
 - 2026-11-21 - Roles confirmed by movement test: leader `5B79016336` (/dev/ttyACM0), follower `5B8E114691` (/dev/ttyACM1)
 

@@ -24,3 +24,4 @@ Claim a task by writing your name next to it. Ask a human before any arm motion 
 ## Notes
 - 2026-11-21 15:40 — Bart's macOS repo merged in (tools/, start/restart scripts, ISSUE-001..015). Bart's repo `bpachniewsk1/normacore-hackathon` is superseded by this one.
 - 2026-11-21 15:58 — **Bart's Mac has the arms** (both buses + 1 camera b309a703). Both arms NOT SAVED here (ISSUE-109) → recalibrating: follower auto, leader manual (`tools/calibrate.py`) — in progress, Bart + Claude.
+- 2026-11-21 15:45 — Follower calibrated on Bart's Mac (all 8 saved, spans match reference; m1 now 1972 ≈ URDF 2021). **Leader manual calibration next** (needs a human sweeping every joint). Local link `vendor/norma-core-src -> ../repo/norma-core` makes Sushruth's scripts work on the Mac.
