@@ -1,0 +1,9 @@
+[ 30.3s] duster (+0.120,0.262) axis 113 deg | 2 caps, using the one at (+0.035,0.314) nearest the bin | bin (+0.271,0.281)
+[ 40.7s]    duster try 1: across +0 mm, along +0 mm, jaws 1888 ticks 318 mA -> HOLD
+[ 42.8s] duster held - holding it over each of the 2 caps (no sliding, no pressing), then a camera check, then the bin
+[ 53.3s]    pass 1: held over cap 1/2 (duster still held)
+[ 61.6s]    pass 1: held over cap 2/2 (duster still held)
+[ 64.0s]    camera check after pass 1: 0 of the targeted caps still on the table
+[ 64.0s] caps still on the table before the bin: 0
+[ 83.7s] model check: {'raw': 'The user wants me to identify two things:\n1.  Is there a dark duster inside the white box?\n2.  How many metal bottle caps are on the table?\n\n**Step 1: Locate the white box.**\nLooking at the left side of the table, there is a white rectangular box [107, 423, 276, 597]. Inside it, there appears to be ', 'seconds': 4.89}
+[ 83.7s] DONE - picture run/duster_result.jpg

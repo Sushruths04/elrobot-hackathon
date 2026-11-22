@@ -1,0 +1,6 @@
+[  1.2s] detections: cap (222.07999999999998, 231.83999999999997)
+[  9.7s] at the cap, sweeping sideways
+[ 12.8s] cap swept
+[ 22.5s] closed on the tissue: 1324 ticks 0 mA (thin sheet: only the camera can confirm)
+[ 23.4s] pulled the tissue straight up
+[ 27.1s]    STOP: lane: IK cannot reach (err 5.1 cm)

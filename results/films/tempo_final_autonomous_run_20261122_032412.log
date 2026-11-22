@@ -1,0 +1,17 @@
+[ 16.9s] cap attempt 1: swept at tip z 0.103 from x +0.173 to +0.028
+[ 19.6s]    picture change around the cap 7.5
+[ 23.6s] cap attempt 2: swept at tip z 0.097 from x +0.173 to +0.028
+[ 26.0s]    picture change around the cap 19.3
+[ 26.0s] cap stage: changed a lot, open
+[ 26.0s]    white tissue patch at (222.0, 256.0) (320 white pixels)
+[ 36.2s] tissue attempt 1: pinched at (+0.133,0.283) tip z 0.087: 1324 ticks 0 mA
+[ 42.7s]    the camera says nothing is held - putting it back/opening and retrying
+[ 45.9s]    white tissue patch at (199.5, 240.0) (132 white pixels)
+[ 51.4s] tissue attempt 2: pinched at (+0.211,0.235) tip z 0.083: 1324 ticks 0 mA
+[ 57.4s]    the camera says nothing is held - putting it back/opening and retrying
+[ 60.5s]    white tissue patch at (221.0, 256.0) (443 white pixels)
+[ 65.8s] tissue attempt 3: pinched at (+0.135,0.283) tip z 0.091: 1324 ticks 0 mA
+[ 69.0s]    the camera says a tissue is HELD
+[ 70.1s] tissue pulled straight up and out
+[ 70.1s] tissue stage done
+[ 70.2s] DONE - no bean cluster detected

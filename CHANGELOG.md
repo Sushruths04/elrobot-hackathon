@@ -1,5 +1,10 @@
 # Changelog (newest first)
 
+## [Unreleased] - 2026-11-22
+### Added
+- `assets/mujoco/pingpong_scene.xml`, `src/normakit/pingpong_env.py`, `src/normakit/pingpong_vision.py`, `src/normakit/ppo.py`: MuJoCo 3.2.7 flat-paddle + 40 mm `2.7 g` hollow ITTF ball twin (`e ~ 0.80-0.88`, quadratic air drag, `0-100 ms` latency randomisation, `FdVel3D` finite-difference velocity, external `640x480` front-camera HSV + ray-plane/apparent-radius 3D tracker).
+- `scripts/train_pingpong.py`, `scripts/run_pingpong.py`, `models/pingpong/balance_ppo.pt`, `models/pingpong/dribble_ppo.pt`, `docs/12_PINGPONG_BALANCE_AND_DRIBBLE.md`: 30 Hz PPO policies trained for ElRobot (`balance`: **39/40 = 97.5%** noisy state, **15/15 = 100%** front-camera pipeline; `dribble`: **7.42** mean / **18** max bounces state, **4.83** mean / **15** max bounces front-camera) + guarded real-arm 30 Hz runner (`core.py` untouched).
+
 ## [Unreleased] - 2026-11-21 night
 ### Added
 - `assets/mujoco/elrobot_scene.xml`, `scripts/build_mujoco_assets.py`: MuJoCo 3.2.7 physics twin compiled from `elrobot_follower.urdf` with V-HACD convex-decomposed gripper jaws (16 + 19 hulls), 24-sector hollow black cup, clear glass bottle distractor, textured table, and calibrated `front` + `wrist` cameras.

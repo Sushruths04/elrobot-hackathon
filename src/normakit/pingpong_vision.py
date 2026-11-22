@@ -106,6 +106,7 @@ class FrontCameraBallTracker:
                 R_wc_opencv = np.column_stack([r_mj[:, 0], -r_mj[:, 1], -r_mj[:, 2]])
         self.cam_pos = np.asarray(cam_pos_world, dtype=np.float64)
         self.R_wc = np.asarray(R_wc_opencv, dtype=np.float64)
+        self._r_px_filt: float | None = None
 
     def localize(
         self,
@@ -140,7 +141,8 @@ class FrontCameraBallTracker:
         # 3D flight mode (dribble / keep-up): apparent diameter depth Z_cam = f * R_ball / r_px along ray
         if r_px < 4.0:
             return None
-        z_cam = self.f_mean * BALL_RADIUS_M / r_px
+        self._r_px_filt = r_px if self._r_px_filt is None else (0.30 * self._r_px_filt + 0.70 * r_px)
+        z_cam = self.f_mean * BALL_RADIUS_M / self._r_px_filt
         p_world = self.cam_pos + z_cam * d_world
         rel = p_world - surf_origin
         h_est = max(0.0, float(np.dot(rel, n_ax)))

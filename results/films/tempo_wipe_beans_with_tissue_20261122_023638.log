@@ -1,0 +1,8 @@
+[  0.0s] gripper 1342 ticks (the tissue is held between the jaws)
+[  0.1s] pass 1: straight to the left of the beans at z 0.075
+[  4.5s]    dark bean pixels in the bean box: 355 before -> 763 after pass 1
+[  4.5s] pass 2: straight to the left of the beans at z 0.065
+[  8.7s]    dark bean pixels in the bean box: 355 before -> 716 after pass 2
+[  8.7s] pass 3: straight to the left of the beans at z 0.055
+[ 13.0s]    dark bean pixels in the bean box: 355 before -> 741 after pass 3
+[ 13.0s] DONE - wipe finished, check run/wipe_*_after.jpg

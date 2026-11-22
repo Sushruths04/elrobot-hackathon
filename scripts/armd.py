@@ -104,7 +104,7 @@ def api(path, b):
     t_all = time.time(); STATS["calls"] += 1
     if path == "/state":
         st = S(); tip = kin.jaw_tip_pose(q_of(st))[0]
-        return {"joints": {i: {"raw": st.joints[i].raw, "mA": st.joints[i].current_ma} for i in sorted(st.joints)}, "tip": [round(float(x), 4) for x in tip], "armed_s": int(armed())}
+        return {"joints": {i: {"raw": st.joints[i].raw, "mA": st.joints[i].current_ma, "norm": round(float(st.joints[i].norm), 4), "goal_norm": round(float(st.joints[i].goal_norm), 4)} for i in sorted(st.joints)}, "tip": [round(float(x), 4) for x in tip], "armed_s": int(armed())}
     if path == "/stats": return STATS
     if path == "/ik":                                               # dry IK for several wrist rolls: position error mm, orientation error deg (no motion, no ARM needed)
         st = S(); out = {}

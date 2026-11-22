@@ -70,6 +70,48 @@ def run_sim(ckpt_path: Path, task: str, video_out: str) -> int:
     return 0
 
 
+def run_preflight(host: str) -> int:
+    """100% read-only check: motor calibration spans, currents, temperatures, and live orange-ball detection."""
+    import cv2
+    from normakit import vision
+
+    be = StationBackend(host)
+    be.start()
+    time.sleep(1.0)
+    try:
+        st = be.state()
+        fcam = front_camera(be)
+        print(f"Connected to follower bus {be._bus}, front_camera={fcam}")
+        bad = []
+        for i in JOINT_IDS:
+            if i not in st.joints:
+                bad.append(f"joint {i} missing")
+                continue
+            j = st.joints[i]
+            span = (j.hi - j.lo) % 4096
+            print(f"  joint {i}: raw={j.raw:4d} range=[{j.lo:4d},{j.hi:4d}] span={span:4d} norm={j.norm:+.3f} cur={j.current_ma:3d}mA temp={j.temp_c}C")
+            if span < 100:
+                bad.append(f"joint {i} uncalibrated (span={span})")
+        rgb = vision.decode(be.frame_jpeg(fcam))
+        det = detect_orange_ball(rgb)
+        bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+        if det["visible"]:
+            cv2.circle(bgr, (int(det["u"]), int(det["v"])), max(4, int(det["r_px"])), (0, 255, 0), 2)
+            cv2.putText(bgr, f"ball u={det['u']:.0f} v={det['v']:.0f} r={det['r_px']:.1f}px", (12, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
+        else:
+            cv2.putText(bgr, "NO ORANGE BALL DETECTED YET", (12, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 140, 255), 2)
+        out_img = ROOT / "run/pingpong_preflight.jpg"
+        cv2.imwrite(str(out_img), bgr)
+        print(f"Live orange-ball check: {det} -> saved {out_img.relative_to(ROOT)}")
+        if bad:
+            print("PREFLIGHT FAILED:", ", ".join(bad))
+            return 2
+        print("PREFLIGHT OK (read-only, zero motor commands sent).")
+        return 0
+    finally:
+        be.stop_backend()
+
+
 def grip_paddle_routine(be: StationBackend) -> int:
     st0 = be.state()
     be._sync(REG_GOAL_POS, {i: int(st0.joints[i].raw).to_bytes(2, "little") for i in JOINT_IDS})
@@ -107,7 +149,7 @@ def grip_paddle_routine(be: StationBackend) -> int:
     return g8_final
 
 
-def run_real(ckpt_path: Path, task: str, host: str, seconds: float, do_grip: bool) -> int:
+def run_real(ckpt_path: Path, task: str, host: str, seconds: float, do_grip: bool, home_only: bool = False) -> int:
     ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
     ac = PPOActorCritic(obs_dim=ckpt["obs_dim"], act_dim=ckpt["act_dim"])
     ac.load_state_dict(ckpt["model_state_dict"])
@@ -127,6 +169,29 @@ def run_real(ckpt_path: Path, task: str, host: str, seconds: float, do_grip: boo
         be._sync(REG_GOAL_POS, {i: int(s.joints[i].raw).to_bytes(2, "little") for i in JOINT_IDS})
 
     try:
+        # AGENTS.md Rule #3: verify all 8 motors are calibrated before any write
+        st_init = be.state()
+        for i in JOINT_IDS:
+            span = (st_init.joints[i].hi - st_init.joints[i].lo) % 4096
+            if span < 100:
+                sys.exit(f"REFUSED: joint {i} has uncalibrated span={span}")
+
+        # AGENTS.md Rule #4: First motion of new code: one motor (joint 1), small delta (+40 ticks ~ 3.5 deg), slow!
+        print("Step 1 (AGENTS.md Rule #4): slow one-motor test on joint 1 (+40 ticks and back at speed=180)...", flush=True)
+        be._sync(REG_GOAL_POS, {i: int(st_init.joints[i].raw).to_bytes(2, "little") for i in JOINT_IDS})
+        be._sync(REG_TORQUE, {i: b"\x01" for i in JOINT_IDS})
+        be._sync(REG_TORQUE_LIMIT, {i: (800 if i != 8 else 450).to_bytes(2, "little") for i in JOINT_IDS})
+        be._sync(REG_ACC, {i: bytes([20]) for i in JOINT_IDS})
+        be._sync(REG_GOAL_SPEED, {i: (180).to_bytes(2, "little") for i in JOINT_IDS})
+        r1_0 = st_init.joints[1].raw
+        be._sync(REG_GOAL_POS, {1: ((r1_0 + 40) % 4096).to_bytes(2, "little")})
+        time.sleep(0.9)
+        be._sync(REG_GOAL_POS, {1: int(r1_0).to_bytes(2, "little")})
+        time.sleep(0.9)
+        if input("Did joint 1 move ~3.5 deg and return cleanly? Type 'yes' to continue: ").strip() != "yes":
+            hold_now()
+            return 0
+
         if do_grip:
             grip_ticks = grip_paddle_routine(be)
             if not seconds:
@@ -142,8 +207,11 @@ def run_real(ckpt_path: Path, task: str, host: str, seconds: float, do_grip: boo
             home_goals = {i: _to_ticks(st0, i, HOME_Q[i]) for i in range(1, 8)}
             home_goals[8] = grip_ticks
             be._sync(REG_GOAL_POS, {i: v.to_bytes(2, "little") for i, v in home_goals.items()})
-            print("Moving smoothly to level paddle HOME pose (3.0 s)...", flush=True)
+            print("Moving smoothly to level paddle HOME pose (3.0 s) — motor 8 untouched...", flush=True)
             time.sleep(3.0)
+            if home_only or seconds <= 0:
+                print("Holding HOME pose. Tape the paddle flat & level (black rubber UP) onto the gripper now!", flush=True)
+                return 0
 
         if input(f"Paddle level and workspace clear? Type 'yes' to start {seconds:.0f}s 30 Hz {task} loop: ").strip() != "yes":
             hold_now()
@@ -164,7 +232,9 @@ def run_real(ckpt_path: Path, task: str, host: str, seconds: float, do_grip: boo
         prev_q = home_vec.copy()
         prev_t = time.perf_counter()
         t_end = prev_t + seconds
+        import cv2
         from normakit import vision
+        rec_frames: list[np.ndarray] = []
 
         print(f"RUNNING 30 Hz {task.upper()} on {fcam} — place/drop the orange ping-pong ball on the paddle! (Ctrl+C to stop)", flush=True)
         while time.perf_counter() < t_end:
@@ -191,6 +261,11 @@ def run_real(ckpt_path: Path, task: str, host: str, seconds: float, do_grip: boo
             if est_uwh is not None:
                 last_uwh = est_uwh
             vel_fd = fd.update(last_uwh, dt)
+            if len(rec_frames) < 600:
+                vis_bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+                if det["visible"]:
+                    cv2.circle(vis_bgr, (int(det["u"]), int(det["v"])), max(4, int(det["r_px"])), (0, 255, 0), 2)
+                rec_frames.append(vis_bgr)
 
             if not det["visible"]:
                 # Ball not visible -> smoothly relax back toward level HOME_Q and wait!
@@ -233,6 +308,14 @@ def run_real(ckpt_path: Path, task: str, host: str, seconds: float, do_grip: boo
                 time.sleep(rem)
 
         hold_now()
+        if rec_frames:
+            out_mp4 = ROOT / f"run/real_pingpong_{task}.mp4"
+            h_f, w_f = rec_frames[0].shape[:2]
+            vw = cv2.VideoWriter(str(out_mp4), cv2.VideoWriter_fourcc(*"mp4v"), 30, (w_f, h_f))
+            for f_bgr in rec_frames:
+                vw.write(f_bgr)
+            vw.release()
+            print(f"Saved real-run video -> {out_mp4.relative_to(ROOT)}", flush=True)
         print("Finished cleanly — holding pose.", flush=True)
         return 0
     except KeyboardInterrupt:
@@ -247,13 +330,18 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--task", choices=["balance", "dribble"], default="balance")
     ap.add_argument("--policy", default="")
+    ap.add_argument("--preflight", action="store_true", help="read-only Station + calibration + live orange-ball camera check")
     ap.add_argument("--real", action="store_true", help="run on real Station follower arm (requires --i-have-a-human)")
     ap.add_argument("--i-have-a-human", action="store_true")
+    ap.add_argument("--home-only", action="store_true", help="move to level HOME pose and hold so you can tape the paddle flat")
     ap.add_argument("--grip-paddle", action="store_true", help="open jaws at home and gently clamp paddle handle")
     ap.add_argument("--host", default="localhost:8888")
     ap.add_argument("--seconds", type=float, default=15.0)
     ap.add_argument("--video", default="")
     a = ap.parse_args()
+
+    if a.preflight:
+        sys.exit(run_preflight(a.host))
 
     ckpt = Path(a.policy) if a.policy else (ROOT / f"models/pingpong/{a.task}_ppo.pt")
     if not ckpt.exists():
@@ -263,7 +351,7 @@ def main() -> None:
         sys.exit(run_sim(ckpt, a.task, a.video))
     if not a.i_have_a_human:
         sys.exit("REFUSED: --real requires --i-have-a-human (person at 12V plug, Station mirroring OFF).")
-    sys.exit(run_real(ckpt, a.task, a.host, a.seconds, a.grip_paddle))
+    sys.exit(run_real(ckpt, a.task, a.host, a.seconds, a.grip_paddle, home_only=a.home_only))
 
 
 if __name__ == "__main__":

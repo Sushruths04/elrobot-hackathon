@@ -1,0 +1,11 @@
+[  0.4s] lifted clear first
+[  9.7s] cap attempt 1: sweep at z 0.081 from the cap's left edge
+[ 15.4s]    picture change around the cap: 5.1 (open needs more than 9)
+[ 15.4s]    the cap did not change - still closed - retrying
+[ 16.5s]    no cap found
+[ 17.6s]    no cap found
+[ 20.3s] cap attempt 4: sweep at z 0.075 from the cap's left edge
+[ 26.1s]    picture change around the cap: 7.1 (open needs more than 9)
+[ 26.1s]    the cap did not change - still closed - retrying
+[ 26.1s] cap stage NOT confirmed
+[ 30.3s] tissue attempt 1: pinch the tip at z 0.092

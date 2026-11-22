@@ -1,0 +1,8 @@
+[ 22.4s] beans at xy (-0.063,0.316); dark bean pixels 312
+[ 22.4s] lane 1/5: y 0.266, working stroke toward image-left
+[ 29.0s] lane 2/5: y 0.291, working stroke toward image-left
+[ 35.4s] lane 3/5: y 0.316, working stroke toward image-left
+[ 41.7s] lane 4/5: y 0.341, working stroke toward image-left
+[ 48.1s] lane 5/5: y 0.366, working stroke toward image-left
+[ 56.0s] dark bean pixels in the first bean box: 312 before -> 15 after
+[ 56.0s] DONE - vacuum-pattern sweep finished, check run/wipe_final.jpg

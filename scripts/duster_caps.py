@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np, cv2
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT / "src"))
 from normakit import duster as dd, er2
-ap = argparse.ArgumentParser(); ap.add_argument("--dry", action="store_true"); ap.add_argument("--speed", type=int, default=800); ap.add_argument("--duster-height", type=float, default=0.03); a = ap.parse_args()
+ap = argparse.ArgumentParser(); ap.add_argument("--dry", action="store_true"); ap.add_argument("--speed", type=int, default=800); ap.add_argument("--duster-height", type=float, default=0.03); ap.add_argument("--caps", type=int, default=2, help="how many caps must end up on the magnet"); a = ap.parse_args()
 T0 = time.time(); log = lambda *m: print(f"[{time.time()-T0:5.1f}s]", *m, flush=True)
 def A(path, body=None, timeout=60):
     req = urllib.request.Request("http://127.0.0.1:8891" + path, data=None if body is None else json.dumps(body).encode(), method="GET" if body is None else "POST")
@@ -35,7 +35,12 @@ def to_detection():
     if np.hypot(tp[0] - det_pose["tip"][0], tp[1] - det_pose["tip"][1]) < 0.04 and abs(tp[2] - det_pose["tip"][2]) < 0.04: return
     must(A("/move_tip", {**WP, "low_ok": True} if tp[2] < 0.06 else WP), "waypoint"); must(A("/move_joints", {"ticks": det_pose["raw"], "speed": 450 if carrying[0] else a.speed, "low_ok": True, "timeout": 45, "acc": 12 if carrying[0] else 60}), "detection pose"); time.sleep(0.3)
 def scene():
-    d = dd.detect(frame_bgr()); du = d["duster"]
+    img = frame_bgr(); d = dd.detect(img)
+    for sat in (50, 42, 35):                                                                       # a cap next to the duster or in shadow can be missed: relax until the expected number is found
+        if len(d["caps"]) >= a.caps: break
+        d2 = dd.detect(img, sat=sat)
+        if len(d2["caps"]) > len(d["caps"]): d = d2
+    du = d["duster"]
     if du is None or len(d["caps"]) == 0: return None
     u, v = du["center"]; th = math.radians(du["angle"]); h = du["long"] / 2; c = xy_low(u, v); p1 = xy_low(u + h * math.cos(th), v + h * math.sin(th)); p2 = xy_low(u - h * math.cos(th), v - h * math.sin(th)); dv = (p1 - p2) / max(np.linalg.norm(p1 - p2), 1e-9)
     return {"duster_c": c, "duster_d": dv, "duster_px": du["center"], "caps": [{"px": cp["center"], "xy": xy_low(*cp["center"])} for cp in d["caps"]]}
@@ -88,16 +93,17 @@ def over_caps(targets, passno):
         if not holding(): log("   the duster slipped out of the jaws - stopping"); A("/stop", {}); sys.exit(7)
         must(A("/move_tip", {"x": float(cap["xy"][0]), "y": float(cap["xy"][1]), "z": 0.12, "roll": roll_g, "speed": 300, "timeout": 25, "low_ok": True, **GENTLE}), "lift a little"); attached += 1
         log(f"   pass {passno}: held over cap {ci+1}/{len(targets)} (duster still held)")
-attached = 0; remaining = sorted(caps, key=lambda c: np.hypot(*(c["xy"] - S["duster_c"])))[:2]
-for passno in (1, 2):
+attached = 0; remaining = sorted(caps, key=lambda c: np.hypot(*(c["xy"] - S["duster_c"])))[:a.caps]; left = remaining
+for passno in (1, 2, 3):
     over_caps(remaining, passno)
     must(A("/move_tip", {"x": VIEW[0], "y": VIEW[1], "z": 0.16, "roll": roll_g, "speed": 450, "timeout": 45, "low_ok": True, **GENTLE}), "park to the side for the camera check"); time.sleep(1.2)
     if not holding(): log("   the duster slipped out of the jaws - stopping"); A("/stop", {}); sys.exit(7)
-    left = [c for c in dd.detect(frame_bgr())["caps"] if any(np.hypot(c["center"][0] - r["px"][0], c["center"][1] - r["px"][1]) < 30 for r in remaining)]
-    log(f"   camera check after pass {passno}: {len(left)} of the targeted caps still on the table")
+    left = dd.detect(frame_bgr())["caps"]                                                          # EVERY cap still on the table counts, not only the ones I aimed at
+    log(f"   camera check after pass {passno}: {len(left)} cap(s) still on the table")
     if not left: break
-    remaining = [r for r in remaining if any(np.hypot(c["center"][0] - r["px"][0], c["center"][1] - r["px"][1]) < 30 for c in left)]
+    remaining = [{"px": c["center"], "xy": xy_low(*c["center"])} for c in left]
 log(f"caps still on the table before the bin: {len(left)}")
+if left: log("   WARNING: going to the bin although a cap is still on the table")
 tb = bxy
 must(A("/move_tip", {"x": float(tb[0]), "y": float(tb[1]), "z": 0.17, "roll": roll_g, "speed": 450, "timeout": 45, **GENTLE}), "over the bin (high)")
 must(A("/move_tip", {"x": float(tb[0]), "y": float(tb[1]), "z": 0.115, "roll": roll_g, "speed": 250, "timeout": 20, **GENTLE}), "lower into the bin (above the rim)"); must(A("/gripper", {"to": "open"}), "release the duster with its caps into the bin"); time.sleep(0.5)

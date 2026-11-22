@@ -1,0 +1,13 @@
+[  0.1s] the gripper still holds something (1403 ticks): putting the pack back down
+[ 17.3s] pack put down, gripper open
+[ 18.6s] tissue at pixel (304,231)
+[ 21.2s] try 1: pinch the TIP at z 0.068 xy (-0.032,0.252); pack at pixel (304.0, 257.52000000000004)
+[ 29.0s]    close: ticks 1340 mA 4 closed_on_object False
+[ 29.0s]    nothing gripped - opening and retrying higher
+[ 35.3s] try 2: pinch the TIP at z 0.074 xy (-0.027,0.279); pack at pixel (300.79999999999995, 250.08)
+[ 43.5s]    close: ticks 1337 mA 3 closed_on_object False
+[ 43.5s]    nothing gripped - opening and retrying higher
+[ 49.7s] try 3: pinch the TIP at z 0.08 xy (-0.026,0.279); pack at pixel (292.48, 249.84000000000003)
+[ 57.1s]    close: ticks 1325 mA 1 closed_on_object False
+[ 57.1s]    nothing gripped - opening and retrying higher
+[ 60.7s] DONE - no clean tissue grip after all tries

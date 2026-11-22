@@ -48,3 +48,12 @@ run/ui_run.log
 datasets/
 
 showcase_bundle.zip
+
+# big/duplicate videos GitHub cannot take
+results/films/*_nocaption.mp4
+results/films/*_raw.mp4
+showcase/videos/*_nocaption.mp4
+showcase_bundle.zip
+run/START_*
+run/STOP_*
+run/*.jpg

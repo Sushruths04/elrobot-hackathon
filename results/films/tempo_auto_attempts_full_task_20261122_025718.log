@@ -1,0 +1,9 @@
+[  2.5s] lifted clear first
+[  3.7s] cap attempt 1: sweep at z 0.081 from the cap's left edge
+[ 14.8s]    the camera says the cap is OPEN
+[ 14.8s] cap stage done
+[ 18.7s] tissue attempt 1: pinch the tip at z 0.092
+[ 31.0s]    no tissue in the jaws - opening and retrying
+[ 35.8s] tissue attempt 2: pinch the tip at z 0.086
+[ 46.6s]    no tissue in the jaws - opening and retrying
+[ 51.1s] tissue attempt 3: pinch the tip at z 0.08

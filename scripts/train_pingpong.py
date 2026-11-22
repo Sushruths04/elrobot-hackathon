@@ -177,7 +177,7 @@ def main() -> None:
     if a.init and Path(a.init).exists():
         ckpt = torch.load(a.init, map_location="cpu", weights_only=False)
         ac.load_state_dict(ckpt["model_state_dict"])
-        # Re-open exploration std slightly when fine-tuning balance -> dribble!
+        # Re-open exploration std slightly only when cross-task fine-tuning (balance -> dribble)
         if ckpt.get("task") != a.task:
             with torch.no_grad():
                 ac.log_std.fill_(float(np.log(0.42)))

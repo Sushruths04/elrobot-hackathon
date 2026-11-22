@@ -1,0 +1,8 @@
+[  0.1s] beans at xy (-0.063,0.316); dark bean pixels 397
+[  0.1s] pass 1: L sweep, strokes of 10 cm
+[ 10.8s]    dark bean pixels in the bean box: 397 before -> 342 after pass 1
+[ 10.8s] pass 2: L sweep, strokes of 8 cm
+[ 22.5s]    dark bean pixels in the bean box: 397 before -> 321 after pass 2
+[ 22.5s] pass 3: L sweep, strokes of 6 cm
+[ 32.1s]    dark bean pixels in the bean box: 397 before -> 319 after pass 3
+[ 32.1s] DONE - L sweeps finished, check run/wipe_*_after.jpg

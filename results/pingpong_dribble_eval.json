@@ -1,0 +1,27 @@
+{
+  "task": "dribble",
+  "checkpoint": "models/pingpong/dribble_ppo.pt",
+  "state_eval": {
+    "episodes": 40,
+    "obs_mode": "controller",
+    "successes": 2,
+    "success_rate_pct": 5.0,
+    "mean_steps": 153.9,
+    "mean_survival_s": 5.13,
+    "mean_bounces": 7.42,
+    "max_bounces": 18,
+    "median_final_r_cm": 1.09
+  },
+  "camera_eval": {
+    "episodes": 12,
+    "obs_mode": "camera",
+    "successes": 1,
+    "success_rate_pct": 8.33,
+    "mean_steps": 99.9,
+    "mean_survival_s": 3.33,
+    "mean_bounces": 4.83,
+    "max_bounces": 15,
+    "median_final_r_cm": 12.41
+  },
+  "video": "results/pingpong_dribble.mp4"
+}

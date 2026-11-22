@@ -1,0 +1,15 @@
+[  1.3s] lid at pixel (321,227)
+[  1.3s] cap edge start (+0.008,0.232) -> end (-0.070,0.285); blue label pixels now 481
+[  4.8s] above the left side; label pixels 678
+[  6.3s]    level 0.095: tip really at 0.101
+[  7.4s]    level 0.085: tip really at 0.092
+[  8.3s]    level 0.077: tip really at 0.084
+[  9.0s]    level 0.071: tip really at 0.076
+[  9.7s]    level 0.066: tip really at 0.069
+[ 14.8s]    sweep 1/4: label pixels 634 (start 678)
+[ 16.4s]    sweep 2/4: label pixels 512 (start 678)
+[ 18.3s]    sweep 3/4: label pixels 472 (start 678)
+[ 21.1s]    sweep 4/4: label pixels 357 (start 678)
+[ 23.7s] after: label pixels 320 (start 678) -> cap open
+[ 25.5s] model check: [{'open': True, 'seconds': 1.86}, {'open': True, 'seconds': 1.78}]
+[ 25.5s] DONE - photos run/tempo_*.jpg

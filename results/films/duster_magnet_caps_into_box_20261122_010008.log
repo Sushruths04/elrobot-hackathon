@@ -1,0 +1,9 @@
+[ 33.4s] duster (+0.096,0.235) axis 163 deg | 2 caps, using the one at (+0.048,0.323) nearest the bin | bin (+0.271,0.298)
+[ 44.6s]    duster try 1: across +0 mm, along +0 mm, jaws 1324 ticks 0 mA -> no good hold
+[ 57.4s]    duster try 2: across +0 mm, along +20 mm, jaws 1324 ticks 0 mA -> no good hold
+[ 75.0s]    duster try 3: across +0 mm, along -20 mm, jaws 1891 ticks 310 mA -> HOLD
+[ 77.0s] duster held - holding it over each of the 2 caps (no sliding, no pressing), then a camera check, then the bin
+[ 90.3s]    pass 1: held over cap 1/2 (duster still held)
+[101.2s]    pass 1: held over cap 2/2 (duster still held)
+[103.5s]    camera check after pass 1: 0 cap(s) still on the table
+[103.5s] caps still on the table before the bin: 0

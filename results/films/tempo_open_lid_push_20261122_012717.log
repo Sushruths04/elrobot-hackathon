@@ -1,0 +1,8 @@
+[ 33.9s] lid at pixel (240,231)
+[ 33.9s] lid centre xy (+0.120,0.218); front edge y 0.238
+[ 42.1s] above the lid
+[ 44.6s] lowered in front of the lip
+[ 46.7s] under the lip
+[ 51.0s] lifted/pushed the lid back
+[ 56.0s] model check: [{'open': False, 'seconds': 1.42}, {'open': False, 'seconds': 3.0}]
+[ 56.0s] DONE - photos run/tempo_*.jpg

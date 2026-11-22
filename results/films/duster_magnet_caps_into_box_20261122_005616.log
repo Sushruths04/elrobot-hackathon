@@ -1,0 +1,8 @@
+[  1.6s] duster (+0.117,0.276) axis 119 deg | 1 caps, using the one at (-0.021,0.268) nearest the bin | bin (+0.307,0.207)
+[ 16.1s]    duster try 1: across +0 mm, along +0 mm, jaws 1886 ticks 307 mA -> HOLD
+[ 18.2s] duster held - holding it over each of the 1 caps (no sliding, no pressing), then a camera check, then the bin
+[ 29.4s]    pass 1: held over cap 1/1 (duster still held)
+[ 31.9s]    camera check after pass 1: 0 of the targeted caps still on the table
+[ 31.9s] caps still on the table before the bin: 0
+[ 51.6s] model check: {'duster_in_box': True, 'caps_on_table': 1, 'seconds': 3.96}
+[ 51.6s] DONE - picture run/duster_result.jpg

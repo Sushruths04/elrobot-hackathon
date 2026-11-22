@@ -1,0 +1,5 @@
+[  0.0s] demo window 1.4..41.6 s (40 s of movement), replay at 0.8x
+[  2.3s] current pose vs demo start: worst 7 ticks off
+[  3.0s] path tip height: min 0.061 m, max 0.394 m
+[  3.1s] REPLAYING
+[ 53.5s] DONE - replay finished, holding the final pose

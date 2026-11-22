@@ -1,0 +1,6 @@
+[197.9s] tissue at pixel (304,226) -> xy (-0.016,0.230) at z 0.052
+[203.5s] above the tissue, jaws open
+[209.3s] jaws around the tissue
+[213.4s] close: ticks 1399 mA 46 closed_on_object True
+[224.4s] still holding after the pull: gripper 1399 ticks
+[224.4s] DONE - tissue pulled (check run/tempo_pull_4_pulled.jpg)

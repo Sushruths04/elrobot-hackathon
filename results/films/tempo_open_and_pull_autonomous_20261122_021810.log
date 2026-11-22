@@ -1,0 +1,7 @@
+[  0.0s] cap attempt 1: sweep from the top at z 0.078
+[ 17.9s] the camera says the cap is still closed - retrying
+[ 17.9s] cap attempt 2: sweep from the top at z 0.074
+[ 38.7s] the camera says the cap is still closed - retrying
+[ 38.7s] cap attempt 3: sweep from the top at z 0.07
+[ 58.3s] the camera says the cap is still closed - retrying
+[ 58.3s] DONE - the cap would not open after 3 attempts

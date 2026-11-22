@@ -1,0 +1,5 @@
+[  0.0s] gripper 1342 ticks (the tissue is held between the jaws)
+[  0.1s] pass 1: straight to the left of the beans at z 0.075
+[  7.6s]    bean area change after pass 1: 112.9
+[  7.6s] the bean area changed - the beans were wiped
+[  7.6s] DONE - wipe finished, check run/wipe_*_after.jpg

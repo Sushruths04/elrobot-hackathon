@@ -118,7 +118,7 @@ class ElRobotPingPongEnv(gym.Env):
         self.model = _load_pingpong_model(light=use_light)
         self.data = mujoco.MjData(self.model)
         self._renderer: mujoco.Renderer | None = None
-        self._cam_tracker = FrontCameraBallTracker(use_mujoco_intrinsics=True) if obs_mode == "camera" else None
+        self._cam_tracker = FrontCameraBallTracker(use_mujoco_intrinsics=False) if obs_mode == "camera" else None
 
         m = self.model
         self.all_qadr = {i: int(m.jnt_qposadr[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, f"rev_motor_{i:02d}")]) for i in range(1, 9)}
@@ -282,7 +282,7 @@ class ElRobotPingPongEnv(gym.Env):
             s_mass = float(r.uniform(0.92, 1.08))
             self.model.body_mass[self.ball_bid] = 0.0027 * s_mass
             self.model.body_inertia[self.ball_bid] = 7.2e-7 * s_mass
-            damp_jit = float(r.uniform(-36.0, -21.0))  # randomise restitution e in ~[0.80, 0.89]!
+            damp_jit = float(r.uniform(-23.0, -14.0))  # randomise restitution e in ~[0.80, 0.88]!
             self.model.geom_solref[self.ball_gid, 1] = damp_jit
             self.model.geom_solref[self.blade_gid, 1] = damp_jit
             fric = float(r.uniform(0.35, 0.65))
@@ -337,10 +337,10 @@ class ElRobotPingPongEnv(gym.Env):
             v_init = r.uniform(-0.12, 0.12, size=2) * self.spawn_scale
             vz_init = 0.0
         else:
-            rad = float(np.sqrt(r.uniform(0.0, 1.0)) * 0.032 * self.spawn_scale)
+            rad = float(np.sqrt(r.uniform(0.0, 1.0)) * 0.028 * self.spawn_scale)
             du, dw = rad * math.cos(ang), rad * math.sin(ang)
-            dh = float(r.uniform(0.11, 0.21))
-            v_init = r.uniform(-0.08, 0.08, size=2) * self.spawn_scale
+            dh = float(r.uniform(0.065, 0.115))
+            v_init = r.uniform(-0.06, 0.06, size=2) * self.spawn_scale
             vz_init = 0.0
 
         surf_c = c + (BLADE_HALF_THICK_M + BALL_RADIUS_M) * n_ax
@@ -356,7 +356,7 @@ class ElRobotPingPongEnv(gym.Env):
         self.t_step = 0
         self.n_bounces = 0
         self._peak_h_since_hit = float(dh)
-        self._was_above = dh >= 0.045
+        self._was_above = dh >= 0.035
         self._steps_since_bounce = 0
 
         uwh0 = self._observed_ball_uwh()
@@ -415,25 +415,25 @@ class ElRobotPingPongEnv(gym.Env):
             uwh_sub, vuwh_sub = self.true_ball_in_blade()
             if uwh_sub[2] > self._peak_h_since_hit:
                 self._peak_h_since_hit = float(uwh_sub[2])
-            if self._peak_h_since_hit >= 0.045:
+            if self._peak_h_since_hit >= 0.035:
                 self._was_above = True
 
             # Detect upward bounce off the paddle blade
-            if self.task == "dribble" and uwh_sub[2] < 0.010 and vh_before < -0.15 and vuwh_sub[2] > 0.35:
+            if self.task == "dribble" and uwh_sub[2] < 0.010 and vh_before < -0.15 and vuwh_sub[2] > 0.30:
                 # Apply realistic 2.0 deg takeoff scatter on rubber contact
                 if self.domain_rand:
-                    scatter = self.rng.normal(0.0, 0.035, size=2)
+                    scatter = self.rng.normal(0.0, 0.030, size=2)
                     self.data.qvel[self.ball_dadr : self.ball_dadr + 2] += scatter * abs(vuwh_sub[2])
                 if self._was_above and math.hypot(uwh_sub[0], uwh_sub[1]) <= BLADE_RADIUS_M + 0.015:
                     self.n_bounces += 1
                     bounce_scored = True
                     r_hit = math.hypot(uwh_sub[0], uwh_sub[1])
-                    # Estimate upcoming apex from upward takeoff speed v^2 / (2g)
+                    # Target crisp 8.5 cm rapid dribble apex (stays 100% inside 640x480 external front camera!)
                     pred_apex = (vuwh_sub[2] ** 2) / (2.0 * 9.81)
-                    q_apex = math.exp(-(((pred_apex - 0.14) / 0.075) ** 2))
-                    q_cent = math.exp(-((r_hit / 0.048) ** 2))
+                    q_apex = math.exp(-(((pred_apex - 0.085) / 0.055) ** 2))
+                    q_cent = math.exp(-((r_hit / 0.050) ** 2))
                     q_vert = math.exp(-((math.hypot(vuwh_sub[0], vuwh_sub[1]) / 0.55) ** 2))
-                    bounce_bonus += 3.2 * (0.25 + 0.75 * q_apex) * (0.35 + 0.65 * q_cent) * q_vert
+                    bounce_bonus += 3.5 * (0.25 + 0.75 * q_apex) * (0.35 + 0.65 * q_cent) * q_vert
                     self._steps_since_bounce = 0
                 self._peak_h_since_hit = 0.0
                 self._was_above = False

@@ -1,0 +1,8 @@
+[  1.4s] lid at pixel (273,238)
+[  1.4s] front lip xy (+0.030,0.273) at z 0.045
+[  2.0s] above the front of the pack
+[  3.9s] lowered in front of the lip
+[  7.7s] under the lip
+[ 13.2s] lifted the lid upward
+[ 16.7s] model check: [{'open': True, 'seconds': 1.55}, {'open': True, 'seconds': 1.65}]
+[ 16.7s] DONE - photos run/tempo_*.jpg
