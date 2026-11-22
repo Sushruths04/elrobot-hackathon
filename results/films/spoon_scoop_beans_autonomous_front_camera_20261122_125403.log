@@ -1,0 +1,6 @@
+[  0.4s] demo: grasp at 20.3s, operator squeeze command min 0.19 (follower stopped at 0.21 on the handle)
+[  2.1s] start pose (arm out of the camera view)
+[  8.4s] spoon top: now [202.9 206.9] px (spread [3.1 4.4]), demo [222.1 228. ] px
+[ 15.0s] spoon base: now [209.3 241.9] px (spread [5.6 5.1]), demo [249.6 274.1] px
+[ 15.0s] spoon shift vs demo: top [ 3.9 -4.1] cm, base [12.7 -8.4] cm -> using [ 8.3 -6.2] cm
+[ 15.4s] STOP - path too low (-0.100 m)

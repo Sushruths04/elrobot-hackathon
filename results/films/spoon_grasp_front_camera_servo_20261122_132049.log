@@ -1,0 +1,20 @@
+[  0.1s] arm out of view for the spoon measurement
+[  5.9s] handle top [185. 168.], bottom [215. 221.], grasp point [197.  189.2] px
+[ 14.0s] attempt 1: above the estimate [0.083 0.264 0.13 ] ok=True 
+[ 14.9s]   jaw tips seen at [241.7 228. ] px (handle [197.  189.2])
+[ 18.1s]   image Jacobian (px per m): [[-190.0, 84.0], [100.0, 300.0]]
+[ 18.1s]   step 0: jaws [245.7 228. ] handle [197.  189.2] error [-48.7 -38.8] px, z 0.130
+[ 19.0s]   step 1: jaws [237.7 229. ] handle [197.  189.2] error [-40.7 -39.8] px, z 0.130
+[ 19.9s]   step 2: jaws [235.9 224. ] handle [197.  189.2] error [-38.9 -34.8] px, z 0.130
+[ 20.9s]   step 3: jaws [233.5 220. ] handle [197.  189.2] error [-36.5 -30.8] px, z 0.130
+[ 21.8s]   step 4: jaws [222.6 212. ] handle [197.  189.2] error [-25.6 -22.8] px, z 0.130
+[ 22.8s]   step 5: jaws [212.6 205. ] handle [197.  189.2] error [-15.6 -15.8] px, z 0.130
+[ 23.9s]   step 6: jaws [633.6 249. ] handle [197.  189.2] error [-436.6  -59.8] px, z 0.130
+[ 24.7s]   step 7: jaws [633.8 249. ] handle [197.  189.2] error [-436.8  -59.8] px, z 0.130
+[ 25.6s]   step 8: jaws [633.7 249. ] handle [197.  189.2] error [-436.7  -59.8] px, z 0.130
+[ 26.7s]   step 9: jaws [633.7 249. ] handle [197.  189.2] error [-436.7  -59.8] px, z 0.130
+[ 27.5s]   step 10: jaws [633.7 249. ] handle [197.  189.2] error [-436.7  -59.8] px, z 0.130
+[ 28.3s]   step 11: jaws [633.8 249. ] handle [197.  189.2] error [-436.8  -59.8] px, z 0.130
+[ 29.1s]   step 12: jaws [633.7 249. ] handle [197.  189.2] error [-436.7  -59.8] px, z 0.130
+[ 29.8s]   step 13: jaws [633.6 249. ] handle [197.  189.2] error [-436.6  -59.8] px, z 0.130
+[ 30.5s]   could not align - closing anyway to test

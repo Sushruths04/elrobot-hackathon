@@ -1,0 +1,8 @@
+[  0.5s] demo: grasp at 20.3s, operator squeeze command min 0.19 (follower stopped at 0.21 on the handle)
+[  0.6s] arm tip at 0.10 m may hide the spoon - moving to the start pose first
+[  2.5s] start pose (arm out of the camera view)
+[ 13.4s] spoon top: now [246.4 253. ] px (spread [0. 0.]), demo [222.1 228. ] px
+[ 19.3s] spoon base: now [247.7 333.1] px (spread [0.6 4.5]), demo [249.6 274.1] px
+[ 19.3s] spoon shift vs demo: top [-4.8  4.7] cm, base [-3.9 10.8] cm -> using [-4.3  7.7] cm
+[ 19.3s] shift > 7 cm - detection probably wrong
+[ 19.3s] STOP - spoon not found reliably in the front camera

@@ -1,0 +1,7 @@
+{
+  "task_id": "task-highlight-positive",
+  "task_description": "Build a positive-only highlight video (presentation/videos/highlight_positive.mp4) for the hackathon presentation: successes only, no failures/retries/struggle. Lead with the metal duster picking up caps, then wet-wipes lid open + wipe pull + bean cleaning, then optionally 1-2 clear successes as closing. Deliver cut list (presentation/edits_positive.json), regeneration script (scripts/build_highlight_positive.py), poster, additive catalog.json/index.html entries, verification frames, CHANGELOG append. Do NOT overwrite highlight_reel.mp4. Additive changes only; team's uncommitted working-tree changes stay untouched.",
+  "status": "in_progress",
+  "feature_order": ["FEAT-001", "FEAT-002"],
+  "blocked_reason": null
+}

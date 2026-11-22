@@ -46,7 +46,7 @@ class DummyPolicy:
     def reset(self):
         pass
 
-    def act(self, state, jpeg, task):
+    def act(self, state, jpeg, task, images=None):
         out = []
         for k in range(1, self.chunk + 1):
             a = 0.5 - 0.5 * math.cos(math.pi * k / (self.chunk * 4))  # max ~0.15 of the way
@@ -81,14 +81,24 @@ class LeRobotPolicy:
         out = getattr(cfg, "output_features", None) or {}
         self.image_keys = [k for k in inputs if k.startswith("observation.images.")]
         self.needs_image = bool(self.image_keys)
+        # SmolVLA checkpoints store camera1/camera2 and rename the recorded keys in the preprocessor;
+        # feed the recorded keys (observation.images.table / .wrist) and let the preprocessor rename.
+        inv = {}
+        for step in getattr(self.pre, "steps", []):
+            for src, dst in (getattr(step, "rename_map", None) or {}).items():
+                inv[dst] = src
+        if inv:  # keep only cameras that were actually recorded; SmolVLA skips missing slots (e.g. camera3)
+            self.image_keys = [k for k in self.image_keys if k in inv]
+            self.needs_image = bool(self.image_keys)
+        self.feed_keys = {k: inv.get(k, k) for k in self.image_keys}       # checkpoint key -> key we feed
+        self.cameras = [v.removeprefix("observation.images.") for v in self.feed_keys.values()]
         if self.needs_image:
-            if len(self.image_keys) > 1:
-                raise ValueError(f"checkpoint expects several cameras {self.image_keys}; "
-                                 "the API carries one image")
-            if image_key and image_key != self.image_keys[0]:
+            if image_key and image_key not in self.feed_keys.values() and image_key not in self.image_keys:
                 raise ValueError(f"--image-key {image_key} not in checkpoint inputs {self.image_keys}")
-            self.image_key = self.image_keys[0]
-        if STATE_KEY in inputs:
+            self.image_key = list(self.feed_keys.values())[0]
+        # SmolVLA pads state to max_state_dim, and fine-tuning from smolvla_base keeps the base's declared
+        # state shape (6,) even though it trained on our 8 joints, so only check the shape for other policies.
+        if STATE_KEY in inputs and not hasattr(cfg, "max_state_dim"):
             sd = tuple(inputs[STATE_KEY].shape)
             if sd != (N_JOINTS,):
                 raise ValueError(f"checkpoint state shape {sd}, expected ({N_JOINTS},)")
@@ -100,27 +110,33 @@ class LeRobotPolicy:
     def reset(self):
         self.policy.reset()
 
-    def act(self, state, jpeg, task):
+    def act(self, state, jpeg, task, images=None):
+        """images: camera name ('table', 'wrist') -> JPEG. A lone jpeg is used for the first camera."""
         torch = self.torch
         import numpy as np
         from PIL import Image
 
         batch = {STATE_KEY: torch.tensor(state, dtype=torch.float32).unsqueeze(0)}
-        if self.needs_image and jpeg is None:
-            raise ValueError(f"this policy needs an image ({self.image_key})")
-        if jpeg is not None and self.needs_image:
-            img = np.asarray(Image.open(io.BytesIO(jpeg)).convert("RGB"))
-            t = torch.from_numpy(img).permute(2, 0, 1).float().div(255.0).unsqueeze(0)
-            batch[self.image_key] = t
+        images = dict(images or {})
+        if jpeg is not None and self.needs_image and self.cameras[0] not in images:
+            images[self.cameras[0]] = jpeg
+        missing = [c for c in self.cameras if c not in images]
+        if self.needs_image and missing:
+            raise ValueError(f"this policy needs camera images {self.cameras}; missing {missing}")
+        for cam in self.cameras:
+            img = np.asarray(Image.open(io.BytesIO(images[cam])).convert("RGB"))
+            batch["observation.images." + cam] = torch.from_numpy(img).permute(2, 0, 1).float().div(255.0).unsqueeze(0)
         if task:
             batch["task"] = [task]
         with torch.inference_mode():
             batch = self.pre(batch)
             chunk = self.policy.predict_action_chunk(batch)  # (1, N, D)
             chunk = self.post(chunk)
-        arr = chunk.squeeze(0).float().cpu()
+        arr = chunk.squeeze(0).float().cpu().clone()
         if arr.ndim != 2 or arr.shape[1] != N_JOINTS:
             raise RuntimeError(f"policy returned action shape {tuple(arr.shape)}, expected (N, {N_JOINTS})")
+        if bool(torch.isfinite(arr).all()) and arr.shape[1] >= 8:
+            arr[:, 7] = arr[:, 7].clamp(0.0, 1.0)                     # gripper only: ACT 5k predicts -0.12 / 1.12 now and then (2/206 held-out frames); arm joints stay strict
         if not bool(torch.isfinite(arr).all()) or float(arr.min()) < -0.1 or float(arr.max()) > 1.1:
             raise RuntimeError("policy actions are outside the 0..1 joint-norm range "
                                "(checkpoint trained on other units?)")
@@ -140,23 +156,27 @@ def create_app(policy, token=None):
     @app.get("/health", dependencies=[Depends(auth)])
     def health():
         return {"ready": True, "model": policy.name, "device": policy.device,
-                "chunk": policy.chunk, "joints": N_JOINTS}
+                "chunk": policy.chunk, "joints": N_JOINTS, "cameras": getattr(policy, "cameras", [])}
 
     @app.post("/act", response_model=ActResponse, dependencies=[Depends(auth)])
     def act(req: ActRequest):
         t0 = time.perf_counter()
         if not all(math.isfinite(x) for x in req.state):
             raise HTTPException(422, "state contains NaN or Inf")
-        if getattr(policy, "needs_image", False) and not req.image_jpeg_b64:
-            raise HTTPException(422, "this policy requires image_jpeg_b64")
+        if getattr(policy, "needs_image", False) and not (req.image_jpeg_b64 or req.images_jpeg_b64):
+            raise HTTPException(422, f"this policy requires images {getattr(policy, 'cameras', [])}")
         try:
             jpeg = decode_jpeg_b64(req.image_jpeg_b64) if req.image_jpeg_b64 else None
+            images = {k: decode_jpeg_b64(v) for k, v in (req.images_jpeg_b64 or {}).items()}
         except Exception:
-            raise HTTPException(422, "image_jpeg_b64 is not valid base64")
+            raise HTTPException(422, "image payload is not valid base64")
         with lock:
             if req.reset:
                 policy.reset()
-            chunk, dt = policy.act(req.state, jpeg, req.task)
+            try:
+                chunk, dt = policy.act(req.state, jpeg, req.task, images)
+            except ValueError as e:
+                raise HTTPException(422, str(e))
         ms = (time.perf_counter() - t0) * 1000
         lat.append(ms)
         return ActResponse(action_chunk=chunk, chunk_dt=dt, server_ms=round(ms, 3))

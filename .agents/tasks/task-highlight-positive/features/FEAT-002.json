@@ -1,0 +1,31 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Build the positive-only highlight reel from the FEAT-001 cut list: regeneration script, video + poster output, additive catalog/index wiring, verification frames, CHANGELOG entry. Depends on FEAT-001 (presentation/edits_positive.json).",
+  "status": "pending",
+  "steps": [
+    "Write scripts/build_highlight_positive.py following the conventions of scripts/presentation_edit.py (read it first): PyAV Enc class (libx264, 960x720 @ 30 fps, yuv420p, CRF 17-19, +faststart), Lanczos4 resize + unsharp mask enhance_frame, PIL label_patch/blend rounded-rect lower-third labels (DejaVu fonts at /usr/share/fonts/truetype/dejavu/), title_card with fade in/out. It reads ONLY presentation/edits_positive.json and for each segment streams frames from src between in/out at the given speed, blends the segment's labels over their t0..t1 time ranges (times are relative to segment start after cutting), and prepends/appends the intro/outro title cards (~3 s each). Output: presentation/videos/highlight_positive.mp4. NEVER open highlight_reel.mp4 for writing. Also write presentation/posters/highlight_positive.jpg from the single strongest success frame (e.g. cap on the duster magnet or wipe mid-pull), JPEG quality 92.",
+    "Run .venv/bin/python scripts/build_highlight_positive.py. Probe the output with cv2 + container inspection: duration must be 45-90 s, resolution 960x720, codec h264, file size < ~30 MB (if larger, raise CRF to 20-21 and rebuild).",
+    "Extract 3-5 proof frames from the OUTPUT video (one near the middle of each segment) into presentation/_work/positive/proof_<segment-id>.jpg and VIEW them: the labeled success must be clearly visible in each, and the overlay text must match the segment.",
+    "Append ONE additive entry to presentation/catalog.json items array: id 'highlight_positive', mirror the exact shape of existing items (section: pick the first section 'wipes_full' or 'table_clean' - match where a reel entry fits best; src: 'presentation/videos/highlight_positive.mp4'; title: 'Positive-Only Highlight Reel: Duster Caps, Wet-Wipes & Bean Cleaning'; outcome 'success'; verdict 'Positive Only'; tag 'Highlight Reel'; note listing the segment order and total runtime; deck false; reel false). Do not reorder, edit, or remove any existing entry or section. JSON must still parse.",
+    "Additively edit presentation/index.html: immediately after the existing highlight_reel block (<div><video ... src=\"videos/highlight_reel.mp4\"></video><div class=\"sub\" ...>...</div></div>) insert a sibling block in the same structure: <div><video controls preload=\"metadata\" playsinline poster=\"posters/highlight_positive.jpg\" src=\"videos/highlight_positive.mp4\"></video><div class=\"sub\" style=\"font-size:13px;margin-top:6px\">Positive-only highlight reel (NN s): duster caps, wet-wipes lid + wipe pull, bean cleaning - successes only.</div></div> with NN = actual duration. Do NOT run scripts/build_presentation.py (the team's in-flight catalog.json lacks the 'by' field that script requires - it would break the page). Touch nothing else in the file.",
+    "Append a CHANGELOG.md entry following the existing style: new '## [Unreleased] - 2026-11-22 afternoon' section (or add under an existing 2026-11-22 section if one exists at the top) with an '### Added' bullet describing highlight_positive.mp4, scripts/build_highlight_positive.py, presentation/edits_positive.json, poster, catalog + index entries, signed '- Claude'.",
+    "Re-run .venv/bin/python scripts/build_highlight_positive.py once more to confirm the rebuild is idempotent and deterministic (same inputs -> reel rebuilt without errors)."
+  ],
+  "acceptance_criteria": [
+    "presentation/videos/highlight_positive.mp4 exists: 45-90 s, 960x720, h264, < ~30 MB; plays from the intro card through all cut-list segments to the outro card",
+    "presentation/posters/highlight_positive.jpg exists and shows a real success frame from the reel",
+    "3-5 proof frames extracted from the OUTPUT and viewed; each segment visibly shows its labeled success and the overlay text is correct",
+    "presentation/videos/highlight_reel.mp4 byte-identical to the FEAT-001 baseline (size + mtime unchanged)",
+    "git diff for presentation/catalog.json, presentation/index.html and CHANGELOG.md shows additions only - zero removed/modified existing lines",
+    ".venv/bin/python scripts/build_highlight_positive.py runs cleanly twice (idempotent regeneration from edits_positive.json alone)"
+  ],
+  "verification": [
+    ".venv/bin/python - <<'EOF': cv2 probe of highlight_positive.mp4 printing fps, frames, duration, width, height; plus os.path.getsize",
+    "view presentation/_work/positive/proof_*.jpg",
+    "stat -c '%s %y' presentation/videos/highlight_reel.mp4 vs presentation/_work/positive/reel_baseline.txt",
+    "git diff --stat -- presentation/catalog.json presentation/index.html CHANGELOG.md && git diff -U0 -- presentation/catalog.json presentation/index.html | grep -c '^-[^-]' (must be 0 removed lines)"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

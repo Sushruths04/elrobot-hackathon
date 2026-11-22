@@ -1,0 +1,27 @@
+{
+  "project_type": "Hackathon robotics repo (ElRobot 8-servo arm) with a presentation bundle of edited demo videos; this task is pure offline video editing, no robot hardware needed",
+  "language": "Python 3",
+  "build_system": "none (scripts run directly with the repo venv)",
+  "test_framework": "pytest exists (.pytest_cache) but the suite needs robot hardware; do NOT run it. Verification for this task is video probing + frame inspection.",
+  "build_command": ".venv/bin/python scripts/build_highlight_positive.py  (the new script this task creates)",
+  "test_command": "probe output with .venv/bin/python + cv2 (duration, resolution, codec, size) and view extracted jpgs",
+  "verification_instructions": "Per AGENTS.md item 12: presentation work needs no robot. For this task: (1) run .venv/bin/python scripts/build_highlight_positive.py, (2) probe presentation/videos/highlight_positive.mp4 with cv2 (45-90 s, 960x720, h264, < ~30 MB), (3) extract 3-5 frames from the OUTPUT at segment midpoints and view them to confirm each labeled success is actually visible, (4) confirm presentation/videos/highlight_reel.mp4 is untouched (size/mtime unchanged), (5) git diff to confirm catalog.json/index.html edits are additive only.",
+  "snapshot_or_generated_files": "presentation/videos/highlight_positive.mp4 and presentation/posters/highlight_positive.jpg are generated artifacts that get checked in; regenerate with .venv/bin/python scripts/build_highlight_positive.py (reads presentation/edits_positive.json)",
+  "setup_instructions": "No setup needed: repo .venv (symlink to ../hacklab-normacore-kit/.venv) already has av 17.0.1 (PyAV), cv2 4.13.0, numpy, PIL. ffmpeg/ffprobe are NOT installed on this laptop - use PyAV libx264 exactly like scripts/presentation_edit.py does. DejaVu fonts at /usr/share/fonts/truetype/dejavu/. No NVIDIA GPU.",
+  "environment_constraints": "No ffmpeg/ffprobe on PATH. No GPU. Working tree has many UNCOMMITTED team changes (including presentation/catalog.json, presentation/edits.json, scripts/presentation_edit.py, posters): never revert or overwrite them; all edits additive. Branch: feat/highlight-positive (created off feat/twin-video-replay HEAD). Never commit, push, or create PRs - orchestrator handles that. NEVER overwrite or delete presentation/videos/highlight_reel.mp4. Do not run scripts/build_presentation.py: the team's in-flight catalog.json format no longer has the 'by' field that script's card() requires, so it would crash / produce a broken page.",
+  "contribution_requirements": "AGENTS.md rule 8: document every change in CHANGELOG.md (follow existing dated-entry style, sign '- Claude'). Additive changes only (user's standing rule: do not delete or break existing work).",
+  "key_patterns": "Video pipeline: presentation/catalog.json labels every clip (items with id/src/clean/title/outcome/verdict/tag/note/reel flags); scripts/presentation_edit.py auto-trims via motion detection and writes edited clips to presentation/videos/<id>.mp4 (960x720, 30 fps, H.264 libx264 yuv420p CRF 17 +faststart via PyAV, Lanczos4 upscale + unsharp mask, PIL rounded-rect label patches, title cards) plus posters/<id>.jpg. Edited clips with speed>1 have a small 'Nx' badge top-right baked in. Reuse presentation_edit.py's Enc/label_patch/blend/title_card style for the new script. 'beans' = coffee beans (catalog: 'sweep coffee beans clean off the desk'); bricks_detect.jpg is a DIFFERENT task (LEGO/Duplo), not the beans.",
+  "relevant_files": [
+    "scripts/presentation_edit.py (pattern to follow for PyAV encoding, labels, title cards)",
+    "presentation/catalog.json (clip metadata + verdicts; append new entry additively)",
+    "presentation/edits.json (existing per-clip trim metadata, read-only reference)",
+    "presentation/index.html (committed clean; additive hand-edit only, do NOT regenerate)",
+    "presentation/videos/*.mp4 (edited 960x720 30fps clips = sources for the new reel)",
+    "presentation/posters/ (poster per video; add highlight_positive.jpg)",
+    "presentation/images/bricks_detect.jpg (LEGO task, NOT beans - do not confuse)",
+    "presentation/_work/positive/ (scratch dir for frame evidence, created)",
+    "CHANGELOG.md (append entry)",
+    "results/films/*.mp4 (raw uncut sources, only needed if an edited clip proves unusable)"
+  ],
+  "directory_structure": "Repo at /home/laptop/nebius_nividia/normacore-hackathon. presentation/ = videos/, posters/, images/, catalog.json, edits.json, index.html, slides.html, _work/ (scratch). results/films/ = raw recordings + joints jsonl. scripts/ = tooling. Task state: .agents/tasks/task-highlight-positive/."
+}

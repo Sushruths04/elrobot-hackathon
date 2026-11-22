@@ -15,7 +15,7 @@ from normakit.kin import Kin
 from normakit.station_backend import StationBackend, REG_GOAL_POS, REG_GOAL_SPEED, REG_ACC
 J = list(range(1, 9)); wd = lambda a, b: ((a - b + 2048) % 4096) - 2048
 SPEED_CAP = {1: 1200, 2: 700, 3: 700, 4: 800, 5: 1500, 6: 1500, 7: 1500, 8: 800}      # ticks/s per joint (4096 = one turn); loaded joints capped lower
-ZMIN = 0.03; OPEN, CLOSED = 2650, 1321   # OPEN 2650 (norm 0.87): wide gap so a +-1 cm position error still straddles a 1.5 cm pen (2183 was the narrow demo value)
+ZMIN = 0.03; OPEN, CLOSED = 2650, 1250   # CLOSED 1250 (2026-11-22, was 1321): aim past the thin spoon handle (stops ~1357) so the jaws squeeze harder; range min 1243   # OPEN 2650 (norm 0.87): wide gap so a +-1 cm position error still straddles a 1.5 cm pen (2183 was the narrow demo value)
 LOCK = threading.Lock(); STATS = {"calls": 0, "last_ms": {}}
 be = StationBackend("localhost:8888"); be.start(); time.sleep(1.0); kin = Kin(); kin._ensure_mj()
 _warm = {i: norm_to_rad(i, be.state().joints[i].norm) for i in range(1, 8)}; kin.ik_jaw_tip((0.0, 0.27, 0.10), roll_rad=0.0, seed_rad=_warm)   # warm-up
@@ -119,19 +119,20 @@ def api(path, b):
     with LOCK:
         speed = float(b.get("speed", 600))
         if path == "/move_joints":
-            tg = {int(k): int(v) for k, v in b["ticks"].items()}; st = S(); low = path_min_z(st, tg) if all(i in tg for i in range(1, 8)) else None
+            tg = {int(k): int(v) for k, v in b["ticks"].items()}; st = S(); full = {**{i: st.joints[i].raw for i in range(1, 8)}, **{i: v for i, v in tg.items() if i <= 7}}
+            low = path_min_z(st, full)                                          # review 2026-11-22: partial-joint moves are path-checked too
             if low is not None and low < ZMIN and not b.get("low_ok"): return {"error": f"path would take the jaw tip to z={low:.3f} < {ZMIN}"}
             return drive(tg, speed, b.get("wait", True), timeout=float(b.get("timeout", 10)), acc=int(b.get("acc", 60)))
         if path == "/move_tip":
             st = S(); t0 = time.time(); q, pe, oe, tilt = kin.ik_jaw_tip((b["x"], b["y"], b["z"]), roll_rad=float(b.get("roll", 0.0)), tilt_deg=b.get("tilt"), seed_rad=q_of(st)); tik = time.time() - t0
-            if pe > 0.02: return {"error": f"IK cannot reach (err {pe*100:.1f} cm)", "ik_ms": round(tik * 1000)}
+            if pe > float(b.get("max_pos_err", 0.012)) or oe > float(b.get("max_ori_err_deg", 20)): return {"error": f"IK not accurate enough (pos err {pe*100:.1f} cm, ori err {oe:.0f} deg)", "ik_ms": round(tik * 1000)}
             tg = {i: to_ticks(st, i, rad_to_norm(i, q[i])) for i in range(1, 8)}; low = path_min_z(st, tg)
             if low < min(ZMIN, b["z"] - 0.005) and not b.get("low_ok"): return {"error": f"path would dip to z={low:.3f}"}
             r = drive(tg, speed, b.get("wait", True), timeout=float(b.get("timeout", 10)), acc=int(b.get("acc", 60))); r.update({"ik_ms": round(tik * 1000), "ik_err_mm": round(pe * 1000, 1), "ori_err_deg": round(oe, 1), "tilt": round(tilt)}); return r
         if path == "/gripper":
             to = b.get("to", "open"); tgt = OPEN if to == "open" else CLOSED if to == "close" else int(to)
             if to == "close":                                              # an object stops the jaws before the closed value: success = jaws steady (not moving) for 0.5 s
-                be._sync(0x30, {8: (850).to_bytes(2, "little")})           # firmer grip (was 500): a thin pen slips otherwise
+                be._sync(0x30, {8: (1000).to_bytes(2, "little")})           # firmer grip (was 500): a thin pen slips otherwise
                 be._sync(REG_ACC, {8: bytes([40])}); be._sync(REG_GOAL_SPEED, {8: (400).to_bytes(2, "little")}); be._sync(REG_GOAL_POS, {8: tgt.to_bytes(2, "little")}); t0 = time.time(); last = None; steady_since = None
                 while time.time() - t0 < 6:
                     v = S().joints[8].raw

@@ -38,12 +38,15 @@ class PolicyClient:
     def reset(self) -> None:
         self._call("POST", "/reset")
 
-    def act(self, state_norms, jpeg: bytes | None = None, task: str = "") -> np.ndarray:
-        """state_norms: 8 floats (joint 1..8) or dict jid->norm. Returns (N, 8) array."""
+    def act(self, state_norms, jpeg: bytes | None = None, task: str = "",
+            images: dict[str, bytes] | None = None) -> np.ndarray:
+        """state_norms: 8 floats (joint 1..8) or dict jid->norm. images: camera name -> JPEG
+        (e.g. {"table": ..., "wrist": ...}) for multi-camera policies. Returns (N, 8) array."""
         if isinstance(state_norms, dict):
             state_norms = [state_norms[i] for i in range(1, N_JOINTS + 1)]
         req = ActRequest(state=[float(x) for x in state_norms],
-                         image_jpeg_b64=encode_jpeg_b64(jpeg) if jpeg else None, task=task)
+                         image_jpeg_b64=encode_jpeg_b64(jpeg) if jpeg else None, task=task,
+                         images_jpeg_b64={k: encode_jpeg_b64(v) for k, v in images.items()} if images else None)
         resp = ActResponse(**self._call("POST", "/act", json=req.model_dump()))
         chunk = np.asarray(resp.action_chunk, dtype=float)
         if chunk.ndim != 2 or chunk.shape[1] != N_JOINTS or len(chunk) == 0:

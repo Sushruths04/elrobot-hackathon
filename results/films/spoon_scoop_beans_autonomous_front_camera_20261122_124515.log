@@ -1,0 +1,23 @@
+[  0.4s] demo: grasp at 20.3s, operator squeeze command min 0.19 (follower stopped at 0.21 on the handle)
+[  0.4s] arm tip at 0.07 m may hide the spoon - moving to the start pose first
+[  2.2s] start pose (arm out of the camera view)
+[ 17.7s] spoon top: now [247.7 241.9] px (spread [2.  3.6]), demo [222.1 228. ] px
+[ 24.5s] spoon base: now [247.7 285.1] px (spread [0. 0.]), demo [249.6 274.1] px
+[ 24.5s] spoon shift vs demo: top [-4.8  2.7] cm, base [-0.5  2.3] cm -> using [-2.6  2.5] cm
+[ 25.0s] attempt 1: shift [-2.6  2.5] cm, grasp tip [0.017 0.324 0.121]
+[ 46.8s] hover photo results/photos/spoon_auto2_hover_attempt1_124603.jpg
+[ 50.4s] grip check: gripper at 0.01, commanded 0.00, current 4 mA
+[ 50.4s] jaws closed EMPTY - opening and trying the next offset
+[ 54.8s] attempt 2: shift [-1.1  2.5] cm, grasp tip [0.033 0.325 0.12 ]
+[ 56.4s] hover photo results/photos/spoon_auto2_hover_attempt2_124612.jpg
+[ 60.0s] grip check: gripper at 0.01, commanded 0.00, current 4 mA
+[ 60.0s] jaws closed EMPTY - opening and trying the next offset
+[ 64.4s] attempt 3: shift [-4.1  2.5] cm, grasp tip [0.001 0.322 0.121]
+[ 66.0s] hover photo results/photos/spoon_auto2_hover_attempt3_124622.jpg
+[ 69.6s] grip check: gripper at 0.01, commanded 0.00, current 4 mA
+[ 69.6s] jaws closed EMPTY - opening and trying the next offset
+[ 73.9s] attempt 4: shift [-2.6  4. ] cm, grasp tip [0.014 0.338 0.118]
+[ 75.5s] hover photo results/photos/spoon_auto2_hover_attempt4_124631.jpg
+[ 79.2s] grip check: gripper at 0.01, commanded 0.00, current 4 mA
+[ 79.2s] jaws closed EMPTY - opening and trying the next offset
+[ 83.4s] STOP - no grasp after 4 attempts

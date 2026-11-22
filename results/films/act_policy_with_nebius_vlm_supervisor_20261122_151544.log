@@ -1,0 +1,5 @@
+[  0.0s] policy server: {'ready': True, 'model': 'act:models/act_spoon_5k', 'device': 'cuda', 'chunk': 30, 'joints': 8, 'cameras': ['table', 'wrist']}
+[  0.3s] attempt 1: home -> ok=True 
+[ 26.3s]   VLM stage: not_done (no: The wooden spoon is inside the white bowl, not the black cup.; no: The wooden spoon is inside the white bowl, not the black cup.)
+[ 48.8s]   ACT segment 2: exit 0, gripper moved 1.0 cm | Traceback (most recent call last): |   File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+[ 52.7s]   VLM stage: not_done (no: The wooden spoon is inside the white bowl, not the black cup.; no: The wooden spoon is inside the white bowl, not the black cup.)

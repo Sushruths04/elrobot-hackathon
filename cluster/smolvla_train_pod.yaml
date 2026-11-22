@@ -1,0 +1,31 @@
+# SmolVLA fine-tuning on the WZL L40S (namespace isaac-sim). The pod idles until the dataset is copied in, then trains.
+# 1) kubectl apply -f cluster/smolvla_train_pod.yaml -n isaac-sim --dry-run=server   (check)  then without --dry-run
+# 2) see cluster/README_SMOLVLA.md for copy-in, start, watch, copy-out, cleanup
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smolvla-train
+  labels: {app: smolvla-train}
+spec:
+  restartPolicy: Never
+  activeDeadlineSeconds: 43200          # hard stop after 12 h so the shared GPU is never held forever
+  runtimeClassName: nvidia
+  nodeSelector:
+    nvidia.com/gpu.product: NVIDIA-L40S
+  containers:
+  - name: main
+    image: pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime   # CUDA 12.4 <= driver's 12.8
+    command: ["bash", "-c", "sleep infinity"]               # we exec in and run cluster/train_smolvla.sh
+    env:
+    - {name: HF_HOME, value: /data/smolvla/hf_cache}
+    resources:
+      requests: {cpu: "8", memory: 32Gi, nvidia.com/gpu: 1}
+      limits:   {cpu: "16", memory: 64Gi, nvidia.com/gpu: 1}
+    volumeMounts:
+    - {name: data, mountPath: /data}
+    - {name: shm, mountPath: /dev/shm}
+  volumes:
+  - name: data
+    persistentVolumeClaim: {claimName: isaac-sim-data}
+  - name: shm
+    emptyDir: {medium: Memory, sizeLimit: 16Gi}            # dataloader workers need shared memory

@@ -1,0 +1,12 @@
+[  0.4s] demo: grasp at 20.3s, operator squeeze command min 0.19 (follower stopped at 0.21 on the handle)
+[262.3s] start pose (arm out of the camera view)
+[270.0s] spoon top: now [205.4 209.8] px (spread [2.  3.3]), demo [222.1 228. ] px
+[278.0s] spoon base: now [220.8 243.4] px (spread [5.6 6.3]), demo [249.6 274.1] px
+[278.0s] spoon shift vs demo: top [ 3.4 -3.5] cm (base [ 9.5 -7.7] cm, not used: calibration poor at bean height) -> using the top
+[278.6s] attempt 1: coarse shift [ 3.4 -3.5] cm, hover [0.09  0.264 0.122]
+[323.8s]   vision says: horizontal=ok depth=ok vertical=down aligned=True (The gripper is positioned directly above the wooden spoon handle and needs to move downwar)
+[323.8s] aligned photo results/photos/spoon_auto2_aligned_attempt1_130229.jpg
+[325.3s] grip check: gripper at 0.47 (empty closes to ~0.01), current 3 mA
+[325.3s] SPOON IN THE JAWS - scooping and pouring
+[369.6s] end photo results/photos/spoon_auto2_end_130315.jpg
+[369.6s] DONE - task run finished (check the photo: beans in the cup?)

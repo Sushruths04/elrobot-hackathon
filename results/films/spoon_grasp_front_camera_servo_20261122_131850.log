@@ -1,0 +1,11 @@
+[  0.1s] arm out of view for the spoon measurement
+[  5.4s] handle top [184. 169.], bottom [210. 211.], grasp point [194.4 185.8] px
+[ 13.4s] attempt 1: above the estimate [0.081 0.264 0.13 ] ok=True 
+[ 14.2s]   jaw tips seen at [224.4 256. ] px (handle [194.4 185.8])
+[ 17.7s]   image Jacobian (px per m): [[-22.0, 133.0], [0.0, 0.0]]
+[ 17.7s]   probe failed
+[ 18.0s] attempt 2: above the estimate [0.081 0.264 0.13 ] ok=True 
+[ 18.8s]   jaw tips seen at [221.6 256. ] px (handle [194.4 185.8])
+[ 22.0s]   image Jacobian (px per m): [[296.0, 367.0], [0.0, 0.0]]
+[ 22.0s]   probe failed
+[ 22.0s] STOP - no grasp

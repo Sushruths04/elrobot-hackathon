@@ -1,0 +1,30 @@
+{
+  "id": "FEAT-001",
+  "type": "chore",
+  "description": "Baseline check + watch-sample candidate clips and produce the positive-only cut list. The user wants a POSITIVE-ONLY highlight reel (successes only; no failures, no retries, no struggle footage, no human hand assists during execution). Selling points in priority order: (1) metal duster picking up the caps, (2) opening the wet-wipes pack lid + pulling a wipe out + cleaning the (coffee) beans. Anything ambiguous (partial success, hand assist, dropped object) goes on the excluded list, not in the reel. Sources are the already-edited clips in presentation/videos/ (960x720, 30 fps, idle gaps already trimmed by the team's pipeline). Verify content by extracting and VIEWING frames - do not trust filenames or catalog text alone.",
+  "status": "in_progress",
+  "steps": [
+    "Confirm you are on branch feat/highlight-positive in /home/laptop/nebius_nividia/normacore-hackathon. Baseline: .venv/bin/python -c 'import av, cv2, numpy, PIL' works. Record size + mtime of presentation/videos/highlight_reel.mp4 into presentation/_work/positive/reel_baseline.txt (it must be byte-identical at the end of the task; never write to it).",
+    "Probe every candidate below with cv2 (duration, fps, resolution) and record results: presentation/videos/duster_005058.mp4 (catalog: autonomous magnetic duster collects metal caps, first-try, verifies 0 caps left, bins them; 27.7 s), duster_005616.mp4, duster_010008.mp4, duster_rec_005146.mp4, duster_rec_005548.mp4 | final_032056.mp4 (autonomous flip-top lid open on first pass + single-wipe pinch and vertical pull, 16.8 s, speed 1.0), full_022202.mp4 (autonomous lid open + wipe pull, 27.8 s, 2x badge), guided_033615.mp4 (single-wipe tip pinch + vertical extraction, 20.8 s), lid_replay_014807.mp4 (autonomous replay of hand-taught lid opening, 20.4 s), lid_push_020550.mp4, pull_015349.mp4, pull_015914.mp4 | guided_034731.mp4 (single-stroke sweep clearing coffee beans, 26.0 s), wipe_024526.mp4 (multi-lane clearing of spilled beans, 23.5 s, 1.5x badge), wipe_023947.mp4, wipe_023920.mp4, wipe_023638.mp4, wipe_023403.mp4, wipe_024845.mp4 | optional closers: spoon_match_135344.mp4 (vision-shifted autonomous spork grasp + bean transfer, 26.1 s, 4x badge), teleop_pick2.mp4 (marker pick-and-place success, 25.4 s, 3x badge), sim_cup_hd.mp4 (94% MuJoCo cup benchmark, 18 s), sim_pingpong_balance.mp4 (8 s).",
+    "Extract sample frames from each candidate into presentation/_work/positive/ named <id>_t<seconds>.jpg: at minimum frames at 10%, 30%, 50%, 70%, 90% of each clip, plus extra frames around the key action moments (cap snapping onto the magnet, lid popping open, wipe clearing the pack rim, beans being swept). Use cv2 VideoCapture with CAP_PROP_POS_MSEC or POS_FRAMES.",
+    "VIEW every extracted jpg (read the image files) and judge each clip: Is the success moment clearly visible? Is it unambiguous (no human hand touching objects during execution, no dropped object, no retry loop, no visible failure)? Note the exact second where each key moment happens. Also answer honestly from the frames: what are the objects being cleaned in the wipe/guided_034731 clips (catalog says coffee beans - confirm or correct), and confirm the duster clip really shows caps on the magnet / caps gone from the table.",
+    "Pick the final ordered segment list. Required order: 1) strongest duster-picks-caps segment (lead), 2) wet-wipes lid open, 3) wipe pulled out of the pack (final_032056.mp4 covers both 2 and 3 - if used, split it into two sub-segments at the lid-open/wipe-pull boundary second so each gets its own overlay label), 4) bean cleaning, 5) optionally 1-2 other clear successes as closing (spoon/bean transfer or sim_cup_hd fit thematically). Budget the total at 45-90 s including ~3 s intro and ~3 s outro title cards.",
+    "Write presentation/edits_positive.json with this shape: {\"title\": ..., \"intro\": {\"kicker\":..., \"title\":..., \"sub\":...}, \"outro\": {...}, \"segments\": [{\"id\":..., \"src\": \"presentation/videos/<file>.mp4\", \"in\": <sec>, \"out\": <sec>, \"speed\": 1.0, \"labels\": [{\"t0\": <sec>, \"t1\": <sec>, \"text\": ...}], \"why\": ..., \"evidence\": [\"presentation/_work/positive/<frame>.jpg\", ...]}], \"excluded\": [{\"id\":..., \"reason\":...}]}. Labels are short and clean, e.g. 'Metal duster picks up the caps', 'Opens the wet-wipes lid', 'Pulls a wipe', 'Cleans the beans'. List in excluded every candidate you rejected with the concrete reason (e.g. 'hand steadies the pack', 'wipe dropped', 'badge says 4x speed, motion too fast to read').",
+    "Sanity-check edits_positive.json: JSON parses, every src exists, every in/out lies inside the probed duration, in < out, segment order matches the required priority order, sum of (out-in)/speed plus 6 s of cards lands in 45-90 s."
+  ],
+  "acceptance_criteria": [
+    "presentation/edits_positive.json exists, parses, and contains >= 4 segments ordered: duster picks caps first, then wet-wipes lid open, wipe pull, bean cleaning",
+    "Every included segment lists evidence frame paths under presentation/_work/positive/ and those frames visibly show the claimed success moment when viewed",
+    "Every rejected candidate appears in excluded with a concrete reason; nothing ambiguous (hand assist, drop, partial, retry) is included",
+    "Planned total runtime (segments + ~6 s of title cards) is within 45-90 s",
+    "The frames honestly identify what the 'beans' are, and the why fields state what was actually seen",
+    "presentation/videos/highlight_reel.mp4 untouched (matches reel_baseline.txt)"
+  ],
+  "verification": [
+    ".venv/bin/python -c \"import json; d=json.load(open('presentation/edits_positive.json')); print(len(d['segments']), 'segments,', len(d['excluded']), 'excluded')\"",
+    "View 2-3 evidence frames per included segment and confirm the success moment is visible",
+    "stat -c '%s %y' presentation/videos/highlight_reel.mp4 and compare with presentation/_work/positive/reel_baseline.txt"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

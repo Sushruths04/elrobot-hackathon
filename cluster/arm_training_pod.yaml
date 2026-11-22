@@ -1,0 +1,43 @@
+# ACT spoon-and-beans training on the WZL A100-80GB (srv-hpc-gpu02), namespace isaac-sim.
+# Own PVC because isaac-sim-data is RWO and held by vlm-simulation on srv-hpc-gpu04.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: arm-training-data
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: longhorn
+  resources:
+    requests: {storage: 50Gi}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: arm-training
+  labels: {app: arm-training}
+spec:
+  restartPolicy: Never
+  activeDeadlineSeconds: 43200          # hard stop after 12 h
+  runtimeClassName: nvidia
+  nodeSelector:
+    nvidia.com/gpu.product: NVIDIA-A100-80GB-PCIe
+  containers:
+  - name: main
+    image: nvidia/cuda:12.8.0-cudnn-devel-ubuntu22.04
+    command: ["bash", "-c", "sleep infinity"]
+    env:
+    - {name: HF_HOME, value: /data/hf_cache}
+    - {name: UV_CACHE_DIR, value: /data/cache/uv}
+    - {name: PIP_CACHE_DIR, value: /data/cache/pip}
+    - {name: TMPDIR, value: /data/tmp}
+    resources:
+      requests: {cpu: "8", memory: 32Gi, ephemeral-storage: 10Gi, nvidia.com/gpu.shared: 1}
+      limits:   {cpu: "16", memory: 64Gi, ephemeral-storage: 20Gi, nvidia.com/gpu.shared: 1}
+    volumeMounts:
+    - {name: data, mountPath: /data}
+    - {name: shm, mountPath: /dev/shm}
+  volumes:
+  - name: data
+    persistentVolumeClaim: {claimName: arm-training-data}
+  - name: shm
+    emptyDir: {medium: Memory, sizeLimit: 16Gi}

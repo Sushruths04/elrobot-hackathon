@@ -72,6 +72,7 @@ class StationBackend(Backend):
         self._state: dict[int, JointState] = {}
         self._bus: str | None = None
         self._frames: dict[str, bytes] = {}
+        self._frame_t: dict[str, float] = {}   # wall time of the newest frame per camera queue (stale = camera unplugged)
         self._cam_order: list[str] = []
         self._loop = asyncio.new_event_loop()
         self._client = None
@@ -195,7 +196,7 @@ class StationBackend(Backend):
                 if int(fmt.get_kind()) == 1:  # JPEG
                     frames = fp.get_frames_data()
                     if frames:
-                        self._frames[qid] = bytes(frames[-1])
+                        self._frames[qid] = bytes(frames[-1]); self._frame_t[qid] = time.time()
                 else:  # NCHW u8
                     w, h = fmt.get_width(), fmt.get_height()
                     lin = bytes(fp.get_linear_data())
@@ -205,7 +206,7 @@ class StationBackend(Backend):
                         arr = np.frombuffer(lin, np.uint8)[-3 * w * h:].reshape(3, h, w).transpose(1, 2, 0)
                         buf = io.BytesIO()
                         Image.fromarray(arr).save(buf, "JPEG", quality=88)
-                        self._frames[qid] = buf.getvalue()
+                        self._frames[qid] = buf.getvalue(); self._frame_t[qid] = time.time()
             except Exception as ex:
                 log.warning("camera parse %s: %s", qid, ex)
 
@@ -216,6 +217,12 @@ class StationBackend(Backend):
 
     def cameras(self):
         return [f"cam{i}" for i, _ in enumerate(self._cam_order)] + list(self._cam_order)
+
+    def frame_age(self, camera) -> float:
+        """Seconds since this camera last delivered a frame (inf if never). A replugged camera gets a NEW queue; the old one stays frozen."""
+        order = self._cam_order
+        qid = order[int(camera[3:])] if camera.startswith("cam") and camera[3:].isdigit() and int(camera[3:]) < len(order) else camera
+        return time.time() - self._frame_t[qid] if qid in self._frame_t else float("inf")
 
     def frame_jpeg(self, camera=None) -> bytes:
         order = self._cam_order
@@ -264,7 +271,7 @@ def front_camera(be) -> str:
     from PIL import Image
     best = None
     for c in be.cameras():
-        if not c.startswith("cam"):
+        if not c.startswith("cam") or be.frame_age(c) > 2.0:
             continue
         try:
             g = np.asarray(Image.open(io.BytesIO(be.frame_jpeg(c))).convert("L"), float)
@@ -286,7 +293,7 @@ def wrist_camera(be) -> str | None:
     fcam = front_camera(be)
     best = None
     for c in be.cameras():
-        if not c.startswith("cam") or c == fcam:
+        if not c.startswith("cam") or c == fcam or be.frame_age(c) > 2.0:
             continue
         try:
             g = np.asarray(Image.open(io.BytesIO(be.frame_jpeg(c))).convert("L"), float)

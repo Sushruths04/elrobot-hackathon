@@ -5,7 +5,7 @@ All joint values are normalised 0..1 (JointState.norm), joints 1..8, 8 = gripper
 from __future__ import annotations
 
 import base64
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -17,6 +17,8 @@ DEFAULT_CHUNK_DT = 1.0 / 30.0  # LeRobot dataset fps
 class ActRequest(BaseModel):
     state: List[float] = Field(..., description="8 joint positions, 0..1 norm")
     image_jpeg_b64: Optional[str] = Field(None, description="table camera JPEG, base64")
+    images_jpeg_b64: Optional[Dict[str, str]] = Field(
+        None, description="camera name (as recorded, e.g. 'table', 'wrist') -> JPEG base64; for multi-camera policies")
     task: str = ""
     reset: bool = False
 

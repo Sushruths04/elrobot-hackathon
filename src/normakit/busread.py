@@ -26,6 +26,8 @@ async def snapshot(host="localhost:8888", client=None, queue=None):
     entry = None
     while entry is None:
         entry = await asyncio.wait_for(q.get(), 10)
+    while not q.empty():                                     # reused queue: skip backlog, use the newest state (else readings lag further and further)
+        entry = q.get_nowait() or entry
     st = pb.InferenceStateReader(memoryview(bytes(entry.Data)))
     out = {}
     for bus in st.get_buses():

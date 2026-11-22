@@ -1,0 +1,24 @@
+[  0.1s] arm out of view for the spoon measurement
+[  6.8s] handle top [199. 245.], bottom [245. 311.], grasp point [217.4 271.4] px
+[ 15.6s] attempt 1: above the estimate [0.067 0.353 0.14 ] ok=True 
+[ 16.4s]   jaw tips seen at [228. 272.] px (handle [217.4 271.4])
+[ 20.1s]   image Jacobian (px per m): [[-226.0, 953.0], [100.0, 1200.0]]
+[ 20.1s]   step 0: jaws [239.9 283. ] handle [217.4 271.4] error [-22.5 -11.6] px, z 0.140
+[ 22.0s]   step 1: jaws [225.2 270. ] handle [217.4 271.4] error [-7.8  1.4] px, z 0.140
+[ 23.1s]   step 2: jaws [227. 272.] handle [217.4 271.4] error [-9.6 -0.6] px, z 0.130
+[ 24.1s]   step 3: jaws [226.3 271. ] handle [217.4 271.4] error [-8.9  0.4] px, z 0.120
+[ 24.1s]   error growing - back to the best pose (8 px) and descending
+[ 30.0s]   jaws stopped at 0.05 (1323 ticks), 0 mA (empty = 1321-1326 ticks)
+[ 31.4s]   lifted 4 cm: orange handle top rose 0.0 px in the front view
+[ 31.4s]   not grasped - opening, lifting
+[ 36.2s] attempt 2: above the estimate [0.067 0.353 0.14 ] ok=True 
+[ 37.0s]   jaw tips seen at [232.9 279. ] px (handle [217.4 271.4])
+[ 40.6s]   image Jacobian (px per m): [[-1701.0, 1529.0], [-400.0, 400.0]]
+[ 40.7s]   step 0: jaws [255.2 283. ] handle [217.4 271.4] error [-37.8 -11.6] px, z 0.140
+[ 42.2s]   step 1: jaws [215.4 317. ] handle [217.4 271.4] error [  2.  -45.6] px, z 0.140
+[ 43.8s]   step 2: jaws [251.1 350. ] handle [217.4 271.4] error [-33.7 -78.6] px, z 0.140
+[ 43.8s]   error growing - back to the best pose (40 px) and descending
+[ 50.3s]   jaws stopped at 0.05 (1323 ticks), 0 mA (empty = 1321-1326 ticks)
+[ 52.5s]   lifted 4 cm: orange handle top rose 20.0 px in the front view
+[ 52.5s]   not grasped - opening, lifting
+[ 56.5s] STOP - no grasp

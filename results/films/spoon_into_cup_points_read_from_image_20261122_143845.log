@@ -1,0 +1,8 @@
+[  0.1s] try 1: arm out of view, looking
+[  1.3s]   points read from the front image: grasp px (157,223) z 0.062 -> [0.207 0.172 0.062] | cup px (388,228) -> [-0.191  0.187  0.096]
+[  8.3s]   pre-grasp ok=True 
+[ 10.5s]   down to the handle ok=True 
+[ 11.2s]   photo results/photos/spoon_vlm_before_close_t1_143856.jpg
+[ 15.6s]   jaws stopped at 1324 ticks, 0 mA (empty ~1263-1326)
+[ 15.6s]   jaws empty - opening, retry
+[ 26.7s] STOP - no grasp after 1 tries

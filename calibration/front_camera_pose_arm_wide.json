@@ -1,0 +1,22 @@
+{
+ "note": "front camera pose from real-arm jaw-tip points (13:28 mid grid + wide grid, gated detection), RANSAC inliers",
+ "rvec": [
+  -0.04805046499891358,
+  2.9879955910002525,
+  -0.917189239692068
+ ],
+ "tvec": [
+  0.008851750169224409,
+  -0.17553729129041665,
+  0.7098454799788613
+ ],
+ "camera_pos_robot_m": [
+  0.007083658581100161,
+  0.5437641955838601,
+  0.48891985124680604
+ ],
+ "inliers": 25,
+ "points": 53,
+ "pix_to_xy_mm_mean": 10.7974667178691,
+ "pix_to_xy_mm_max": 19.96869441728642
+}

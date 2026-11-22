@@ -1,0 +1,162 @@
+#!/usr/bin/env python
+"""Teleop data-collection panel (127.0.0.1 only):  .venv/bin/python scripts/teleop_panel.py  ->  http://127.0.0.1:8893
+Big buttons for the operator: mirroring ON/OFF, start a session (LeRobot dataset), GO / SAVE OK / SAVE FAIL / DISCARD per episode, end session.
+Shows both cameras, leader-vs-follower joint difference (match before mirroring), episode count and the recorder log.
+Recording itself is scripts/record_teleop.py (started as a subprocess, controlled through run/TELEOP_* files).
+Keyboard: G = go, S = save OK, F = save FAIL, D = discard."""
+import asyncio, json, subprocess, sys, threading, time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from urllib.parse import urlparse, parse_qs
+ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT / "src"))
+from normakit.busread import snapshot
+from normakit.station_backend import StationBackend, front_camera, wrist_camera, REG_GOAL_POS
+RUN = ROOT / "run"; PY = str(ROOT / ".venv/bin/python"); LOG = RUN / "teleop_recorder.log"
+DEFAULT_TASK = "pick up the spoon, scoop beans and pour them into the cup"
+MATCH_TOL = 0.08   # max |leader_norm - follower_norm| on any joint before mirroring may be switched on
+be = StationBackend("localhost:8888", require_motors=False); be.start(); time.sleep(2.5)
+CAM = {"table": front_camera(be), "wrist": wrist_camera(be)}
+S = {"mirror": "unknown", "proc": None, "root": None, "arm": None, "arm_t": 0}
+BUSES = json.loads((RUN / "buses.json").read_text())
+
+def arm_reader():
+    loop = asyncio.new_event_loop(); c = q = None
+    while True:
+        try:
+            s, c, q = loop.run_until_complete(snapshot(client=c, queue=q)); S["arm"] = s; S["arm_t"] = time.time(); time.sleep(0.1)
+        except Exception: c = q = None; time.sleep(1)
+threading.Thread(target=arm_reader, daemon=True).start()
+
+def joints():
+    s = S["arm"]
+    if not s or time.time() - S["arm_t"] > 2: return None
+    L, F = s.get(BUSES["leader"], {}), s.get(BUSES["follower"], {})
+    return [{"j": i, "leader": round(L[i]["norm"], 3), "follower": round(F[i]["norm"], 3), "diff": round(L[i]["norm"] - F[i]["norm"], 3),
+             "follower_mA": F[i]["cur"]} for i in range(1, 9) if i in L and i in F]
+
+def mirror(on, force=False):
+    from station_py import send_commands
+    from target.gen_python.protobuf.station import commands, drivers
+    from target.gen_python.protobuf.drivers.motors_mirroring import mirroring as mm
+    if on and not force:
+        js = joints()
+        if not js or len(js) < 8: return {"error": "cannot read both arms - mirroring NOT switched on"}
+        bad = [f"j{x['j']} {x['diff']:+.2f}" for x in js if x["j"] != 8 and abs(x["diff"]) > MATCH_TOL]
+        if bad: return {"error": "leader and follower do not match yet (turn the leader until all are green): " + ", ".join(bad)}
+    L = mm.MirroringBus(type=mm.BusType.MBT_ST3215, unique_id=BUSES["leader"]); F = mm.MirroringBus(type=mm.BusType.MBT_ST3215, unique_id=BUSES["follower"])
+    cmd = mm.Command(type=mm.CommandType.CT_START_MIRROR if on else mm.CommandType.CT_STOP_MIRROR, source=L, targets=[F] if on else None)
+    dc = commands.DriverCommand(type=drivers.StationCommandType.STC_MOTOR_MIRRORING_COMMAND, body=cmd.encode())
+    asyncio.run_coroutine_threadsafe(send_commands(be._client, [dc]), be._loop).result(5)
+    if not on:
+        st = be.state(); be._sync(REG_GOAL_POS, {i: (st.joints[i].raw % 4096).to_bytes(2, "little") for i in range(1, 9) if i in st.joints})
+    S["mirror"] = "ON" if on else "OFF"; return {"mirroring": S["mirror"]}
+
+
+LAST = {}   # key -> (hash, time it last changed)
+def redetect(force=False):
+    if not force and time.time() - LAST.get("_redetect", 0) < 5: return
+    LAST["_redetect"] = time.time()
+    try: CAM["table"] = front_camera(be); CAM["wrist"] = wrist_camera(be)
+    except Exception: pass
+def frame(k):
+    """Frame for 'table'/'wrist'; if it errors or has not changed for 3 s (camera replugged -> new queue), re-detect the cameras."""
+    try:
+        j = be.frame_jpeg(CAM.get(k)); h = hash(j)
+        if LAST.get(k, (None,))[0] != h: LAST[k] = (h, time.time())
+        elif time.time() - LAST[k][1] > 3: redetect()
+        return j
+    except Exception:
+        redetect(); raise
+
+def rec_running(): return S["proc"] is not None and S["proc"].poll() is None
+def log_tail(n=14):
+    try: return [l for l in LOG.read_text(errors="replace").splitlines() if any(k in l for k in ("READY", "RECORDING", "SAVING", "SAVED", "DISCARD", "DONE", "waiting", "cameras", "error", "Error", "WARNING", " s"))][-n:]
+    except Exception: return []
+def phase():
+    if not rec_running(): return "no session"
+    t = log_tail(3); last = t[-1] if t else ""
+    if "SAVING" in last: return "SAVING"
+    if "ERROR" in last: return "CAMERA ERROR"
+    if "RECORDING" in last or (last.strip().endswith(" s") and "SAVED" not in last): return "RECORDING"
+    return "ready"
+def labels():
+    try: return json.loads((Path(S["root"]) / "EPISODE_LABELS.json").read_text())
+    except Exception: return []
+
+def start_session(task):
+    if rec_running(): return {"error": "a session is already running"}
+    other = subprocess.run(["pgrep", "-f", "scripts/record_teleop.py"], capture_output=True, text=True).stdout.split()
+    if other: return {"error": f"another recorder is still running (pid {' '.join(other)}) - ask Claude to close it first"}
+    if not CAM["table"]: return {"error": "no table camera"}
+    root = ROOT / "datasets" / f"teleop_spoon_beans_{time.strftime('%Y%m%d_%H%M%S')}"
+    redetect(force=True)
+    qid = lambda c: be._cam_order[int(c[3:])] if c and c.startswith("cam") and c[3:].isdigit() else c   # pass stable queue ids, camN differs between processes
+    if not CAM["wrist"]: return {"error": "wrist camera not live - check its cable (the panel picture must move)"}
+    args = [PY, "-u", str(ROOT / "scripts/record_teleop.py"), "--task", task or DEFAULT_TASK, "--root", str(root), "--table-cam", qid(CAM["table"]), "--wrist-cam", qid(CAM["wrist"])]
+    S["proc"] = subprocess.Popen(args, stdout=open(LOG, "w"), stderr=subprocess.STDOUT, cwd=ROOT); S["root"] = str(root)
+    return {"session": str(root), "cameras": CAM}
+def touch(name):
+    if not rec_running(): return {"error": "no session running - press START SESSION first"}
+    (RUN / name).touch(); return {"sent": name}
+def end_session():
+    if not rec_running(): return {"error": "no session running"}
+    if phase() == "RECORDING": return {"error": "an episode is recording - save or discard it first"}
+    (RUN / "TELEOP_QUIT").touch(); return {"ending": S["root"]}
+
+PAGE = r"""<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Teleop recorder</title>
+<style>body{background:#0e1117;color:#e6e6e6;font:15px system-ui;margin:0;padding:10px}.g{display:grid;grid-template-columns:1fr 1fr 380px;gap:10px}
+.c{background:#161b26;border-radius:10px;padding:10px}img{width:100%;border-radius:6px;background:#000}h3{margin:0 0 6px;font-size:14px;color:#9aa4b8}
+button{border:0;border-radius:9px;color:#fff;font-size:18px;font-weight:700;padding:16px;margin:4px 0;width:100%;cursor:pointer}
+.go{background:#1f7a4f}.ok{background:#2e86de}.fail{background:#b9770e}.disc{background:#555c6e}.end{background:#7d3c98}.mon{background:#16a085}.moff{background:#c0392b}
+#ph{font-size:26px;font-weight:800;text-align:center;padding:14px;border-radius:9px}td{padding:2px 6px;text-align:right}.bad{color:#ff6b6b;font-weight:700}.okc{color:#5be38c}
+pre{background:#0b0e14;border-radius:6px;padding:6px;font-size:12px;white-space:pre-wrap;max-height:200px;overflow:auto}input{width:100%;background:#0b0e14;color:#e6e6e6;border:1px solid #333;border-radius:6px;padding:6px}</style>
+<div class=g><div class=c><h3>Table camera</h3><img id=t></div><div class=c><h3>Wrist camera</h3><img id=w></div>
+<div><div class=c><div id=ph>...</div><div id=cnt style="text-align:center;margin-top:6px"></div></div>
+<div class=c><h3>1. Mirroring (leader drives follower)</h3><button class=mon onclick="p('/api/mirror',{on:true})">MIRRORING ON</button><button class=moff onclick="p('/api/mirror',{on:false})">MIRRORING OFF</button><div id=mi></div></div>
+<div class=c><h3>2. Session</h3><input id=task><button class=go onclick="p('/api/session/start',{task:task.value})">START SESSION</button><button class=end onclick="p('/api/session/end')">END SESSION</button></div>
+<div class=c><h3>3. Episodes (keys G / S / F / D)</h3><button class=go onclick="p('/api/go')">GO - record episode (G)</button><button class=ok onclick="p('/api/ok')">SAVE - success (S)</button>
+<button class=fail onclick="p('/api/fail')">SAVE - failed (F)</button><button class=disc onclick="p('/api/discard')">DISCARD (D)</button></div></div></div>
+<div class=g style="margin-top:10px"><div class=c><h3>Leader vs follower (match before mirroring; red = more than 0.08 apart)</h3><table id=jt></table></div>
+<div class=c><h3>Last message</h3><pre id=out>-</pre></div><div class=c><h3>Recorder log</h3><pre id=lg></pre></div></div>
+<script>
+const $=id=>document.getElementById(id);$('task').value=%TASK%;
+function p(u,b){return fetch(u,{method:'POST',body:JSON.stringify(b||{})}).then(r=>r.json()).then(j=>{$('out').textContent=JSON.stringify(j,null,1);tick()})}
+document.onkeydown=e=>{if(e.target.tagName=='INPUT')return;const k=e.key.toLowerCase();if(k=='g')p('/api/go');if(k=='s')p('/api/ok');if(k=='f')p('/api/fail');if(k=='d')p('/api/discard')};
+async function tick(){try{const s=await (await fetch('/api/status')).json();
+ const ph=$('ph');ph.textContent=s.phase=='RECORDING'?'● RECORDING':s.phase=='SAVING'?'SAVING... wait':s.phase=='CAMERA ERROR'?'CAMERA ERROR - wait 5 s, press GO again':s.phase=='ready'?'READY - press GO':'NO SESSION';ph.style.background=s.phase=='RECORDING'?'#c0392b':s.phase=='SAVING'?'#b9770e':s.phase=='CAMERA ERROR'?'#8e44ad':s.phase=='ready'?'#1f7a4f':'#3a4156';
+ $('cnt').textContent=s.session?(s.labels.filter(x=>x.success).length+' successful / '+s.labels.length+' saved  -  '+s.session.split('/').pop()):'';
+ $('mi').innerHTML='mirroring: <b>'+s.mirror+'</b>';
+ $('jt').innerHTML='<tr><td>joint</td><td>leader</td><td>follower</td><td>diff</td></tr>'+(s.joints||[]).map(x=>`<tr><td>${x.j==8?'grip':'j'+x.j}</td><td>${x.leader}</td><td>${x.follower}</td><td class=${Math.abs(x.diff)>0.08&&x.j!=8?'bad':'okc'}>${x.diff>0?'+':''}${x.diff}</td></tr>`).join('');
+ $('lg').textContent=s.log.join('\n');}catch(e){}}
+setInterval(tick,500);tick();
+function cam(){$('t').src='/frame.jpg?c=table&'+Date.now();$('w').src='/frame.jpg?c=wrist&'+Date.now()}setInterval(cam,250);cam();
+</script>"""
+
+class H(BaseHTTPRequestHandler):
+    def log_message(self, *a): pass
+    def send(self, code, body, ctype="application/json"):
+        b = body if isinstance(body, bytes) else (body if isinstance(body, str) else json.dumps(body)).encode()
+        self.send_response(code); self.send_header("Content-Type", ctype); self.send_header("Content-Length", str(len(b))); self.send_header("Cache-Control", "no-store"); self.end_headers(); self.wfile.write(b)
+    def do_GET(self):
+        u = urlparse(self.path); q = parse_qs(u.query)
+        try:
+            if u.path == "/": return self.send(200, PAGE.replace("%TASK%", json.dumps(DEFAULT_TASK)), "text/html; charset=utf-8")
+            if u.path == "/frame.jpg":
+                k = q.get("c", ["table"])[0]; return self.send(200, frame(k), "image/jpeg")
+            if u.path == "/api/status":
+                return self.send(200, {"phase": phase(), "mirror": S["mirror"], "session": S["root"] if rec_running() else None, "labels": labels() if rec_running() else [],
+                                       "joints": joints(), "log": log_tail(), "cams": CAM})
+            self.send(404, "not found", "text/plain")
+        except Exception as e: self.send(503, f"{type(e).__name__}: {e}"[:200], "text/plain")
+    def do_POST(self):
+        n = int(self.headers.get("Content-Length", 0) or 0); b = json.loads(self.rfile.read(n) or b"{}"); p = urlparse(self.path).path
+        try:
+            r = {"/api/mirror": lambda: mirror(bool(b.get("on")), bool(b.get("force"))), "/api/session/start": lambda: start_session(b.get("task")),
+                 "/api/session/end": end_session, "/api/go": lambda: touch("TELEOP_GO"), "/api/ok": lambda: touch("TELEOP_DONE_OK"),
+                 "/api/fail": lambda: touch("TELEOP_DONE_FAIL"), "/api/discard": lambda: touch("TELEOP_DISCARD")}.get(p)
+            self.send(200, r()) if r else self.send(404, {"error": "unknown"})
+        except Exception as e: self.send(500, {"error": f"{type(e).__name__}: {e}"[:300]})
+
+if __name__ == "__main__":
+    print(f"Teleop panel: http://127.0.0.1:8893  cameras {CAM}", flush=True)
+    ThreadingHTTPServer(("127.0.0.1", 8893), H).serve_forever()

@@ -1,0 +1,26 @@
+[  0.0s] handle front px top [196. 186.] bottom [216. 229.] -> grasp xy [0.165 0.203] (radial 0.261 m); pre-grasp [0.127 0.156 0.13 ]
+[  0.2s] IK pre {'pos_err_mm': 0.4, 'ori_err_deg': 0.1, 'tilt': 60, 'j7_norm': 0.96} | goal {'pos_err_mm': 0.4, 'ori_err_deg': 0.1, 'tilt': 60, 'j7_norm': 0.94}
+[  0.2s] attempt 1: pre-grasp, jaws open
+[  0.7s]   move: ok=True 
+[  1.5s]   wrist: handle at x=360 (gap 320), in-gap pixels 356, area 5770
+[  3.2s]   probe: 1 cm sideways moves the handle -9 px in the wrist image
+[  3.2s]   step 0: handle x error +40 px, in-gap pixels 501, tip [0.125 0.157 0.126]
+[  4.1s]   step 1: handle x error +34 px, in-gap pixels 876, tip [0.117 0.163 0.126]
+[  4.9s]   step 2: handle x error +20 px, in-gap pixels 1191, tip [0.11  0.17  0.126]
+[  4.9s]   handle fills the jaw gap
+[  9.2s]   jaws stopped at 0.05 (1324 ticks), current 0 mA (empty closes to ~0.01)
+[ 11.3s]   lift 4 cm: orange handle top moved up -63.0 px in the front camera
+[ 11.3s]   photo results/photos/spoon_side_grasp_attempt1_131432.jpg
+[ 11.3s]   not grasped - releasing, back to pre-grasp
+[ 15.2s] attempt 2: pre-grasp, jaws open
+[ 15.7s]   move: ok=True 
+[ 16.5s]   wrist: handle at x=365 (gap 320), in-gap pixels 588, area 5786
+[ 18.0s]   probe: 1 cm sideways moves the handle -9 px in the wrist image
+[ 18.0s]   step 0: handle x error +42 px, in-gap pixels 777, tip [0.12  0.16  0.125]
+[ 18.9s]   step 1: handle x error +30 px, in-gap pixels 1155, tip [0.113 0.166 0.125]
+[ 18.9s]   handle fills the jaw gap
+[ 23.3s]   jaws stopped at 0.05 (1323 ticks), current 0 mA (empty closes to ~0.01)
+[ 25.4s]   lift 4 cm: orange handle top moved up 2.0 px in the front camera
+[ 25.4s]   photo results/photos/spoon_side_grasp_attempt2_131446.jpg
+[ 25.4s]   not grasped - releasing, back to pre-grasp
+[ 29.2s] STOP - no grasp

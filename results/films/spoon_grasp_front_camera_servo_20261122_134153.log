@@ -1,0 +1,30 @@
+[  0.1s] arm out of view for the spoon measurement
+[  6.7s] handle 3D: base [0.05  0.322 0.045] top [0.098 0.276 0.118] -> grasp point [0.082 0.292 0.092] (pixel [219.7 261.8]), approach height 0.122
+[  6.7s] handle top [205. 236.], bottom [244. 306.], grasp point [219.7 261.8] px
+[ 15.6s] attempt 1: above the estimate [0.082 0.292 0.122] ok=True 
+[ 16.4s]   jaw tips seen at [225.3 255. ] px (handle [219.7 261.8])
+[ 19.9s]   image Jacobian (px per m): [[-1863.0, -1525.0], [400.0, 600.0]]
+[ 20.0s]   step 0: jaws [210.9 262. ] handle [219.7 261.8] error [  5.4 -18.9] px, z 0.122
+[ 22.0s]   step 1: jaws [206.5 258. ] handle [219.7 261.8] error [  9.7 -14.9] px, z 0.122
+[ 24.5s]   step 2: jaws [211.5 256. ] handle [219.7 261.8] error [  4.8 -12.9] px, z 0.122
+[ 25.5s]   step 3: jaws [202.8 271. ] handle [219.7 261.8] error [16.9 -9.2] px, z 0.092
+[ 27.4s]   step 4: jaws [201.3 272. ] handle [219.7 261.8] error [ 18.4 -10.2] px, z 0.092
+[ 29.1s]   step 5: jaws [207.1 265. ] handle [219.7 261.8] error [12.6 -3.2] px, z 0.092
+[ 33.5s]   jaws stopped at 0.05 (1324 ticks), 1 mA (empty = 1321-1326 ticks)
+[ 35.4s]   lifted 4 cm: orange handle top rose 0.0 px in the front view
+[ 35.4s]   not grasped - opening, lifting
+[ 40.6s] attempt 2: above the estimate [0.082 0.292 0.122] ok=True 
+[ 41.4s]   jaw tips seen at [224.7 257. ] px (handle [219.7 261.8])
+[ 44.8s]   image Jacobian (px per m): [[-2291.0, -1826.0], [200.0, 500.0]]
+[ 44.8s]   step 0: jaws [212.1 265. ] handle [219.7 261.8] error [  4.2 -21.9] px, z 0.122
+[ 46.9s]   step 1: jaws [201.6 259. ] handle [219.7 261.8] error [ 14.7 -15.9] px, z 0.122
+[ 48.9s]   step 2: jaws [208.8 257. ] handle [219.7 261.8] error [  7.5 -13.9] px, z 0.122
+[ 50.9s]   step 3: jaws [217.2 256. ] handle [219.7 261.8] error [ -0.9 -12.9] px, z 0.122
+[ 51.9s]   step 4: jaws [195. 278.] handle [219.7 261.8] error [ 24.7 -16.2] px, z 0.092
+[ 53.5s]   step 5: jaws [200.5 271. ] handle [219.7 261.8] error [19.1 -9.2] px, z 0.092
+[ 55.2s]   step 6: jaws [204.7 259. ] handle [219.7 261.8] error [15.   2.8] px, z 0.092
+[ 57.1s]   step 7: jaws [207.9 264. ] handle [219.7 261.8] error [11.8 -2.2] px, z 0.092
+[ 61.5s]   jaws stopped at 0.05 (1323 ticks), 0 mA (empty = 1321-1326 ticks)
+[ 63.4s]   lifted 4 cm: orange handle top rose -1.0 px in the front view
+[ 63.4s]   not grasped - opening, lifting
+[ 67.6s] STOP - no grasp

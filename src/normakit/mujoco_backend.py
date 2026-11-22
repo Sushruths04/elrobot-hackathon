@@ -537,6 +537,9 @@ class MujocoBackend(Backend):
     def cameras(self) -> list[str]:
         return ["cam0", "cam1"]
 
+    def frame_age(self, camera: str | None = None) -> float:
+        return 0.0
+
     def _resolve_cam(self, camera: str | None) -> str:
         if camera in (None, "cam0", "front", "table"):
             return "front"

@@ -47,7 +47,8 @@ def ask(provider, model, jpeg, question, max_tokens=300, timeout=60):
         msg = o["choices"][0]["message"]; txt = msg.get("content") or ""
         if not txt.strip():                                           # reasoning models can spend the whole budget thinking: retry once with a bigger budget
             o = _post(NEBIUS + "/chat/completions", {"Authorization": "Bearer " + key("nebius")}, {"model": model, "temperature": 0, "max_tokens": max_tokens * 4, "messages": [{"role": "user", "content": [{"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + b64}}, {"type": "text", "text": q}]}]}, timeout)
-            msg = o["choices"][0]["message"]; txt = msg.get("content") or msg.get("reasoning_content") or ""
+            msg = o["choices"][0]["message"]; txt = msg.get("content") or ""
+            if not txt.strip(): return {"incomplete": True, "raw": (msg.get("reasoning_content") or "")[:300], "seconds": round(time.time() - t0, 2)}   # review 2026-11-22: never parse reasoning text
     elif provider == "anthropic":
         o = _post("https://api.anthropic.com/v1/messages", {"x-api-key": key("anthropic"), "anthropic-version": "2023-06-01"}, {"model": model, "max_tokens": max_tokens, "temperature": 0, "messages": [{"role": "user", "content": [{"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": b64}}, {"type": "text", "text": q}]}]}, timeout)
         txt = "".join(c.get("text", "") for c in o["content"])
@@ -60,7 +61,8 @@ def point(provider, model, jpeg, what, width, height, timeout=60, many=False):
         from . import er2; return er2._gemini_point(jpeg, what, width, height)["points"]
     q = (f'Point to {what}. Reply {{"points": [{{"label": text, "x": number, "y": number}}, ...]}} with the centre of every instance (or end) asked for, '
          'x and y normalised to 0-1000 over the whole image (x to the right, y downwards).')
-    d = ask(provider, model, jpeg, q, max_tokens=400, timeout=timeout); out = []
+    d = ask(provider, model, jpeg, q, max_tokens=3000, timeout=max(timeout, 90)); out = []
+    if d.get("incomplete"): return []                                 # reasoning ran out of budget: no answer, not a guess
     for it in (d.get("points") if isinstance(d.get("points"), list) else [d]):
         try: out.append((str(it.get("label", "")), float(it["x"]) / 1000 * width, float(it["y"]) / 1000 * height))
         except Exception: pass

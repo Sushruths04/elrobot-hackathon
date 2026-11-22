@@ -31,7 +31,29 @@ def sample_chunk(chunk, pos):
     return [(1 - f) * chunk[i][k] + f * chunk[j][k] for k in range(len(chunk[i]))]
 
 
-def run_loop(backend, client, task, hz=10.0, steps=100, max_delta=0.05, guard=None, log=print):
+def resolve_cameras(backend, wanted):
+    """Map recorded camera names ('table', 'wrist') to backend camera ids. Station renumbers cameras on
+    every replug, so use the same detectors as scripts/record_teleop.py."""
+    if not wanted:
+        return {}
+    if hasattr(backend, "_cam_order"):  # StationBackend
+        from normakit.station_backend import front_camera, wrist_camera
+        found = {"table": front_camera(backend), "wrist": wrist_camera(backend)}
+    else:                               # SimBackend names its cameras 'table' and 'wrist'
+        found = {c: c for c in backend.cameras()}
+    missing = [c for c in wanted if not found.get(c)]
+    if missing:
+        raise RuntimeError(f"policy needs cameras {wanted}; not found on the robot: {missing}")
+    if "table" in wanted and "wrist" in wanted and found["table"] == found["wrist"]:
+        raise RuntimeError("table and wrist resolved to the same camera; check the wrist camera")
+    return {c: found[c] for c in wanted}
+
+
+def grab(backend, cams):
+    return {name: backend.frame_jpeg(cid) for name, cid in cams.items()}
+
+
+def run_loop(backend, client, task, hz=10.0, steps=100, max_delta=0.05, guard=None, log=print, cams=None):
     """Returns list of dicts sent to Guard.move results. Stops on e-stop or server error.
 
     Chunk rows are chunk_dt seconds apart (30 fps for ACT). Each tick of 1/hz seconds advances the
@@ -48,7 +70,10 @@ def run_loop(backend, client, task, hz=10.0, steps=100, max_delta=0.05, guard=No
             break
         if chunk is None or pos >= max(1.0, len(chunk) / 2):
             norms = backend.state().norms()
-            chunk = client.act([norms[i] for i in JOINT_IDS], backend.frame_jpeg(), task)
+            if cams:
+                chunk = client.act([norms[i] for i in JOINT_IDS], None, task, images=grab(backend, cams))
+            else:
+                chunk = client.act([norms[i] for i in JOINT_IDS], backend.frame_jpeg(), task)
             pos = 0.0
         cur = backend.state().norms()
         row = sample_chunk(chunk, pos)
@@ -84,7 +109,8 @@ def main():
 
     client = PolicyClient(a.url)
     try:
-        print("server:", client.health())
+        health = client.health()
+        print("server:", health)
     except PolicyError as e:
         print(e, file=sys.stderr)
         return 3
@@ -99,11 +125,16 @@ def main():
     time.sleep(1.0)
     guard = Guard(be)
     try:
+        cams = resolve_cameras(be, health.get("cameras") or [])
+        if len(cams) > 1:
+            print("cameras:", cams)
+        else:
+            cams = None  # single-camera checkpoint: keep the original one-image path
         client.reset()  # clear any policy-side action queue from a previous episode
-        sent = run_loop(be, client, a.task, a.hz, a.steps, a.max_delta, guard)
+        sent = run_loop(be, client, a.task, a.hz, a.steps, a.max_delta, guard, cams=cams)
         print(f"sent {len(sent)} commands, last server_ms={client.last_server_ms:.1f}")
         return 0
-    except PolicyError as e:
+    except (PolicyError, RuntimeError) as e:
         print(e, file=sys.stderr)
         guard.estop()
         return 3

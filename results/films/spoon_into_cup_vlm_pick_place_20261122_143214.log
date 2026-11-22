@@ -1,0 +1,22 @@
+[  0.1s] try 1: arm out of view, looking
+[ 12.5s]   handle base [0.121 0.227 0.045] top [0.184 0.245 0.114] -> grasp [0.153 0.236 0.079] | cup [-0.195  0.216  0.096]  (px top [152. 238.] base [209. 259.] cup [394. 242.])
+[ 19.6s]   pre-grasp ok=True 
+[ 21.8s]   down to the handle ok=True 
+[ 22.2s]   photo results/photos/spoon_vlm_before_close_t1_143236.jpg
+[ 26.6s]   jaws stopped at 1323 ticks, 0 mA (empty ~1263-1326)
+[ 26.6s]   jaws empty - opening, retry
+[ 31.7s] try 2: arm out of view, looking
+[ 50.0s]   handle base [0.121 0.227 0.045] top [0.188 0.242 0.111] -> grasp [0.155 0.235 0.078] | cup [-0.202  0.216  0.096]  (px top [150. 238.] base [209. 259.] cup [397. 242.])
+[ 57.2s]   pre-grasp ok=True 
+[ 59.5s]   down to the handle ok=True 
+[ 59.9s]   photo results/photos/spoon_vlm_before_close_t2_143314.jpg
+[ 64.2s]   jaws stopped at 1323 ticks, 1 mA (empty ~1263-1326)
+[ 64.2s]   jaws empty - opening, retry
+[ 69.6s] try 3: arm out of view, looking
+[ 87.5s]   handle base [0.12  0.235 0.045] top [0.184 0.245 0.115] -> grasp [0.152 0.24  0.08 ] | cup [-0.187  0.23   0.096]  (px top [152. 238.] base [209. 263.] cup [390. 249.])
+[ 94.6s]   pre-grasp ok=True 
+[ 96.8s]   down to the handle ok=True 
+[ 97.2s]   photo results/photos/spoon_vlm_before_close_t3_143351.jpg
+[101.6s]   jaws stopped at 1323 ticks, 0 mA (empty ~1263-1326)
+[101.6s]   jaws empty - opening, retry
+[112.4s] STOP - no grasp after 3 tries

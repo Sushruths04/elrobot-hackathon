@@ -1,0 +1,27 @@
+[  1.6s] today's handle: base [0.088 0.278 0.045] top [0.139 0.243 0.118] (pixels top (176.0, 216.0) bottom (221.0, 279.0))
+[  1.6s]   demo ep15 (113219 ep2): handle base [0.131, 0.25, 0.045] top [0.117, 0.256, 0.139] | distance 8.4 cm | grasped 83% up
+[  1.6s]   demo ep14 (113219 ep1): handle base [0.053, 0.266, 0.045] top [0.092, 0.271, 0.131] | distance 9.4 cm | grasped 95% up
+[  1.6s]   demo ep4 (103601 ep4): handle base [0.065, 0.26, 0.045] top [0.089, 0.287, 0.133] | distance 9.8 cm | grasped 76% up
+[  1.6s]   demo ep2 (103601 ep2): handle base [0.068, 0.239, 0.045] top [0.09, 0.286, 0.125] | distance 10.9 cm | grasped 100% up
+[  1.6s]   demo ep6 (110808 ep0): handle base [0.131, 0.25, 0.045] top [0.123, 0.299, 0.126] | distance 11.0 cm | grasped 97% up
+[  1.8s] plan ep15: shift [-0.6  0.5 -4.2] cm, grasp tip [0.105 0.235 0.082], path min 0.063 m
+[  2.0s] plan ep14: shift [ 2.4 -1.  -4.5] cm, grasp tip [0.106 0.275 0.084], path min 0.057 m
+[  2.1s] plan ep4: shift [ 3. -2. -3.] cm, grasp tip [0.116 0.297 0.069], path min 0.067 m
+[  3.8s] try 1: replaying demo ep15 shifted [-0.6  0.5 -4.2] cm
+[ 38.5s]   photo before closing: results/photos/spoon_match_before_close_try1_135423.jpg
+[ 41.9s]   jaws stopped at 1263 ticks, 3 mA (empty = 1321-1326)
+[ 41.9s]   not grasped - opening, next demo
+[ 47.5s]   re-measured handle: base [0.088 0.287 0.045] top [0.137 0.25  0.119]
+[ 47.9s] plan ep14: shift [ 2.3 -0.2 -4.5] cm, grasp tip [0.105 0.283 0.085], path min 0.058 m
+[ 47.9s] try 2: replaying demo ep14 shifted [ 2.3 -0.2 -4.5] cm
+[ 76.0s]   photo before closing: results/photos/spoon_match_before_close_try2_135500.jpg
+[ 79.6s]   jaws stopped at 1263 ticks, 4 mA (empty = 1321-1326)
+[ 79.6s]   not grasped - opening, next demo
+[ 86.0s]   re-measured handle: base [0.183 0.323 0.045] top [0.124 0.318 0.119]
+[ 87.5s] plan ep4: shift [ 7.  4. -3.] cm, grasp tip [0.156 0.356 0.07 ], path min 0.068 m
+[ 87.5s] try 3: replaying demo ep4 shifted [ 7.  4. -3.] cm
+[121.3s]   photo before closing: results/photos/spoon_match_before_close_try3_135546.jpg
+[124.1s]   jaws stopped at 1355 ticks, 97 mA (empty = 1321-1326)
+[124.1s]   SPOON IN THE JAWS (jaws stopped on the handle under load) - scooping and pouring like the demo
+[151.6s]   end photo results/photos/spoon_match_end_135616.jpg
+[151.6s] DONE - full task run finished
