@@ -1,4 +1,21 @@
-# Issues (IDs 101+ = Sushruth's rig; 001..015 = Bart's macOS session, listed at the bottom). Next ID: ISSUE-116
+# Issues (IDs 101+ = Sushruth's rig; 001..015 = Bart's macOS session, listed at the bottom). Next ID: ISSUE-119
+
+### ISSUE-116 - Twin replay: recorded grasp puts the jaw tips ~40 mm above the table (sim marker never lifted)
+- **Status:** open (twin modelling residual; the arm servo replay itself tracks at 4.93 mm mean EE error)
+- **Evidence:** replaying `run/recordings/20261121_205828_teleop_pick1/joints.jsonl` through `MujocoBackend` (`scripts/twin_replay.py`, `docs/twin/replay_metrics.json`): at the recorded grasp (jaw closes ~frame 640) the recorded joints put the jaw tips ~5 mm from the marker in xy but ~40 mm above the table, while straddling a 15 mm marker needs the tips at ~10-15 mm; the sim marker's max height is 0.72 cm (never lifted, never in the tray). In the real `front.mp4` the same recorded joints DO grasp the marker and place it into the tray (~frames 600-760).
+- **Cause (guess):** wrist-pitch / calibration residual between `Kin` FK (URDF) and the real arm at this pose; a few degrees of wrist pitch is ~40 mm at the jaw tips. Unverified.
+- **Next:** measure the real jaw-tip height at the grasp (wrist camera or a touch-down probe on the table); if a constant FK residual shows up, fit it and document the correction.
+
+### ISSUE-117 - `table_tex.png` tape lines do not match this session's real table
+- **Status:** known (texture deliberately not changed; it is shared with `elrobot_scene.xml`)
+- **Evidence:** frame-0 alignment of `20261121_205828_teleop_pick1` (`docs/twin/camera_align_f0.png`, `docs/twin/replay_metrics.json`): the twin texture's yellow tapes sit at robot x=-0.15 m and x=+0.21 m, while this session's real table tapes measured x=-0.21 m (right) and x=+0.24 m (left) via the `calibration/table_mujoco_front.json` homography -> +14.6 / -43.2 px at mid-height. The camera intrinsics residual is 0.39 px, so the diff is table layout, not camera error (tray/marker/tape still match within ~15 px).
+- **Cause (guess):** the table was (re-)taped between the texture capture and this session. Unverified.
+- **Next:** if pixel-exact tape lines matter, regenerate `table_tex.png` from a current table photo.
+
+### ISSUE-118 - `joints.jsonl` t column drifts +3.8 s over a 1058-frame clip
+- **Status:** known (use the frame index for video sync, never the t column)
+- **Evidence:** `run/recordings/20261121_205828_teleop_pick1`: dt mean 0.1286 s vs the video's 0.125 s (8 fps), accumulating +3.8 s over 1058 frames. Line i of `joints.jsonl` aligns 1:1 with video frame i (verified visually at the grasp and at rest).
+- **Cause (guess):** recorder timestamp jitter / clock source in the capture loop, not dropped frames. Unverified.
 
 ### ISSUE-115 - `calibration/table_front.json` corners were touched from behind the robot (180-deg swapped)
 - **Status:** fix ready (`calibration/table_front_180fix.json`, original file kept untouched)
