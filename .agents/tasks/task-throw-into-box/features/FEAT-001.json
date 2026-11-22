@@ -1,0 +1,25 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Baseline check, then feasibility doc and simulated throw environment: box + small ball in a MuJoCo scene variant (do not modify existing elrobot_scene.xml behavior; add separate scene file or programmatic injection), gymnasium env, reward, physically-limited actuation matching ST3215 model.",
+  "status": "completed",
+  "steps": [
+    "Run .venv/bin/python scripts/selftest_sim.py and scripts/test_policy_client.py; record baseline.",
+    "Read docs/10_MODEL_AND_A100_PLAN.md, src/normakit/mujoco_backend.py (ST3215ServoParams, send_goals, step_seconds), core.py Guard.",
+    "Write docs/11_THROW_INTO_BOX.md: assumptions about missing reference ('something like that'), honest feasibility (max joint speed from ST3215 model measured in sim, achievable release speed and range, box distance e.g. 15-30 cm lob/toss), Guard 10 Hz + 0.35 step limit blocks ballistic motion so real throw needs a human-approved exemption (propose a separate opt-in 'throw mode' but DO NOT edit core.py limits), model choice: sim RL (PPO/SAC) or CEM trajectory optimisation over a low-dim release trajectory, then distil to ACT/policy served via server/, trained on A100.",
+    "Add assets/mujoco/throw_scene.xml (or scene builder in src/normakit/throw_env.py) with a box (open top, walls) and a small ball held by the gripper at start or placed in jaws; randomise box position.",
+    "Add src/normakit/throw_env.py: gymnasium Env wrapping MujocoBackend, action = normalised 8-joint targets (0..1) per control step, obs = joints + ball pos + box pos, reward = -distance of ball landing to box centre + big bonus for in-box, with in-box success detection.",
+    "Add scripts/throw_smoke.py checking env reset/step/success detection works headless."
+  ],
+  "acceptance_criteria": [
+    "docs/11_THROW_INTO_BOX.md exists with assumptions, feasibility numbers, model choice, safety/Guard section",
+    "Env resets and steps headless; a scripted ball drop above box registers success",
+    "selftest_sim.py still passes"
+  ],
+  "verification": [
+    ".venv/bin/python scripts/throw_smoke.py",
+    ".venv/bin/python scripts/selftest_sim.py"
+  ],
+  "blocked_reason": null,
+  "findings": "Baseline selftest_sim and test_policy_client pass. throw_scene.xml uses <include> of elrobot_scene.xml; env patches mujoco_backend.SCENE_XML during construction. assets/ is untracked in git (whole dir), so throw_scene.xml was force-added but elrobot_scene.xml it includes is still untracked. Random search: 14/150 in box, box fixed; sim ball speeds (up to 13 m/s) are likely contact artefacts. ~50 env steps/s per core. Guard issue logged as ISSUE-016, core.py untouched."
+}

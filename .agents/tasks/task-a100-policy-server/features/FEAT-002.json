@@ -1,0 +1,25 @@
+{
+ "id": "FEAT-002",
+ "type": "feat",
+ "description": "A100-hostable policy inference server (FastAPI) wrapping a LeRobot pretrained policy (ACT default, policy type configurable so SmolVLA/diffusion/pi0 load too) with health check, latency benchmark, container recipe and run script. Define the shared request/response schema in src/normakit/policy_api.py first (FEAT-003 depends on it).",
+ "status": "completed",
+ "steps": [
+  "Create src/normakit/policy_api.py: pydantic schema. Request: state (8 floats, 0..1 norm), image_jpeg_b64 (table camera), task str, optional reset flag. Response: action_chunk (N x 8 floats, 0..1 norm), chunk_dt (seconds), server_ms.",
+  "Create server/policy_server.py (FastAPI+uvicorn): load checkpoint via lerobot PreTrainedPolicy.from_pretrained (use LeRobot 0.4.4 API in .venv; handle normalization stats, image key observation.images.table), endpoints GET /health (model name, device, ready), POST /act, POST /reset, GET /metrics (p50/p95 ms). Add --dummy mode returning a smooth deterministic chunk from the given state with no torch/GPU. Bind 0.0.0.0; optional bearer token from env POLICY_API_TOKEN (never hardcoded).",
+  "Create server/Dockerfile (CUDA/PyTorch base, lerobot==0.4.4 with needed extras, fastapi, uvicorn), server/requirements.txt, server/run.sh (venv alternative, env vars CHECKPOINT, POLICY_TYPE, PORT, DEVICE), server/README.md with exact A100 commands including docker run --gpus all.",
+  "Create server/bench.py: sends N synthetic requests to a URL and prints p50/p95/max end-to-end ms and server ms.",
+  "Guard torch imports so --dummy works without CUDA; install fastapi/uvicorn into .venv only if missing."
+ ],
+ "acceptance_criteria": [
+  "python server/policy_server.py --dummy --port 8765 starts on this laptop and /health reports ready",
+  "POST /act returns an action_chunk of shape N x 8 with values in 0..1",
+  "server/bench.py against the dummy server prints latency stats",
+  "Dockerfile and run.sh are consistent with README"
+ ],
+ "verification": [
+  "Start dummy server in background, run .venv/bin/python server/bench.py --url http://localhost:8765 --n 50, stop server",
+  ".venv/bin/python scripts/selftest_sim.py still passes"
+ ],
+ "blocked_reason": null,
+ "findings": "Dummy server + bench verified (p50 2ms e2e), selftest_sim passes. LeRobot path (get_policy_class, make_pre_post_processors, predict_action_chunk) written for 0.4.4 but untested without GPU/checkpoint. fastapi/uvicorn already in .venv. Dockerfile copies only policy_api.py plus an empty normakit/__init__.py. Auth via POLICY_API_TOKEN on /act and /reset."
+}

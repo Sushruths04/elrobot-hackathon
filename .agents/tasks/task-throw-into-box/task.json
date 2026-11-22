@@ -1,0 +1,16 @@
+{
+  "task_id": "task-throw-into-box",
+  "task_description": "Train a model that throws a small object into a box (user: 'trow a small object inside the box something like that'; no reference found in repo; assumptions documented). Sim-first, A100-trainable, real-arm path through Guard.",
+  "status": "completed",
+  "feature_order": [
+    "FEAT-001",
+    "FEAT-002"
+  ],
+  "blocked_reason": null,
+  "verification": {
+    "build": "pass",
+    "tests": "pass",
+    "test_quality": "pass",
+    "summary": "selftest_sim passes; coder reported test_policy_client, throw_smoke, eval_throw pass (72/100 strict sim). Review v2 APPROVED with 6 non-blocking issues."
+  }
+}

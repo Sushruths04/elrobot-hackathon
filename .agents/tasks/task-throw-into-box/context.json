@@ -1,0 +1,26 @@
+{
+  "project_type": "Python robot-arm toolkit (normakit) with MuJoCo digital twin, LeRobot 0.4.4, FastAPI policy server",
+  "language": "Python",
+  "build_system": "none (venv .venv)",
+  "test_framework": "plain scripts with PASS/FAIL checks",
+  "build_command": ".venv/bin/python -c 'import sys; sys.path.insert(0,\"src\"); import normakit.mujoco_backend'",
+  "test_command": ".venv/bin/python scripts/selftest_sim.py && .venv/bin/python scripts/test_policy_client.py",
+  "verification_instructions": "Run both test commands; run new eval script in sim with small episode count.",
+  "snapshot_or_generated_files": null,
+  "setup_instructions": "use existing .venv (mujoco 3.2.7, torch 2.12 cpu/cu126, gymnasium, lerobot 0.4.4)",
+  "environment_constraints": "Laptop NVIDIA driver broken: no GPU training locally; A100 remote (A100_HOST, POLICY_API_TOKEN env). Never move real arm. Do not touch uncommitted team files (.mcp.json, norma, scripts/autorun.py, src/normakit/kin.py, station_backend.py, vision.py, untracked assets/calibration). Do not edit core.py Guard limits.",
+  "contribution_requirements": "AGENTS.md: document in CHANGELOG.md and docs/ISSUES.md; no API keys; first real motion one motor small delta slow",
+  "key_patterns": "MujocoBackend in src/normakit/mujoco_backend.py (ST3215 model, norms 0..1, send_goals, step_seconds, cup_pos); scene assets/mujoco/elrobot_scene.xml; policy schema src/normakit/policy_api.py; server/policy_server.py; scripts/run_policy.py",
+  "relevant_files": [
+    "docs/10_MODEL_AND_A100_PLAN.md",
+    "src/normakit/mujoco_backend.py",
+    "src/normakit/sim_backend.py",
+    "assets/mujoco/elrobot_scene.xml",
+    "src/normakit/core.py",
+    "src/normakit/policy_api.py",
+    "server/policy_server.py",
+    "scripts/run_policy.py",
+    "scripts/selftest_sim.py"
+  ],
+  "directory_structure": "src/normakit library, scripts CLI, server A100 server, docs, assets/mujoco"
+}

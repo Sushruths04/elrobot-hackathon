@@ -1,0 +1,22 @@
+{
+ "id": "FEAT-003",
+ "type": "feat",
+ "description": "Robot-side client and dry-run test: PolicyClient (HTTP, timeout, token from env) plus scripts/run_policy.py looping state+camera -> server -> action chunk -> Guard.move, and a no-hardware test using SimBackend and the dummy server. Depends on FEAT-002 schema.",
+ "status": "completed",
+ "steps": [
+  "Create src/normakit/policy_client.py: PolicyClient(url, token_env='POLICY_API_TOKEN', timeout) with health() and act(state_norms, jpeg, task) -> np.ndarray (N,8); clean error if unreachable.",
+  "Create scripts/run_policy.py: args --backend sim|station (default sim), --url, --task, --hz 10 (Guard max_cmd_hz is 10), --steps, --max-delta. Loop: backend.state() norms in joint order 1..8, backend.frame_jpeg(), client.act, execute chunk through Guard.move one action per tick, re-query when chunk is half used. Station backend requires explicit --i-have-a-human flag and prints AGENTS.md safety reminder; exits nonzero without it. Guard.move is the only path to send_goals. Stop on e-stop.",
+  "Create scripts/test_policy_client.py: starts the dummy server (subprocess or thread), runs the loop with SimBackend(realtime=False) for ~30 steps, asserts sent goals respect Guard limits (0.02..0.98, step limit) and prints PASS. Never touches hardware.",
+  "Add CHANGELOG.md entry; update docs/08 status table row 4 to reference scripts/run_policy.py."
+ ],
+ "acceptance_criteria": [
+  ".venv/bin/python scripts/test_policy_client.py prints PASS without hardware or GPU",
+  "run_policy.py --backend station without --i-have-a-human exits nonzero without touching hardware"
+ ],
+ "verification": [
+  ".venv/bin/python scripts/test_policy_client.py",
+  ".venv/bin/python scripts/selftest_sim.py"
+ ],
+ "blocked_reason": null,
+ "findings": "test_policy_client.py PASS (dummy server port 8765, sim, no GPU). selftest_sim no FAIL lines. run_loop in run_policy.py is importable. One action per tick at 10 Hz (chunk_dt is 1/30), so playback is slower than training rate; revisit with a stride."
+}

@@ -1,0 +1,26 @@
+{
+  "id": "FEAT-001",
+  "type": "chore",
+  "description": "Create the feature branch feat/webapp-voice-console from the current HEAD (f0effef, which is exactly origin/main tip - the team merged feat/throw-into-box after the earlier briefing; local 'main' ref is stale at ea5129b so do NOT switch to it). Branching from the current checkout is branching from up-to-date main content and avoids touching the dirty working tree. Then verify the untouched baseline is green and all webapp dependencies already exist in .venv (no pip installs).",
+  "status": "completed",
+  "steps": [
+    "cd /home/laptop/nebius_nividia/normacore-hackathon && git checkout -b feat/webapp-voice-console  (creates the branch at f0effef without checking out any files, so the team's uncommitted changes stay exactly as they are; if the branch name already exists, use feat/webapp-voice-console-2 and record it in findings)",
+    "Confirm with git branch --show-current and git status that the working tree changes are unchanged (deleted dotfiles, modified run/duster_offset.json + showcase/index.html, untracked results/run/showcase files all still present)",
+    "Run the baseline: .venv/bin/python scripts/selftest_sim.py  (must exit 0 / print ALL OK; it reuses run/sim_H.json calibration if present, otherwise self-calibrates ~2 min). This file must remain untouched.",
+    "Verify dependencies without installing: .venv/bin/python -c \"import fastapi, uvicorn, anthropic, httpx, pytest, websockets; print('deps ok')\" (all confirmed present: fastapi 0.136.3, uvicorn 0.46.0, anthropic 2.10.0, httpx 0.28.1, pytest 9.0.3, websockets 12.0)",
+    "Verify the anthropic import path used by src/normakit/agent.py works and the FastAPI TestClient works: .venv/bin/python -c \"from fastapi.testclient import TestClient; import sys; sys.path.insert(0,'src'); import normakit.agent as a; print(len(a.TOOLS), a.MODEL)\" (expect 8 tools)",
+    "Record the selftest output and branch name in this feature's findings; do NOT commit anything yet (there is nothing to commit - .agents/ is untracked task state and must never be committed)"
+  ],
+  "acceptance_criteria": [
+    "git branch --show-current prints feat/webapp-voice-console (or the -2 variant)",
+    "git status shows exactly the same uncommitted changes as before the branch was created (nothing staged, nothing lost)",
+    ".venv/bin/python scripts/selftest_sim.py exits 0 with ALL OK on the new branch",
+    "No new files created yet outside .agents/tasks/ and no existing file modified"
+  ],
+  "verification": [
+    "cd /home/laptop/nebius_nividia/normacore-hackathon && git branch --show-current",
+    "cd /home/laptop/nebius_nividia/normacore-hackathon && .venv/bin/python scripts/selftest_sim.py"
+  ],
+  "blocked_reason": null,
+  "findings": "Branch feat/webapp-voice-console created at f0effef (= origin/main tip) via git checkout -b from feat/throw-into-box; no file checkouts occurred and the working tree is byte-identical before/after (13 deleted dotfiles, modified run/duster_offset.json + showcase/index.html, 32 untracked entries incl. .agents/; nothing staged). Baseline selftest on the new branch: .venv/bin/python scripts/selftest_sim.py exit 0, printed ALL OK; it reused existing run/sim_H.json calibration (no ~2 min recalib needed); pybullet 'not a unit axis' warnings and the 'descent to table height times out in the twin ... NOT verified' INFO line are pre-existing benign output, all checks PASS. Dependency check (no installs): fastapi 0.136.3, uvicorn 0.46.0, anthropic 2.10.0, httpx 0.28.1, pytest 9.0.3, websockets 12.0 -> 'deps ok'. Agent/TestClient check: fastapi.testclient.TestClient imports fine; sys.path.insert(0,'src'); import normakit.agent -> 8 tools, MODEL=claude-sonnet-5-5. Nothing committed (nothing to commit; .agents/ stays untracked). No repo files created or modified by this feature."
+}

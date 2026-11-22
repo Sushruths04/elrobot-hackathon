@@ -1,0 +1,13 @@
+{
+  "task_id": "task-webapp-voice-console",
+  "task_description": "Add a futuristic interactive web application + voice agent for the hackathon demo as ONE new top-level layer (webapp/) over the existing normakit library: FastAPI backend (WebSocket camera + telemetry, Claude tool-use chat reusing src/normakit/agent.py, sim backend default, station mode gated behind --i-have-a-human + in-UI human-presence confirmation, e-stop via Guard), dark sci-fi HUD single-page frontend with browser Web Speech voice (no GPU), tests with no hardware/no API key, webapp/README.md with A100 hosting path, docs/13_WEB_VOICE_CONSOLE.md, one appended CHANGELOG.md entry. HARD CONSTRAINT: no existing file or folder is edited/deleted/moved (except the single CHANGELOG.md append AGENTS.md requires); work happens on new branch feat/webapp-voice-console branched from current HEAD == origin/main (f0effef); nothing is pushed.",
+  "status": "completed",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+  "blocked_reason": null,
+  "verification": {
+    "build": "pass",
+    "tests": "pass",
+    "test_quality": "pass",
+    "summary": "Commit e651ee3 on feat/webapp-voice-console contains exactly the 15 intended files (+1447 lines: webapp/*, docs/13_WEB_VOICE_CONSOLE.md, CHANGELOG.md +1 line append); working tree still carries the team's uncommitted changes untouched; nothing pushed. Orchestrator re-ran: pytest webapp/tests (10 passed, no hardware, no ANTHROPIC_API_KEY); scripts/selftest_sim.py ALL OK exit 0 (untouched baseline); live boot on sim :8920 -> GET / 200, /api/status correct JSON (backend=sim, key absent), /static/app.js and /static/style.css 200, clean shutdown. Tests reviewed: they exercise the real SimBackend/Arm/Guard (real JPEG decode check, arm norms unchanged while gated, Guard 'e-stop active' surfacing through run_chat, subprocess exit-2 refusal of --backend station without --i-have-a-human) and would fail if the new code were reverted."
+  }
+}
