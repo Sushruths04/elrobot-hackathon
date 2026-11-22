@@ -68,8 +68,7 @@ def label_patch(text, size=15, bold=True, bg=(0, 0, 0, 170), fg=(255, 255, 255, 
     return _patch[k]
 
 def blend(img, patch, x, y):
-    rgb, al = patch; h, w = al.shape[:2]; x = max(0, min(max(0, W - w), x)); y = max(0, min(max(0, H - h), y))
-    w = min(w, W - x); h = min(h, H - y); rgb = rgb[:h, :w]; al = al[:h, :w]
+    rgb, al = patch; h, w = al.shape[:2]; x = max(0, min(W - w, x)); y = max(0, min(H - h, y))
     roi = img[y:y + h, x:x + w].astype(np.float32); img[y:y + h, x:x + w] = (roi * (1 - al) + rgb * al).astype(np.uint8)
 
 class Enc:
