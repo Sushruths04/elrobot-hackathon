@@ -40,23 +40,46 @@ class FdVel3D:
         return self.vel.copy()
 
 
-def detect_orange_ball(rgb: np.ndarray, min_area: int = 45) -> dict:
-    """Detect an orange 40 mm ping-pong ball in an RGB 640x480 frame.
+def detect_orange_ball(rgb: np.ndarray, min_area: int = 45, ball_color: str = "orange") -> dict:
+    """Detect an orange (or white-on-black-paddle) 40 mm ping-pong ball in an RGB 640x480 frame.
     Returns {"visible": bool, "u": float, "v": float, "r_px": float}."""
     hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
-    mask = cv2.inRange(hsv, np.array([8, 145, 110], np.uint8), np.array([25, 255, 255], np.uint8))
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
-    cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    if not cnts:
+    if ball_color in ("orange", "auto"):
+        mask = cv2.inRange(hsv, np.array([8, 145, 110], np.uint8), np.array([25, 255, 255], np.uint8))
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
+        cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if cnts:
+            c = max(cnts, key=cv2.contourArea)
+            area = float(cv2.contourArea(c))
+            if area >= min_area:
+                (cx, cy), r_encl = cv2.minEnclosingCircle(c)
+                r_area = float(np.sqrt(area / np.pi))
+                return {"visible": True, "u": float(cx), "v": float(cy), "r_px": 0.5 * (float(r_encl) + r_area)}
+        if ball_color == "orange":
+            return {"visible": False, "u": 0.0, "v": 0.0, "r_px": 0.0}
+
+    # White ball on dark/black paddle rubber: find dark paddle mask first, then bright round white blob inside its hull!
+    dark_pad = (hsv[:, :, 2] < 85).astype(np.uint8) * 255
+    dark_pad = cv2.morphologyEx(dark_pad, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (25, 25)))
+    pad_cnts, _ = cv2.findContours(dark_pad, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not pad_cnts:
         return {"visible": False, "u": 0.0, "v": 0.0, "r_px": 0.0}
-    c = max(cnts, key=cv2.contourArea)
-    area = float(cv2.contourArea(c))
-    if area < min_area:
-        return {"visible": False, "u": 0.0, "v": 0.0, "r_px": 0.0}
-    (cx, cy), r_encl = cv2.minEnclosingCircle(c)
-    r_area = float(np.sqrt(area / np.pi))
-    r_px = 0.5 * (float(r_encl) + r_area)
-    return {"visible": True, "u": float(cx), "v": float(cy), "r_px": r_px}
+    pad_hull = cv2.convexHull(max(pad_cnts, key=cv2.contourArea))
+    hull_mask = np.zeros(hsv.shape[:2], dtype=np.uint8)
+    cv2.drawContours(hull_mask, [pad_hull], -1, 255, thickness=-1)
+    white_m = cv2.inRange(hsv, np.array([0, 0, 175], np.uint8), np.array([180, 55, 255], np.uint8)) & hull_mask
+    white_m = cv2.morphologyEx(white_m, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
+    w_cnts, _ = cv2.findContours(white_m, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    best_w = None
+    for c in w_cnts:
+        area = float(cv2.contourArea(c))
+        if min_area <= area <= 4500:
+            (cx, cy), r_encl = cv2.minEnclosingCircle(c)
+            circ = area / max(1.0, np.pi * (r_encl ** 2))
+            if circ >= 0.55 and (best_w is None or area > best_w[0]):
+                r_area = float(np.sqrt(area / np.pi))
+                best_w = (area, {"visible": True, "u": float(cx), "v": float(cy), "r_px": 0.5 * (float(r_encl) + r_area)})
+    return best_w[1] if best_w is not None else {"visible": False, "u": 0.0, "v": 0.0, "r_px": 0.0}
 
 
 class FrontCameraBallTracker:

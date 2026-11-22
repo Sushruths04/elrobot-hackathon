@@ -70,7 +70,7 @@ def run_sim(ckpt_path: Path, task: str, video_out: str) -> int:
     return 0
 
 
-def run_preflight(host: str) -> int:
+def run_preflight(host: str, ball_color: str = "auto") -> int:
     """100% read-only check: motor calibration spans, currents, temperatures, and live orange-ball detection."""
     import cv2
     from normakit import vision
@@ -93,7 +93,7 @@ def run_preflight(host: str) -> int:
             if span < 100:
                 bad.append(f"joint {i} uncalibrated (span={span})")
         rgb = vision.decode(be.frame_jpeg(fcam))
-        det = detect_orange_ball(rgb)
+        det = detect_orange_ball(rgb, ball_color=ball_color)
         bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
         if det["visible"]:
             cv2.circle(bgr, (int(det["u"]), int(det["v"])), max(4, int(det["r_px"])), (0, 255, 0), 2)
@@ -149,7 +149,7 @@ def grip_paddle_routine(be: StationBackend) -> int:
     return g8_final
 
 
-def run_real(ckpt_path: Path, task: str, host: str, seconds: float, do_grip: bool, home_only: bool = False) -> int:
+def run_real(ckpt_path: Path, task: str, host: str, seconds: float, do_grip: bool, home_only: bool = False, ball_color: str = "auto") -> int:
     ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
     ac = PPOActorCritic(obs_dim=ckpt["obs_dim"], act_dim=ckpt["act_dim"])
     ac.load_state_dict(ckpt["model_state_dict"])
@@ -256,7 +256,7 @@ def run_real(ckpt_path: Path, task: str, host: str, seconds: float, do_grip: boo
 
             c_blade, R_blade = _blade_pose_from_kin(kin, q_all)
             rgb = vision.decode(be.frame_jpeg(fcam))
-            det = detect_orange_ball(rgb)
+            det = detect_orange_ball(rgb, ball_color=ball_color)
             est_uwh = tracker.localize(det, c_blade, R_blade, mode=task)
             if est_uwh is not None:
                 last_uwh = est_uwh
@@ -335,13 +335,14 @@ def main() -> None:
     ap.add_argument("--i-have-a-human", action="store_true")
     ap.add_argument("--home-only", action="store_true", help="move to level HOME pose and hold so you can tape the paddle flat")
     ap.add_argument("--grip-paddle", action="store_true", help="open jaws at home and gently clamp paddle handle")
+    ap.add_argument("--ball-color", choices=["auto", "orange", "white"], default="auto", help="orange (recommended) or white ball on black rubber")
     ap.add_argument("--host", default="localhost:8888")
     ap.add_argument("--seconds", type=float, default=15.0)
     ap.add_argument("--video", default="")
     a = ap.parse_args()
 
     if a.preflight:
-        sys.exit(run_preflight(a.host))
+        sys.exit(run_preflight(a.host, ball_color=a.ball_color))
 
     ckpt = Path(a.policy) if a.policy else (ROOT / f"models/pingpong/{a.task}_ppo.pt")
     if not ckpt.exists():
@@ -351,7 +352,7 @@ def main() -> None:
         sys.exit(run_sim(ckpt, a.task, a.video))
     if not a.i_have_a_human:
         sys.exit("REFUSED: --real requires --i-have-a-human (person at 12V plug, Station mirroring OFF).")
-    sys.exit(run_real(ckpt, a.task, a.host, a.seconds, a.grip_paddle, home_only=a.home_only))
+    sys.exit(run_real(ckpt, a.task, a.host, a.seconds, a.grip_paddle, home_only=a.home_only, ball_color=a.ball_color))
 
 
 if __name__ == "__main__":
