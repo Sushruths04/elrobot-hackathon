@@ -1,0 +1,7 @@
+{
+  "task_id": "task-twin-video-replay",
+  "task_description": "Give the user visible output: (1) headless screenshots of the webapp console UI, and (2) a MuJoCo digital-twin replay of the teleop_pick1 real video (synced front.mp4 + joints.jsonl) with side-by-side real-vs-twin PNG stills, an mp4/GIF, and measured fidelity metrics, committed under docs/twin/ with a docs/14 page and CHANGELOG entry, on a new branch feat/twin-video-replay based on feat/webapp-voice-console.",
+  "status": "in_progress",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+  "blocked_reason": null
+}

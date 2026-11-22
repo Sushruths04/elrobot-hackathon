@@ -1,0 +1,28 @@
+{
+  "id": "FEAT-001",
+  "type": "chore",
+  "description": "Create the working branch feat/twin-video-replay from the current feat/webapp-voice-console HEAD (9ad4374) and confirm the baseline is green: sim selftest passes, webapp's 10 pytest tests pass, MujocoBackend renders a front-camera frame headless, and headless Chrome can take a screenshot. The working tree contains the team's uncommitted changes - git checkout -b keeps them; do NOT stage, commit, revert, or otherwise touch them.",
+  "status": "completed",
+  "steps": [
+    "cd /home/laptop/nebius_nividia/normacore-hackathon && git checkout -b feat/twin-video-replay (from current feat/webapp-voice-console HEAD; uncommitted changes carry over untouched - verify with git status that the same modified/untracked files are still present)",
+    "Run .venv/bin/python scripts/selftest_sim.py and confirm it prints ALL OK (exit 0)",
+    "Run .venv/bin/python -m pytest webapp/tests -q and confirm 10 passed",
+    "Run a headless MuJoCo render smoke check: .venv/bin/python with sys.path including src/, construct normakit.mujoco_backend.MujocoBackend(realtime=False), start(), frame_jpeg('front') returns > 10000 bytes, stop_backend()",
+    "Run google-chrome --headless --disable-gpu --no-sandbox --screenshot=<somewhere local, not committed> --window-size=800,600 about:blank and confirm a PNG is written (dbus errors are harmless)",
+    "Record all results in this feature's findings field"
+  ],
+  "acceptance_criteria": [
+    "git branch shows feat/twin-video-replay as current branch, created at 9ad4374",
+    "selftest_sim.py exits 0 with ALL OK",
+    "pytest webapp/tests passes 10 tests",
+    "MujocoBackend.frame_jpeg('front') returns a JPEG > 10000 bytes headless",
+    "git status still shows the team's uncommitted changes (nothing reverted, nothing of theirs staged or committed)"
+  ],
+  "verification": [
+    "cd /home/laptop/nebius_nividia/normacore-hackathon && .venv/bin/python scripts/selftest_sim.py; echo exit=$?",
+    "cd /home/laptop/nebius_nividia/normacore-hackathon && .venv/bin/python -m pytest webapp/tests -q",
+    "git status --short | head -30 and git branch --show-current"
+  ],
+  "blocked_reason": null,
+  "findings": "All green on 2026-11-22. 1) Branch: created feat/twin-video-replay at 9ad4374 via git checkout -b; diff of git status before/after confirmed the team's uncommitted changes (all D/M/?? entries) carried over untouched; nothing of theirs staged or committed. 2) selftest_sim.py: printed ALL OK, exit=0; reused existing run/sim_H.json (no ~2 min recalib needed); pybullet 'axis of motion not a unit axis' warnings are pre-existing noise; the 'descent to table height times out in the twin' line is a known INFO, not a failure. 3) webapp pytest: 10 passed in 1.58s (a RequestsDependencyWarning about urllib3/chardet versions comes from the user site-packages, harmless). 4) MuJoCo headless render: MujocoBackend(realtime=False), start(), frame_jpeg('front') returned 36910 bytes (>10000), stop_backend() clean; JPEG written to run/twin_front_smoke.jpg (gitignored via run/*.jpg) and visually confirmed: front camera shows arm at rest plus black cup, distractor bottle, blue place target on the table. 5) Chrome headless: /usr/bin/google-chrome --headless --disable-gpu --no-sandbox --screenshot=run/chrome_smoke.png --window-size=800,600 about:blank wrote a 2727-byte PNG (gitignored via run/*.png); dbus connection errors in output are harmless as expected. Note: no CHANGELOG.md entry added for this feature because it changes no repo files (verification only, artifacts gitignored); FEAT-002/003 should add the CHANGELOG entry when they land the replay tooling. Environment reminders for later features: repo /tmp is sandboxed per-command so write scratch under run/; run/*.jpg, run/*.png, run/*.log and run/recordings/ are gitignored but other dotfiles/files in run/ are NOT (a run/.git_status_*.txt scratch file showed up as untracked; deleted it)."
+}

@@ -1,0 +1,28 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Show the webapp: take headless-Chrome screenshots of the running web console (sim backend) and commit them under docs/twin/, then write docs/14_DIGITAL_TWIN_VIDEO_REPLAY.md explaining everything (what was built, which video was matched, camera accuracy in px, EE tracking error, honest limits, one-command regeneration), append the CHANGELOG entry, and run the final regression (selftest_sim + webapp tests). Depends on FEAT-002 artifacts.",
+  "status": "pending",
+  "steps": [
+    "Write scripts/screenshot_webapp.sh (or .py): start .venv/bin/python webapp/run.py --backend sim --port 8920 in the background, poll http://127.0.0.1:8920 until HTTP 200, wait a few seconds for the WebSocket camera/telemetry to stream, then google-chrome --headless --disable-gpu --no-sandbox --window-size=1600,900 --virtual-time-budget=15000 --screenshot=docs/twin/webapp_console.png http://127.0.0.1:8920, then kill the server cleanly. Chrome dbus errors are harmless. Make the script idempotent and safe to re-run.",
+    "Run the script, OPEN docs/twin/webapp_console.png and LOOK at it: the dark sci-fi HUD with camera panel, joint telemetry and chat must be visible (not a blank first-paint). If the page is blank because the WS frame had not arrived, increase the wait/virtual-time-budget or add a small JS-free delay approach (e.g. --virtual-time-budget higher) until the screenshot shows the live UI.",
+    "Write docs/14_DIGITAL_TWIN_VIDEO_REPLAY.md (style like docs/13_WEB_VOICE_CONSOLE.md and docs/MUJOCO_TWIN_REPORT.md): what the user asked for; the webapp screenshots (embed the PNG paths); the twin replay: source video = run/recordings/20261121_205828_teleop_pick1 (front.mp4 + joints.jsonl synced 1:1 at 8 fps; same footage as presentation/videos/teleop_pick1.mp4), new assets/mujoco/twin_desk_scene.xml (tray + marker measured from frame 0 via calibration/table_mujoco_front.json), replay method (servo-physics replay through MujocoBackend, pattern from scripts/validate_twin.py); embed the side-by-side stills + mp4/gif paths; report the measured numbers from docs/twin/replay_metrics.json (EE err mean/rms/p95 mm, tape-line alignment px, camera intrinsic residual 0.39 px from calibration/camera_front.json, marker grasp outcome); honest limits section (leader arm + human hands not modelled, background clutter absent, no radial lens distortion in the pinhole twin camera, cardboard tray modelled rigid, marker grasp physics may not match the real pinch exactly, servo replay tracks joints within the reported mm but objects can diverge); regeneration commands (one command for the twin pipeline, one for the webapp screenshots).",
+    "Append a CHANGELOG.md bullet under '## [Unreleased] - 2026-11-22' -> '### Added' naming: assets/mujoco/twin_desk_scene.xml, scripts/twin_replay.py, scripts/screenshot_webapp.*, docs/twin/ artifacts, docs/14 page, and the measured headline numbers; end the bullet with ' - Claude'.",
+    "Final regression: .venv/bin/python scripts/selftest_sim.py (ALL OK) and .venv/bin/python -m pytest webapp/tests -q (10 passed). Confirm no existing file behaviour changed: git diff feat/webapp-voice-console...feat/twin-video-replay --stat lists only this task's files (plus the small additive MujocoBackend change from FEAT-002).",
+    "Commit FEAT-003 files with explicit paths: scripts/screenshot_webapp.*, docs/twin/webapp_console.png (+ any extra webapp shots), docs/14_DIGITAL_TWIN_VIDEO_REPLAY.md, CHANGELOG.md."
+  ],
+  "acceptance_criteria": [
+    "docs/twin/webapp_console.png exists and visibly shows the live web console UI (camera panel + telemetry + chat)",
+    "docs/14_DIGITAL_TWIN_VIDEO_REPLAY.md exists, embeds the artifacts, states measured numbers and honest limits, and gives one-command regeneration",
+    "CHANGELOG.md has the new bullet under [Unreleased] - 2026-11-22 / Added ending with ' - Claude'",
+    "selftest_sim.py ALL OK and webapp pytest 10 passed after all changes",
+    "git log shows the FEAT-003 commit containing only this feature's files"
+  ],
+  "verification": [
+    "cd /home/laptop/nebius_nividia/normacore-hackathon && bash scripts/screenshot_webapp.sh && ls -la docs/twin/webapp_console.png (open it to confirm live UI)",
+    ".venv/bin/python scripts/selftest_sim.py && .venv/bin/python -m pytest webapp/tests -q",
+    "git diff --stat $(git merge-base feat/webapp-voice-console HEAD)..HEAD"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

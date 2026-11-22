@@ -1,0 +1,31 @@
+{
+  "project_type": "Python robotics repo (ElRobot follower arm, normakit library) with MuJoCo/pybullet digital twins, FastAPI web console, and recorded real-robot sessions",
+  "language": "Python 3.10",
+  "build_system": "none (plain Python, repo .venv); entry points are scripts/*.py",
+  "test_framework": "pytest for webapp/tests (10 tests, conftest.py mocks anthropic client); scripts/selftest_sim.py is the end-to-end sim logic test",
+  "build_command": "no build step; import check via .venv/bin/python -c 'import normakit' with sys.path including src/",
+  "test_command": ".venv/bin/python scripts/selftest_sim.py && .venv/bin/python -m pytest webapp/tests -q",
+  "verification_instructions": "1) .venv/bin/python scripts/selftest_sim.py must print ALL OK (exit 0). 2) .venv/bin/python -m pytest webapp/tests -q must pass 10 tests. 3) New scripts must run end-to-end headless and produce their artifact files. 4) Open produced PNGs and confirm they show the expected content.",
+  "snapshot_or_generated_files": "docs/twin/* (PNGs, mp4, gif, replay_metrics.json) are generated artifacts that DO get committed for this task. presentation/videos/*.mp4 and run/recordings/ are local-only (gitignored / untracked) - never commit them. results/ is committed for small files.",
+  "setup_instructions": "Nothing to install. Use the repo venv at .venv/bin/python (has mujoco 3.2.7, pybullet, opencv 4.13, PIL 10.4, numpy 2.2, fastapi/uvicorn/pytest). google-chrome is at /usr/bin/google-chrome for headless screenshots. ffmpeg is NOT installed; write mp4 with cv2.VideoWriter (mp4v fourcc) and GIF with PIL.",
+  "environment_constraints": "Linux laptop, NO NVIDIA GPU (nvidia-smi fails), NO display (headless only). MuJoCo renders headless via MUJOCO_GL=egl (normakit.mujoco_backend sets this by default and imports torch first to avoid segfaults - construct MujocoBackend rather than mujoco.Renderer directly). pybullet SimBackend uses the tiny software renderer. Chrome headless needs --no-sandbox --disable-gpu (dbus errors in output are harmless). Never touch real robot hardware. Do not edit vendor/ or src/normakit/core.py safety limits (AGENTS.md rule). Team has UNCOMMITTED changes in the working tree - do not revert or commit them; add only files this task owns.",
+  "contribution_requirements": "AGENTS.md: document every change in CHANGELOG.md (newest-first; append a bullet under '## [Unreleased] - 2026-11-22' -> '### Added', end with ' - Claude'); document every problem in docs/ISSUES.md (label guesses as guesses). Keep replies terse. Never delete irreplaceable data. Docs pages are numbered docs/NN_NAME.md (latest is docs/13_WEB_VOICE_CONSOLE.md, so this task writes docs/14_*.md).",
+  "key_patterns": "MujocoBackend (src/normakit/mujoco_backend.py) mirrors StationBackend: state()/send_goals()/_sync(reg, {jid: bytes})/frame_jpeg()/reset_arm_ticks()/step_seconds()/set_cup_pose(). Raw servo ticks are 0..4096 per joint 1..8. scripts/validate_twin.py is the reference replay implementation: reset_arm_ticks(D[0]), set object poses, then loop: _sync(REG_GOAL_POS, ticks) + step_seconds(dt), tracking EE error vs normakit.kin.Kin FK. Recordings in run/recordings/<session>/ contain front.mp4 (8 fps, 640x480, cam0 = the calibrated front camera) and joints.jsonl (one line per video frame: {t, '1'..'8': {raw, norm, mA}}) - frame i aligns with joints line i. calibration/table_mujoco_front.json holds camera_pos_world_m and H_pixel_to_robot_xy_m (pixel on z=0 table plane -> robot xy metres). CHANGELOG bullets name files and measured numbers.",
+  "relevant_files": [
+    "src/normakit/mujoco_backend.py (MujocoBackend; SCENE_XML constant; __init__ looks up black_cup/distractor_bottle/place_target bodies by name)",
+    "scripts/validate_twin.py (reference replay + metrics pattern)",
+    "assets/mujoco/elrobot_scene.xml (calibrated arm+table+cup scene with front/wrist cameras)",
+    "scripts/build_mujoco_assets.py (how the scene and camera were generated; documents H and camera pose)",
+    "calibration/table_mujoco_front.json (H_pixel_to_robot_xy_m + camera_pos_world_m for the front camera)",
+    "calibration/camera_front.json (front lens intrinsics, 0.39 px reprojection residual)",
+    "run/recordings/20261121_205828_teleop_pick1/ (front.mp4 8fps 1058 frames + joints.jsonl 1058 lines + meta.json; synced 1:1)",
+    "run/pick1_frame_0000.jpg, run/pick1_frame_0300.jpg, run/pick1_frame_0700.jpg, run/pick1_frame_1000.jpg (extracted reference frames to look at)",
+    "docs/MUJOCO_TWIN_REPORT.md (prior twin validation numbers: 6.79 mm mean EE replay error on handover cup demo)",
+    "webapp/run.py, webapp/app.py, webapp/README.md (web console; .venv/bin/python webapp/run.py --backend sim --port 8920)",
+    "webapp/tests/ (10 pytest tests; must keep passing)",
+    "scripts/selftest_sim.py (baseline sim test; must keep passing)",
+    "CHANGELOG.md (append under ## [Unreleased] - 2026-11-22 ### Added)",
+    "docs/13_WEB_VOICE_CONSOLE.md (style reference for docs/14 page)"
+  ],
+  "directory_structure": "src/normakit/ (library: backends, kin, vision, agent), scripts/ (all runnable tools), assets/mujoco/ (MJCF scenes + hulls + table_tex.png), calibration/ (camera + table + servo calibration JSON), run/recordings/<session>/ (local synced front.mp4 + joints.jsonl), presentation/videos/ (local edited mp4s), webapp/ (FastAPI console: app.py run.py safety.py agent_bridge.py static/ tests/), docs/ (numbered design/report docs), results/ (committed benchmark outputs), handover/ (previous team's real-robot evidence incl. demo_traj_pick1.json cup demo)"
+}
