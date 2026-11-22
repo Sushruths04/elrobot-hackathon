@@ -122,10 +122,12 @@ class MujocoBackend(Backend):
         viewer: bool = False,
         photometric: PhotometricConfig | None = None,
         seed: int = 0,
+        scene_xml: str | None = None,
     ):
-        if not SCENE_XML.exists():
-            raise FileNotFoundError(f"Missing {SCENE_XML}; run scripts/build_mujoco_assets.py first.")
-        self.model = mujoco.MjModel.from_xml_path(str(SCENE_XML))
+        scene_path = Path(scene_xml) if scene_xml is not None else SCENE_XML
+        if not scene_path.exists():
+            raise FileNotFoundError(f"Missing {scene_path}; run scripts/build_mujoco_assets.py first.")
+        self.model = mujoco.MjModel.from_xml_path(str(scene_path))
         self.data = mujoco.MjData(self.model)
         self.realtime = realtime
         self.params = servo_params or ST3215ServoParams(**SERVO_PRESETS[servo_preset].__dict__)
@@ -150,18 +152,23 @@ class MujocoBackend(Backend):
         self.act_ids = {i: mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, f"act_motor_{i:02d}") for i in JOINT_IDS}
         self.jaw1_qpos = int(self.model.jnt_qposadr[mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, "rev_motor_08_2")])
         self.jaw2_qpos = int(self.model.jnt_qposadr[mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, "rev_motor_08_1")])
+        # Optional scene objects: scenes without them load fine, but the matching
+        # setters/getters below raise a clear RuntimeError when the body is absent.
         self.cup_jnt = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, "cup_freejoint")
-        self.cup_qpos = int(self.model.jnt_qposadr[self.cup_jnt])
-        self.cup_dof = int(self.model.jnt_dofadr[self.cup_jnt])
+        self.cup_qpos = int(self.model.jnt_qposadr[self.cup_jnt]) if self.cup_jnt >= 0 else None
+        self.cup_dof = int(self.model.jnt_dofadr[self.cup_jnt]) if self.cup_jnt >= 0 else None
         self.cup_bid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, "black_cup")
         self.bot_jnt = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, "distractor_bottle")
         if self.bot_jnt < 0:
             self.bot_jnt = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, "bottle_freejoint")
-        self.bot_qpos = int(self.model.jnt_qposadr[self.bot_jnt])
-        self.bot_dof = int(self.model.jnt_dofadr[self.bot_jnt])
+        self.bot_qpos = int(self.model.jnt_qposadr[self.bot_jnt]) if self.bot_jnt >= 0 else None
+        self.bot_dof = int(self.model.jnt_dofadr[self.bot_jnt]) if self.bot_jnt >= 0 else None
         self.ee_sid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_SITE, "ee_site")
         self.tip_sid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_SITE, "jaw_tip_site")
-        self.place_mocap_id = int(self.model.body_mocapid[mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, "place_target")])
+        if self.ee_sid < 0 or self.tip_sid < 0:
+            raise ValueError(f"Scene {scene_path} is missing the required ee_site / jaw_tip_site sites.")
+        place_bid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, "place_target")
+        self.place_mocap_id = int(self.model.body_mocapid[place_bid]) if place_bid >= 0 else None
 
         # Per-servo register & profile state
         self.torque_on = {i: bool(enable_torque) for i in JOINT_IDS}
@@ -197,9 +204,12 @@ class MujocoBackend(Backend):
         self._run = False
         self._thr: threading.Thread | None = None
         self.reset_arm_norms({1: 0.50, 2: 0.25, 3: 0.28, 4: 0.72, 5: 0.50, 6: 0.65, 7: 0.50, 8: 0.90})
-        self.set_cup_pose(0.065, 0.255)
-        self.set_bottle_pose(-0.12, 0.36)
-        self.set_place_target(-0.085, 0.250)
+        if self.cup_jnt >= 0 and self.cup_bid >= 0:
+            self.set_cup_pose(0.065, 0.255)
+        if self.bot_jnt >= 0:
+            self.set_bottle_pose(-0.12, 0.36)
+        if self.place_mocap_id is not None:
+            self.set_place_target(-0.085, 0.250)
 
     # ------------------------------------------------------------------ conversions
     def norm_to_qpos(self, jid: int, norm: float) -> float:
@@ -253,6 +263,8 @@ class MujocoBackend(Backend):
         self.reset_arm_norms({int(i): self.ticks_to_norm(int(i), int(v)) for i, v in ticks.items()})
 
     def set_cup_pose(self, x: float, y: float, z: float = 0.001, mass_kg: float | None = None, friction: float | None = None) -> None:
+        if self.cup_jnt < 0 or self.cup_bid < 0:
+            raise RuntimeError("set_cup_pose(): scene has no 'black_cup' body with 'cup_freejoint' (scene_xml without a cup).")
         with self._lock:
             self.data.qpos[self.cup_qpos : self.cup_qpos + 7] = [x, y, z, 1.0, 0.0, 0.0, 0.0]
             self.data.qvel[self.cup_dof : self.cup_dof + 6] = 0.0
@@ -267,21 +279,29 @@ class MujocoBackend(Backend):
             mujoco.mj_forward(self.model, self.data)
 
     def set_bottle_pose(self, x: float, y: float, z: float = 0.001) -> None:
+        if self.bot_jnt < 0:
+            raise RuntimeError("set_bottle_pose(): scene has no 'distractor_bottle'/'bottle_freejoint' (scene_xml without a bottle).")
         with self._lock:
             self.data.qpos[self.bot_qpos : self.bot_qpos + 7] = [x, y, z, 1.0, 0.0, 0.0, 0.0]
             self.data.qvel[self.bot_dof : self.bot_dof + 6] = 0.0
             mujoco.mj_forward(self.model, self.data)
 
     def set_place_target(self, x: float, y: float) -> None:
+        if self.place_mocap_id is None or self.place_mocap_id < 0:
+            raise RuntimeError("set_place_target(): scene has no mocap 'place_target' body (scene_xml without a place target).")
         with self._lock:
             self.data.mocap_pos[self.place_mocap_id] = [x, y, 0.0008]
             mujoco.mj_forward(self.model, self.data)
 
     def cup_pos(self) -> np.ndarray:
+        if self.cup_qpos is None:
+            raise RuntimeError("cup_pos(): scene has no 'black_cup' body with 'cup_freejoint' (scene_xml without a cup).")
         with self._lock:
             return self.data.qpos[self.cup_qpos : self.cup_qpos + 3].copy()
 
     def cup_upright_cos(self) -> float:
+        if self.cup_bid < 0:
+            raise RuntimeError("cup_upright_cos(): scene has no 'black_cup' body (scene_xml without a cup).")
         with self._lock:
             R = self.data.xmat[self.cup_bid].reshape(3, 3)
             return float(R[2, 2])

@@ -1,0 +1,59 @@
+{
+  "session": "20261121_205828_teleop_pick1",
+  "scene": "assets/mujoco/twin_desk_scene.xml",
+  "frames_replayed": 1058,
+  "action_window": [
+    286,
+    1057
+  ],
+  "mp4_window": [
+    322,
+    801
+  ],
+  "mp4_note": "mp4 trimmed to the most active ~60 s block of the action window to stay under ~15 MB",
+  "ee_err_mm": {
+    "mean": 4.93,
+    "rms": 15.25,
+    "p95": 15.58
+  },
+  "camera_align_frame0_tape_lines": {
+    "real_x_at_y240": [
+      161.0,
+      443.0
+    ],
+    "twin_x_at_y240": [
+      175.6,
+      399.7
+    ],
+    "diff_px_twin_minus_real": [
+      14.6,
+      -43.2
+    ],
+    "note": "x-pixel of the yellow table tape lines at mid-height (HSV yellow threshold + line fit). Twin texture tapes sit at robot x=-0.15 m and x=+0.21 m; this session's real table measured x=-0.21 m (right tape) and x=+0.24 m (left tape) via H, so most of the diff is a real-table vs table_tex.png mismatch, not camera error (tray/marker/tape all match within ~15 px)."
+  },
+  "measured_object_poses": {
+    "tray": {
+      "x": 0.136,
+      "y": 0.258,
+      "yaw_rad": 0.0
+    },
+    "marker": {
+      "x": 0.023,
+      "y": 0.265,
+      "yaw_rad": 3.12
+    },
+    "note": "measured from real frame 0 via calibration/table_mujoco_front.json, iterated vs twin render to ~10 px"
+  },
+  "marker_outcome": {
+    "max_marker_z_cm": 0.72,
+    "final_marker_xyz_m": [
+      0.023,
+      0.265,
+      0.0072
+    ],
+    "ends_inside_tray_footprint": false,
+    "sim_grasp_succeeded": false,
+    "sim_grasp_note": "Sim marker is never lifted: at the recorded grasp (jaw closes ~line 640) the recorded joints put the jaw tips ~5 mm from the marker in xy but ~40 mm above the table, while the real grasp needs the tips at ~10-15 mm to straddle a 15 mm marker. Arm servo replay is the deliverable; the wrist-pitch/tip-height gap is a twin-vs-real modeling residual.",
+    "real_video_outcome": "marker grasped off the table and placed into the tray (front.mp4, ~frames 600-760)"
+  }
+}
