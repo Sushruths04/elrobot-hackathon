@@ -2,6 +2,7 @@
 
 ## [Unreleased] - 2026-11-22
 ### Added
+- `webapp/`: futuristic web console + voice agent over normakit (FastAPI :8920, WebSocket telemetry/camera, Claude tool-use chat reusing `normakit.agent`, browser STT/TTS, sim default; station mode needs `--i-have-a-human` + 10-min human-presence confirm; e-stop via Guard; no existing file touched) + `docs/13_WEB_VOICE_CONSOLE.md`. Sim tested, real arm not run - Claude
 - `assets/mujoco/pingpong_scene.xml`, `src/normakit/pingpong_env.py`, `src/normakit/pingpong_vision.py`, `src/normakit/ppo.py`: MuJoCo 3.2.7 flat-paddle + 40 mm `2.7 g` hollow ITTF ball twin (`e ~ 0.80-0.88`, quadratic air drag, `0-100 ms` latency randomisation, `FdVel3D` finite-difference velocity, external `640x480` front-camera HSV + ray-plane/apparent-radius 3D tracker).
 - `scripts/train_pingpong.py`, `scripts/run_pingpong.py`, `models/pingpong/balance_ppo.pt`, `models/pingpong/dribble_ppo.pt`, `docs/12_PINGPONG_BALANCE_AND_DRIBBLE.md`: 30 Hz PPO policies trained for ElRobot (`balance`: **39/40 = 97.5%** noisy state, **15/15 = 100%** front-camera pipeline; `dribble`: **7.42** mean / **18** max bounces state, **4.83** mean / **15** max bounces front-camera) + guarded real-arm 30 Hz runner (`core.py` untouched).
 

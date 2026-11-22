@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NORMACORE // ELROBOT WEB CONSOLE</title>
+<link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+<div class="scanlines" aria-hidden="true"></div>
+
+<header>
+  <div class="brand">NORMA<span class="cyan">CORE</span> <span class="dim">//</span> ELROBOT&nbsp;CONSOLE</div>
+  <div class="badges">
+    <span id="badge-backend" class="badge">BACKEND --</span>
+    <span id="badge-model" class="badge">MODEL --</span>
+    <span id="badge-sim" class="badge sim hidden">SIMULATION</span>
+    <span id="badge-human" class="badge amber hidden" title="human-presence window remaining">HUMAN --:--</span>
+    <span id="badge-key" class="badge red hidden" title="ANTHROPIC_API_KEY is not set in the server environment">NO API KEY</span>
+    <span id="badge-conn" class="badge red">OFFLINE</span>
+  </div>
+</header>
+
+<div id="estop-banner" class="hidden">
+  <span>&#9632; E-STOP LATCHED &mdash; Guard refuses all motion</span>
+  <button id="btn-release" type="button">RELEASE</button>
+</div>
+
+<main>
+  <section class="panel" id="panel-camera">
+    <div class="panel-title">CAMERA <span id="cam-name" class="dim">--</span><span id="cam-fps" class="fps">0 fps</span></div>
+    <div class="cam-frame">
+      <img id="cam-img" alt="live camera frame">
+      <div id="cam-err" class="cam-err hidden"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-chat">
+    <div class="panel-title">CLAUDE CONSOLE</div>
+    <div id="transcript" aria-live="polite"></div>
+    <div id="agent-status" class="hidden">AGENT WORKING<span class="blink">_</span></div>
+    <div id="chips">
+      <button type="button" class="chip">put the red block in the blue tray</button>
+      <button type="button" class="chip">look around</button>
+      <button type="button" class="chip">go home</button>
+    </div>
+    <div id="composer">
+      <button id="btn-mic" type="button" title="voice input (browser Web Speech API)">MIC</button>
+      <button id="btn-tts" type="button" title="spoken replies on/off">SPK</button>
+      <input id="input" type="text" autocomplete="off" spellcheck="false"
+             placeholder="task the arm&hellip; (Enter to send)">
+      <button id="btn-send" type="button">SEND</button>
+      <button id="btn-cancel" type="button" class="hidden">CANCEL</button>
+    </div>
+    <div id="voice-hint" class="hidden">voice needs Chrome/Edge &mdash; typing works everywhere</div>
+  </section>
+
+  <section class="panel" id="panel-telemetry">
+    <div class="panel-title">TELEMETRY</div>
+    <div id="estop-row">E-STOP <span id="estop-led" class="led ok">CLEAR</span></div>
+    <canvas id="joints" width="280" height="360"></canvas>
+    <div class="legend"><span class="sw cyan-bg"></span>norm &nbsp;<span class="sw amber-bg"></span>goal</div>
+  </section>
+</main>
+
+<button id="btn-estop" type="button" title="emergency stop - latches Guard, cancels the agent">E&#8209;STOP</button>
+
+<div id="modal-human" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <h2>HUMAN AT THE TABLE?</h2>
+    <p>Station mode drives the <b>real arm</b>. Motion tools are blocked until a person
+       confirms presence at the table. The confirmation window lasts
+       <b>10 minutes</b>, then this prompt returns.</p>
+    <p class="dim">Sim mode never asks. The real e-stop is the servo power plug.</p>
+    <button id="btn-confirm-human" type="button">I AM AT THE TABLE</button>
+  </div>
+</div>
+
+<script src="static/app.js"></script>
+</body>
+</html>

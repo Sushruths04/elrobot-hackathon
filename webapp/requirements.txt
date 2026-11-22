@@ -1,0 +1,6 @@
+# Documentation only - all of these are already installed in the repo's .venv.
+# Do NOT pip install into the shared venv.
+fastapi
+uvicorn[standard]
+anthropic
+pytest
