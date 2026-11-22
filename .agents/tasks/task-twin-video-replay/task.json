@@ -1,7 +1,13 @@
 {
   "task_id": "task-twin-video-replay",
   "task_description": "Give the user visible output: (1) headless screenshots of the webapp console UI, and (2) a MuJoCo digital-twin replay of the teleop_pick1 real video (synced front.mp4 + joints.jsonl) with side-by-side real-vs-twin PNG stills, an mp4/GIF, and measured fidelity metrics, committed under docs/twin/ with a docs/14 page and CHANGELOG entry, on a new branch feat/twin-video-replay based on feat/webapp-voice-console.",
-  "status": "in_progress",
+  "status": "completed",
   "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
-  "blocked_reason": null
+  "blocked_reason": null,
+  "verification": {
+    "build": "pass",
+    "tests": "pass",
+    "test_quality": "pass",
+    "summary": "selftest_sim.py ALL OK (exit 0); webapp pytest 10 passed; no new unit tests added (deliverables are pipelines + rendered artifacts, each verified end-to-end and visually); artifacts inspected: 8 side-by-side stills show twin arm matching real pose (EE err on labels 0.3-4.9 mm sampled), webapp_console.png shows live HUD; team's uncommitted changes intact incl. their CHANGELOG bullet; branch feat/twin-video-replay has 3 commits (0910569, 34e5977, 08457d0) with only this task's files + additive MujocoBackend change."
+  }
 }
