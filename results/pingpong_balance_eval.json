@@ -4,24 +4,24 @@
   "state_eval": {
     "episodes": 40,
     "obs_mode": "controller",
-    "successes": 39,
-    "success_rate_pct": 97.5,
-    "mean_steps": 297.5,
-    "mean_survival_s": 9.92,
+    "successes": 38,
+    "success_rate_pct": 95.0,
+    "mean_steps": 292.8,
+    "mean_survival_s": 9.76,
     "mean_bounces": 0.0,
     "max_bounces": 0,
-    "median_final_r_cm": 0.97
+    "median_final_r_cm": 1.23
   },
   "camera_eval": {
     "episodes": 15,
     "obs_mode": "camera",
-    "successes": 15,
-    "success_rate_pct": 100.0,
-    "mean_steps": 300.0,
-    "mean_survival_s": 10.0,
+    "successes": 14,
+    "success_rate_pct": 93.33,
+    "mean_steps": 293.6,
+    "mean_survival_s": 9.79,
     "mean_bounces": 0.0,
     "max_bounces": 0,
-    "median_final_r_cm": 0.45
+    "median_final_r_cm": 0.81
   },
   "video": "results/pingpong_balance.mp4"
 }

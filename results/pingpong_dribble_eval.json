@@ -4,24 +4,24 @@
   "state_eval": {
     "episodes": 40,
     "obs_mode": "controller",
-    "successes": 2,
-    "success_rate_pct": 5.0,
-    "mean_steps": 153.9,
-    "mean_survival_s": 5.13,
-    "mean_bounces": 7.42,
-    "max_bounces": 18,
-    "median_final_r_cm": 1.09
+    "successes": 4,
+    "success_rate_pct": 10.0,
+    "mean_steps": 126.9,
+    "mean_survival_s": 4.23,
+    "mean_bounces": 6.15,
+    "max_bounces": 22,
+    "median_final_r_cm": 1.75
   },
   "camera_eval": {
-    "episodes": 12,
+    "episodes": 10,
     "obs_mode": "camera",
-    "successes": 1,
-    "success_rate_pct": 8.33,
-    "mean_steps": 99.9,
-    "mean_survival_s": 3.33,
-    "mean_bounces": 4.83,
-    "max_bounces": 15,
-    "median_final_r_cm": 12.41
+    "successes": 0,
+    "success_rate_pct": 0.0,
+    "mean_steps": 45.4,
+    "mean_survival_s": 1.51,
+    "mean_bounces": 2.2,
+    "max_bounces": 4,
+    "median_final_r_cm": 16.54
   },
   "video": "results/pingpong_dribble.mp4"
 }

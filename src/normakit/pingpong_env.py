@@ -1,12 +1,11 @@
-"""Gymnasium MuJoCo 3.x environment for ElRobot flat-paddle table-tennis balancing & dribbling.
+"""Gymnasium MuJoCo 3.x environment matched 1:1 to the real sideways JOOLA bat grip on ElRobot
+(`results/photos/bat_grip_front_20261122_105923_2.jpg`, `{1:0.505, 2:0.019, 3:0.974, 4:0.464, 5:0.464, 6:0.35, 7:0.80, 8:0.341}`).
 
-Combines the proven sim-to-real lessons from:
-  - zecice/so101-pingpong-balance (MIT): 30 Hz incremental joint deltas, FdVel finite-difference velocity,
-    0..3 frames latency randomisation + past-action history, P=32 randomized servo stiffness, light_model=True fast CPU training.
-  - mariapatni/robo-ping-pong: hollow-shell ball inertia (2/3 m r^2), quadratic aerodynamic drag,
-    anti-buzz min_rise >= 4.5 cm bounce gating, restitution & takeoff scatter randomisation.
-  - Measured ElRobot hardware timings (run/latency_stats.json & docs/STACK.md):
-    front camera 30.5 fps, command write 22.8 ms, approved TorqueLimit <= 800 (2.35 N*m).
+Key match to real hardware:
+  - Jaws clamp the wooden handle neck at gripper norm = 0.341 (`q8 = 0.751 rad`), red JOOLA blade extends 11.8 cm to -X (image-right).
+  - Shoulder/elbow joints 2 & 3 stay parked steady (`norm = 0.030, 0.960`); active balancing uses the 5 fast mid-range joints `[1, 4, 5, 6, 7]`
+    where `(j4, j6)` give pure fore/aft pitch and `(j5, j7)` give pure left/right roll!
+  - Camera mode uses calibration-free `detect_bat_and_ball` (ball offset relative to live red JOOLA ellipse in the front camera).
 """
 from __future__ import annotations
 
@@ -22,28 +21,29 @@ import mujoco
 import numpy as np
 from gymnasium import spaces
 
-from .core import URDF_LIMITS
+from .core import URDF_LIMITS, norm_to_rad
 from .pingpong_vision import (
     BALL_RADIUS_M,
     BLADE_HALF_THICK_M,
     BLADE_RADIUS_M,
     FdVel3D,
-    FrontCameraBallTracker,
-    detect_orange_ball,
+    detect_bat_and_ball,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
 PINGPONG_XML = ROOT / "assets/mujoco/pingpong_scene.xml"
 
-# 6 active arm joints: base yaw (1), shoulder/elbow pitch (2,3,4), wrist pitch (6), wrist roll (7).
-# Joint 5 is locked at 0.0; Joint 8 gently clamps the paddle handle at q8=1.25 rad without overload stall.
-ACTIVE_JIDS = [1, 2, 3, 4, 6, 7]
-HOME_Q = {1: 0.0, 2: -0.45, 3: 0.40, 4: 0.40, 5: 0.0, 6: -0.35, 7: 0.0, 8: 1.25}
-MAX_Q_DEV = np.array([0.40, 0.35, 0.40, 0.40, 0.50, 0.50], dtype=np.float64)
-# Max joint speed caps matching scripts/armd.py SPEED_CAP (in rad/s)
-MAX_JVEL_RAD_S = np.array([1.84, 1.07, 1.07, 1.23, 2.30, 2.30], dtype=np.float64)
+# Exact real grip norms from results/photos/bat_grip_joints_20261122_105923.txt (with j2=0.030, j3=0.960 safely inside 0.02..0.98)
+REAL_GRIP_NORMS = {1: 0.505, 2: 0.030, 3: 0.960, 4: 0.464, 5: 0.464, 6: 0.350, 7: 0.800, 8: 0.341}
+HOME_Q = {i: float(norm_to_rad(i, REAL_GRIP_NORMS[i])) for i in range(1, 9)}
 
-AIR_DRAG_COEF = 3.39e-4  # 0.5 * rho(1.2) * Cd(0.45) * pi * (0.02)^2
+# 5 active balancing joints (all near the middle of their travel!): j1 (yaw), j4 & j6 (fore/aft pitch), j5 & j7 (left/right roll)
+ACTIVE_JIDS = [1, 4, 5, 6, 7]
+LOCKED_JIDS = [2, 3, 8]
+MAX_Q_DEV = np.array([0.35, 0.40, 0.45, 0.45, 0.45], dtype=np.float64)
+MAX_JVEL_RAD_S = np.array([1.84, 1.23, 2.30, 2.30, 2.30], dtype=np.float64)
+
+AIR_DRAG_COEF = 3.39e-4
 
 
 def _load_pingpong_model(light: bool = True) -> mujoco.MjModel:
@@ -51,11 +51,9 @@ def _load_pingpong_model(light: bool = True) -> mujoco.MjModel:
         return mujoco.MjModel.from_xml_path(str(PINGPONG_XML))
     tree = ET.parse(PINGPONG_XML)
     root = tree.getroot()
-    # Make asset paths absolute so in-memory stripped XML compiles cleanly without mesh loads
     comp = root.find("compiler")
     comp.set("meshdir", str((ROOT / "assets/mujoco").resolve()))
     wb = root.find("worldbody")
-    # Remove cup, bottle, coaster, back_wall, and visual-only STL geoms for ~15x faster CPU PPO steps
     for b in list(wb.findall("body")):
         if b.attrib.get("name") in ("black_cup", "distractor_bottle", "place_target"):
             wb.remove(b)
@@ -70,7 +68,7 @@ def _load_pingpong_model(light: bool = True) -> mujoco.MjModel:
             if g.attrib.get("contype") == "0" and g.attrib.get("conaffinity") == "0":
                 b.remove(g)
             elif gname.startswith("col_jaw") or gname.startswith("col_Gripper_Base"):
-                b.remove(g)  # paddle is rigidly clamped & >10cm above table; skip costly STL GJK in state rollouts
+                b.remove(g)
             else:
                 g.attrib.pop("material", None)
     asset = root.find("asset")
@@ -89,11 +87,11 @@ class ElRobotPingPongEnv(gym.Env):
 
     def __init__(
         self,
-        task: str = "balance",          # "balance" | "dribble"
-        obs_mode: str = "controller",   # "controller" (noisy state + FdVel) | "camera" (640x480 front RGB -> HSV + 3D tracker)
-        max_steps: int = 300,           # 10.0 s @ 30 Hz
+        task: str = "balance",
+        obs_mode: str = "controller",
+        max_steps: int = 300,
         act_hist: int = 3,
-        max_latency: int = 3,           # 0..3 steps = 0..100 ms matching run/latency_stats.json
+        max_latency: int = 3,
         domain_rand: bool = True,
         ball_noise: float = 1.0,
         spawn_scale: float = 1.0,
@@ -112,13 +110,12 @@ class ElRobotPingPongEnv(gym.Env):
         self.ball_noise = float(ball_noise)
         self.spawn_scale = float(spawn_scale)
         self.dt = 1.0 / 30.0
-        self.n_substeps = 16  # 16 * (1/480 s) = 1/30 s exact 30 Hz!
+        self.n_substeps = 16
 
         use_light = (obs_mode == "controller") if light_model is None else bool(light_model)
         self.model = _load_pingpong_model(light=use_light)
         self.data = mujoco.MjData(self.model)
         self._renderer: mujoco.Renderer | None = None
-        self._cam_tracker = FrontCameraBallTracker(use_mujoco_intrinsics=False) if obs_mode == "camera" else None
 
         m = self.model
         self.all_qadr = {i: int(m.jnt_qposadr[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, f"rev_motor_{i:02d}")]) for i in range(1, 9)}
@@ -127,18 +124,7 @@ class ElRobotPingPongEnv(gym.Env):
 
         self.act_qadr = np.array([self.all_qadr[i] for i in ACTIVE_JIDS], dtype=int)
         self.act_dadr = np.array([self.all_dadr[i] for i in ACTIVE_JIDS], dtype=int)
-        self.home_vec = np.array([HOME_Q[i] for i in ACTIVE_JIDS], dtype=np.float64)
-        self.q_lo = np.maximum(
-            np.array([URDF_LIMITS[i][0] + 0.04 for i in ACTIVE_JIDS]),
-            self.home_vec - MAX_Q_DEV,
-        )
-        self.q_hi = np.minimum(
-            np.array([URDF_LIMITS[i][1] - 0.04 for i in ACTIVE_JIDS]),
-            self.home_vec + MAX_Q_DEV,
-        )
-
-        # Action scale per 33 ms step: fine 0.028 rad/step for balance; faster 0.080 rad/step for upward dribble strikes
-        self.action_scale = 0.028 if task == "balance" else 0.080
+        self.action_scale = 0.028 if task == "balance" else 0.075
 
         self.blade_sid = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_SITE, "blade_site")
         self.blade_gid = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, "paddle_blade")
@@ -150,45 +136,45 @@ class ElRobotPingPongEnv(gym.Env):
         self.cup_jnt = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, "cup_freejoint")
         self.bot_jnt = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, "bottle_freejoint")
 
-        # ST3215 P=32 proportional stiffness (~150 N*m/rad, 0.25 deg gravity droop) clamped at TorqueLimit=800 (2.35 N*m)
-        self._kp_nom = np.array([140.0, 160.0, 160.0, 150.0, 120.0, 110.0], dtype=np.float64)
-        self._kd_nom = np.array([2.8, 3.4, 3.4, 3.0, 2.0, 1.8], dtype=np.float64)
+        self._kp_nom = np.array([140.0, 150.0, 125.0, 120.0, 110.0], dtype=np.float64)
+        self._kd_nom = np.array([2.8, 3.0, 2.2, 2.0, 1.8], dtype=np.float64)
         self._kp = self._kp_nom.copy()
         self._kd = self._kd_nom.copy()
         self._tau_cap = 2.35
 
         self.rng = np.random.default_rng(seed)
         self._fd = FdVel3D(alpha=0.50, dt=self.dt)
-        self._q_target = self.home_vec.copy()
-        self._hist = np.zeros((self.act_hist, 6), dtype=np.float32)
+        self._hist = np.zeros((self.act_hist, len(ACTIVE_JIDS)), dtype=np.float32)
         self._delay_buf: list[np.ndarray] = []
         self._latency_steps = 1
         self._bias_err = np.zeros(3)
         self._ou_err = np.zeros(3)
         self._last_vis_uwh = np.zeros(3)
 
-        # Auto-settle under nominal servo PD + gravity and trim wrist pitch/roll (j6, j7) so settled blade normal == [0, 0, 1]!
+        # Auto-trim wrist pitch (j6) & wrist roll (j7) around your real grip so settled blade normal == [0, 0, +1]!
         self.settled_home_target = dict(HOME_Q)
-        for _trim_it in range(4):
+        for _trim_it in range(6):
             self.data.qpos[:] = 0.0
             self.data.qvel[:] = 0.0
             for i, qv in self.settled_home_target.items():
                 self.data.qpos[self.all_qadr[i]] = qv
-            for _ in range(600):
+            for _ in range(500):
                 for idx_a, jid in enumerate(ACTIVE_JIDS):
                     err = self.settled_home_target[jid] - float(self.data.qpos[self.all_qadr[jid]])
                     vel = float(self.data.qvel[self.all_dadr[jid]])
                     self.data.ctrl[self.all_aid[jid]] = float(np.clip(self._kp_nom[idx_a] * err - self._kd_nom[idx_a] * vel, -2.35, 2.35))
-                for fj in (5, 8):
+                for fj in LOCKED_JIDS:
                     ef = self.settled_home_target[fj] - float(self.data.qpos[self.all_qadr[fj]])
                     vf = float(self.data.qvel[self.all_dadr[fj]])
-                    self.data.ctrl[self.all_aid[fj]] = float(np.clip(14.0 * ef - 0.5 * vf, -1.6, 1.6))
+                    kp_f = 160.0 if fj in (2, 3) else 18.0
+                    kd_f = 3.4 if fj in (2, 3) else 0.6
+                    cap_f = 2.35 if fj in (2, 3) else 1.4
+                    self.data.ctrl[self.all_aid[fj]] = float(np.clip(kp_f * ef - kd_f * vf, -cap_f, cap_f))
                 mujoco.mj_step(self.model, self.data)
             _, r_eq = self.blade_pose()
             n_eq = r_eq[:, 2]
-            # rev_motor_06 axis is -X: positive dq6 tilts blade forward (+Y normal), so subtract asin(ny) to level!
+            # At real grip: +dq6 gives wx = -1.0 (tilts normal toward +Y -> subtract ny!), +dq7 gives wy = -0.96 (tilts normal toward -X -> add nx!)
             self.settled_home_target[6] = float(np.clip(self.settled_home_target[6] - math.asin(float(np.clip(n_eq[1], -0.5, 0.5))), URDF_LIMITS[6][0] + 0.05, URDF_LIMITS[6][1] - 0.05))
-            # rev_motor_07 axis is +Y: positive dq7 rolls blade left (-X normal), so add asin(nx) to level!
             self.settled_home_target[7] = float(np.clip(self.settled_home_target[7] + math.asin(float(np.clip(n_eq[0], -0.5, 0.5))), URDF_LIMITS[7][0] + 0.05, URDF_LIMITS[7][1] - 0.05))
 
         self.settled_qpos_arm = {i: float(self.data.qpos[self.all_qadr[i]]) for i in range(1, 9)}
@@ -202,12 +188,14 @@ class ElRobotPingPongEnv(gym.Env):
             np.array([URDF_LIMITS[i][1] - 0.04 for i in ACTIVE_JIDS]),
             self.home_vec + MAX_Q_DEV,
         )
+        self._q_target = self.home_vec.copy()
         self.home_blade_pos = self.data.site_xpos[self.blade_sid].copy()
 
-        # Obs dim = 3 (ball u,w,h) + 3 (FdVel vu,vw,vh) + 3 (blade dpos) + 3 (blade normal) + 6 (dq) + 6 (qvel) + 6*act_hist = 42
-        obs_dim = 24 + 6 * self.act_hist
+        # Obs dim = 3 (ball u,w,h) + 3 (FdVel vu,vw,vh) + 5 (dq) + 5 (qvel) + 5*act_hist = 31 (pure camera + joint encoders!)
+        n_act = len(ACTIVE_JIDS)
+        obs_dim = 6 + 2 * n_act + n_act * self.act_hist
         self.observation_space = spaces.Box(-np.inf, np.inf, shape=(obs_dim,), dtype=np.float32)
-        self.action_space = spaces.Box(-1.0, 1.0, shape=(6,), dtype=np.float32)
+        self.action_space = spaces.Box(-1.0, 1.0, shape=(n_act,), dtype=np.float32)
 
         self.t_step = 0
         self.n_bounces = 0
@@ -215,12 +203,10 @@ class ElRobotPingPongEnv(gym.Env):
         self._was_above = False
         self._steps_since_bounce = 0
 
-    # ------------------------------------------------------------------ kinematics & sensing
     def blade_pose(self) -> tuple[np.ndarray, np.ndarray]:
         return self.data.site_xpos[self.blade_sid].copy(), self.data.site_xmat[self.blade_sid].reshape(3, 3).copy()
 
     def true_ball_in_blade(self) -> tuple[np.ndarray, np.ndarray]:
-        """Returns (pos_uwh_m, vel_uwh_m_s) relative to top paddle surface."""
         c, R_b = self.blade_pose()
         u_ax, w_ax, n_ax = R_b[:, 0], R_b[:, 1], R_b[:, 2]
         surf_c = c + (BLADE_HALF_THICK_M + BALL_RADIUS_M) * n_ax
@@ -231,64 +217,59 @@ class ElRobotPingPongEnv(gym.Env):
         return uwh, vuwh
 
     def _observed_ball_uwh(self) -> np.ndarray:
-        if self.obs_mode == "camera" and self._cam_tracker is not None:
+        if self.obs_mode == "camera":
             rgb = self.render()
-            det = detect_orange_ball(rgb)
-            c, R_b = self.blade_pose()
-            est = self._cam_tracker.localize(det, c, R_b, mode=self.task)
-            if est is not None:
-                self._last_vis_uwh = est
+            det = detect_bat_and_ball(rgb, ball_color="auto")
+            if det.get("visible") and det.get("uwh_m") is not None:
+                self._last_vis_uwh = det["uwh_m"].copy()
+                if self.task == "balance":
+                    self._last_vis_uwh[2] = 0.0
             return self._last_vis_uwh.copy()
 
         true_uwh, _ = self.true_ball_in_blade()
         if self.ball_noise <= 0.0:
             return true_uwh
-        self._ou_err = 0.96 * self._ou_err + self.rng.normal(0.0, [0.0008, 0.0010, 0.0018]) * self.ball_noise
-        white = self.rng.normal(0.0, [0.0015, 0.0020, 0.0035]) * self.ball_noise
+        self._ou_err = 0.96 * self._ou_err + self.rng.normal(0.0, [0.0012, 0.0015, 0.0020]) * self.ball_noise
+        white = self.rng.normal(0.0, [0.0018, 0.0022, 0.0035]) * self.ball_noise
         noisy = true_uwh + self._bias_err + self._ou_err + white
         if self.task == "balance":
-            noisy[2] = 0.0  # ray-plane tracker sets h = 0 on blade surface
+            noisy[2] = 0.0
         else:
             noisy[2] = max(0.0, noisy[2])
         return noisy
 
     def _build_obs(self, uwh_obs: np.ndarray, vel_fd: np.ndarray) -> np.ndarray:
-        c, R_b = self.blade_pose()
-        n_ax = R_b[:, 2]
         q_cur = self.data.qpos[self.act_qadr]
         qv_cur = self.data.qvel[self.act_dadr]
-        obs = np.concatenate([
-            [uwh_obs[0] / 0.08, uwh_obs[1] / 0.08, uwh_obs[2] / 0.20],
-            vel_fd / 1.0,
-            (c - self.home_blade_pos) / 0.10,
-            [n_ax[0], n_ax[1], n_ax[2] - 1.0],
+        return np.concatenate([
+            [uwh_obs[0] / BLADE_RADIUS_M, uwh_obs[1] / BLADE_RADIUS_M, uwh_obs[2] / 0.20],
+            vel_fd / 0.8,
             (q_cur - self.home_vec) / 0.25,
             qv_cur * 0.15,
             self._hist.ravel(),
         ]).astype(np.float32)
-        return obs
 
-    # ------------------------------------------------------------------ gym API
     def reset(self, *, seed: int | None = None, options: dict | None = None):
         if seed is not None:
             self.rng = np.random.default_rng(seed)
         r = self.rng
+        n_act = len(ACTIVE_JIDS)
 
         if self.domain_rand:
-            self._kp = self._kp_nom * r.uniform(0.80, 1.20, size=6)
-            self._kd = self._kd_nom * r.uniform(0.75, 1.35, size=6)
+            self._kp = self._kp_nom * r.uniform(0.80, 1.20, size=n_act)
+            self._kd = self._kd_nom * r.uniform(0.75, 1.35, size=n_act)
             self._tau_cap = float(r.uniform(2.05, 2.45))
             self._latency_steps = int(r.integers(0, self.max_latency + 1))
             s_mass = float(r.uniform(0.92, 1.08))
             self.model.body_mass[self.ball_bid] = 0.0027 * s_mass
             self.model.body_inertia[self.ball_bid] = 7.2e-7 * s_mass
-            damp_jit = float(r.uniform(-23.0, -14.0))  # randomise restitution e in ~[0.80, 0.88]!
+            damp_jit = float(r.uniform(-23.0, -14.0))
             self.model.geom_solref[self.ball_gid, 1] = damp_jit
             self.model.geom_solref[self.blade_gid, 1] = damp_jit
             fric = float(r.uniform(0.35, 0.65))
             self.model.geom_friction[self.ball_gid, 0] = fric
             self.model.geom_friction[self.blade_gid, 0] = fric
-            self._bias_err = r.normal(0.0, [0.002, 0.003, 0.004]) * self.ball_noise
+            self._bias_err = r.normal(0.0, [0.0025, 0.0030, 0.0040]) * self.ball_noise
         else:
             self._kp = self._kp_nom.copy()
             self._kd = self._kd_nom.copy()
@@ -300,7 +281,7 @@ class ElRobotPingPongEnv(gym.Env):
         self.data.qpos[:] = 0.0
         self.data.qvel[:] = 0.0
         for i, qv in self.settled_qpos_arm.items():
-            noise_q = float(r.normal(0.0, 0.008)) if (self.domain_rand and i in ACTIVE_JIDS) else 0.0
+            noise_q = float(r.normal(0.0, 0.006)) if (self.domain_rand and i in ACTIVE_JIDS) else 0.0
             self.data.qpos[self.all_qadr[i]] = qv + noise_q
         if self.cup_jnt >= 0:
             cq = int(self.model.jnt_qposadr[self.cup_jnt])
@@ -311,22 +292,23 @@ class ElRobotPingPongEnv(gym.Env):
         if self.model.nmocap > 0:
             self.data.mocap_pos[0] = [0.45, 0.78, -0.05]
 
-        # Pre-load settled gravity torque and step just 16 substeps so random kp/tau settles in <0.5 ms CPU!
         for i, cv in self.settled_ctrl_arm.items():
             self.data.ctrl[self.all_aid[i]] = cv
-        self._q_target = self.home_vec.copy() + (r.normal(0.0, 0.005, size=6) if self.domain_rand else 0.0)
+        self._q_target = self.home_vec.copy() + (r.normal(0.0, 0.006, size=n_act) if self.domain_rand else 0.0)
         for _ in range(16):
             for idx_a, jid in enumerate(ACTIVE_JIDS):
                 err = self._q_target[idx_a] - float(self.data.qpos[self.all_qadr[jid]])
                 vel = float(self.data.qvel[self.all_dadr[jid]])
                 self.data.ctrl[self.all_aid[jid]] = float(np.clip(self._kp[idx_a] * err - self._kd[idx_a] * vel, -self._tau_cap, self._tau_cap))
-            for fj in (5, 8):
+            for fj in LOCKED_JIDS:
                 ef = self.settled_home_target[fj] - float(self.data.qpos[self.all_qadr[fj]])
                 vf = float(self.data.qvel[self.all_dadr[fj]])
-                self.data.ctrl[self.all_aid[fj]] = float(np.clip(14.0 * ef - 0.5 * vf, -1.6, 1.6))
+                kp_f = 160.0 if fj in (2, 3) else 18.0
+                kd_f = 3.4 if fj in (2, 3) else 0.6
+                cap_f = 2.35 if fj in (2, 3) else 1.4
+                self.data.ctrl[self.all_aid[fj]] = float(np.clip(kp_f * ef - kd_f * vf, -cap_f, cap_f))
             mujoco.mj_step(self.model, self.data)
 
-        # Spawn ball on or above the blade
         c, R_b = self.blade_pose()
         u_ax, w_ax, n_ax = R_b[:, 0], R_b[:, 1], R_b[:, 2]
         ang = float(r.uniform(0.0, 2.0 * math.pi))
@@ -337,10 +319,10 @@ class ElRobotPingPongEnv(gym.Env):
             v_init = r.uniform(-0.12, 0.12, size=2) * self.spawn_scale
             vz_init = 0.0
         else:
-            rad = float(np.sqrt(r.uniform(0.0, 1.0)) * 0.028 * self.spawn_scale)
+            rad = float(np.sqrt(r.uniform(0.0, 1.0)) * 0.026 * self.spawn_scale)
             du, dw = rad * math.cos(ang), rad * math.sin(ang)
             dh = float(r.uniform(0.065, 0.115))
-            v_init = r.uniform(-0.06, 0.06, size=2) * self.spawn_scale
+            v_init = r.uniform(-0.05, 0.05, size=2) * self.spawn_scale
             vz_init = 0.0
 
         surf_c = c + (BLADE_HALF_THICK_M + BALL_RADIUS_M) * n_ax
@@ -362,7 +344,6 @@ class ElRobotPingPongEnv(gym.Env):
         uwh0 = self._observed_ball_uwh()
         self._last_vis_uwh = uwh0.copy()
         v0 = self._fd.update(uwh0, self.dt)
-        # Prime finite-difference filter on step 0 so initial velocity isn't stuck at 0 if moving
         return self._build_obs(uwh0, v0), {}
 
     def step(self, action: np.ndarray):
@@ -371,13 +352,11 @@ class ElRobotPingPongEnv(gym.Env):
         self._hist = np.roll(self._hist, shift=1, axis=0)
         self._hist[0] = a.astype(np.float32)
 
-        # Incremental target update bounded by ST3215 max velocity & safe workspace box around HOME_Q
         max_dq = np.minimum(self.action_scale, MAX_JVEL_RAD_S * self.dt)
         self._q_target = np.clip(self._q_target + max_dq * a, self.q_lo, self.q_hi)
         self._delay_buf.append(self._q_target.copy())
         cmd_q = self._delay_buf.pop(0)
 
-        # Random gentle disturbance kick in balance mode (tests active recovery like zecice demo!)
         if self.task == "balance" and self.domain_rand and self.t_step in (90, 190):
             kick = self.rng.normal(0.0, 0.12, size=2)
             self.data.qvel[self.ball_dadr : self.ball_dadr + 2] += kick
@@ -388,7 +367,6 @@ class ElRobotPingPongEnv(gym.Env):
         bounce_bonus = 0.0
 
         for _ in range(self.n_substeps):
-            # Rate-limit internal servo target ramp by MAX_JVEL_RAD_S
             dq_lim = MAX_JVEL_RAD_S * dt_sub
             q_prof = q_prof + np.clip(cmd_q - q_prof, -dq_lim, dq_lim)
             for idx_a, jid in enumerate(ACTIVE_JIDS):
@@ -396,13 +374,14 @@ class ElRobotPingPongEnv(gym.Env):
                 vel = float(self.data.qvel[self.all_dadr[jid]])
                 tau = self._kp[idx_a] * err - self._kd[idx_a] * vel
                 self.data.ctrl[self.all_aid[jid]] = float(np.clip(tau, -self._tau_cap, self._tau_cap))
-            # Hold locked joint 5 (0.0) and gentle paddle clamp joint 8 (1.25)
-            for fixed_j in (5, 8):
-                err_f = HOME_Q[fixed_j] - float(self.data.qpos[self.all_qadr[fixed_j]])
-                vel_f = float(self.data.qvel[self.all_dadr[fixed_j]])
-                self.data.ctrl[self.all_aid[fixed_j]] = float(np.clip(14.0 * err_f - 0.5 * vel_f, -1.6, 1.6))
+            for fj in LOCKED_JIDS:
+                ef = self.settled_home_target[fj] - float(self.data.qpos[self.all_qadr[fj]])
+                vf = float(self.data.qvel[self.all_dadr[fj]])
+                kp_f = 160.0 if fj in (2, 3) else 18.0
+                kd_f = 3.4 if fj in (2, 3) else 0.6
+                cap_f = 2.35 if fj in (2, 3) else 1.4
+                self.data.ctrl[self.all_aid[fj]] = float(np.clip(kp_f * ef - kd_f * vf, -cap_f, cap_f))
 
-            # Quadratic aerodynamic drag on the 2.7 g ping-pong ball
             bv = self.data.qvel[self.ball_dadr : self.ball_dadr + 3]
             bspd = float(np.linalg.norm(bv))
             if bspd > 1e-4:
@@ -418,9 +397,7 @@ class ElRobotPingPongEnv(gym.Env):
             if self._peak_h_since_hit >= 0.035:
                 self._was_above = True
 
-            # Detect upward bounce off the paddle blade
             if self.task == "dribble" and uwh_sub[2] < 0.010 and vh_before < -0.15 and vuwh_sub[2] > 0.30:
-                # Apply realistic 2.0 deg takeoff scatter on rubber contact
                 if self.domain_rand:
                     scatter = self.rng.normal(0.0, 0.030, size=2)
                     self.data.qvel[self.ball_dadr : self.ball_dadr + 2] += scatter * abs(vuwh_sub[2])
@@ -428,7 +405,6 @@ class ElRobotPingPongEnv(gym.Env):
                     self.n_bounces += 1
                     bounce_scored = True
                     r_hit = math.hypot(uwh_sub[0], uwh_sub[1])
-                    # Target crisp 8.5 cm rapid dribble apex (stays 100% inside 640x480 external front camera!)
                     pred_apex = (vuwh_sub[2] ** 2) / (2.0 * 9.81)
                     q_apex = math.exp(-(((pred_apex - 0.085) / 0.055) ** 2))
                     q_cent = math.exp(-((r_hit / 0.050) ** 2))
@@ -467,7 +443,7 @@ class ElRobotPingPongEnv(gym.Env):
                 )
             success = bool(truncated and r_uv <= 0.060)
         else:
-            stalled = self._steps_since_bounce > 45  # > 1.5 s with no >= 4.5 cm bounce -> dead/resting ball
+            stalled = self._steps_since_bounce > 45
             terminated = bool(true_uwh[2] < -0.045 or r_uv > 0.165 or true_uwh[2] > 0.55 or stalled)
             truncated = (not terminated) and (self.t_step >= self.max_steps)
             if terminated:
@@ -487,10 +463,10 @@ class ElRobotPingPongEnv(gym.Env):
         }
         return obs, float(reward), terminated, truncated, info
 
-    def render(self) -> np.ndarray:
+    def render(self, camera: str = "front") -> np.ndarray:
         if self._renderer is None:
             self._renderer = mujoco.Renderer(self.model, height=480, width=640)
-        self._renderer.update_scene(self.data, camera="front")
+        self._renderer.update_scene(self.data, camera=camera)
         return self._renderer.render().copy()
 
     def close(self) -> None:

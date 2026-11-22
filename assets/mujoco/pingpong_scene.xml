@@ -212,12 +212,12 @@
                                     <geom name="vis_wrist_cam_mount_0" type="box" size="0.016 0.016 0.004" contype="0" conaffinity="0" group="1" material="arm_pla_mat" />
                                   </body>
                                   <camera name="wrist" pos="0.0008 0.036 0.040" xyaxes="1 0 0 0 0.374607 0.927184" resolution="640 480" sensorsize="0.0064 0.0048" focalpixel="302.189 301.752" principalpixel="-4.031 9.244" />
-                                  <body name="paddle" pos="0.0009 0.085 0.0">
-                                    <inertial pos="0 0.095 0" mass="0.082" diaginertia="0.00018 0.000095 0.00026" />
-                                    <geom name="paddle_handle" type="box" pos="0 0.020 0" size="0.013 0.040 0.005" rgba="0.25 0.26 0.28 1" contype="0" conaffinity="0" group="1" />
-                                    <geom name="paddle_blade" type="cylinder" pos="0 0.125 0" size="0.078 0.0035" rgba="0.14 0.15 0.18 1" contype="1" conaffinity="3" condim="4" friction="0.48 0.005 0.0005" solref="-120000 -22" solimp="0.99 0.995 0.0002" />
-                                    <geom name="paddle_rim" type="cylinder" pos="0 0.125 -0.0022" size="0.0795 0.0015" rgba="0.15 0.35 0.78 1" contype="0" conaffinity="0" group="1" />
-                                    <site name="blade_site" pos="0 0.125 0" size="0.004" group="4" />
+                                  <body name="paddle" pos="0.0009 0.092 0.0" quat="0.7071068 0 0.7071068 0">
+                                    <inertial pos="-0.085 0 0" mass="0.085" diaginertia="0.00018 0.00026 0.000095" />
+                                    <geom name="paddle_handle" type="box" pos="0.015 0 0" size="0.048 0.013 0.0055" rgba="0.72 0.58 0.44 1" contype="0" conaffinity="0" group="1" />
+                                    <geom name="paddle_blade" type="cylinder" pos="-0.118 0 0" size="0.077 0.0035" rgba="0.82 0.32 0.38 1" contype="1" conaffinity="3" condim="4" friction="0.48 0.005 0.0005" solref="-120000 -22" solimp="0.99 0.995 0.0002" />
+                                    <geom name="paddle_rim" type="cylinder" pos="-0.118 0 -0.001" size="0.0785 0.0028" rgba="0.10 0.10 0.12 1" contype="0" conaffinity="0" group="1" />
+                                    <site name="blade_site" pos="-0.118 0 0" size="0.004" group="4" />
                                   </body>
                                 </body>
                               </body>
@@ -283,7 +283,7 @@
     <body name="pingpong_ball" pos="0.0 0.30 0.25">
       <freejoint name="pp_ball_freejoint" />
       <inertial pos="0 0 0" mass="0.0027" diaginertia="7.2e-07 7.2e-07 7.2e-07" />
-      <geom name="pp_ball_geom" type="sphere" size="0.020" rgba="1.0 0.48 0.03 1" contype="1" conaffinity="3" condim="4" friction="0.45 0.005 0.0005" solref="-120000 -22" solimp="0.99 0.995 0.0002" />
+      <geom name="pp_ball_geom" type="sphere" size="0.020" rgba="1.0 0.50 0.04 1" contype="1" conaffinity="3" condim="4" friction="0.45 0.005 0.0005" solref="-120000 -22" solimp="0.99 0.995 0.0002" />
     </body>
   </worldbody>
   <contact>

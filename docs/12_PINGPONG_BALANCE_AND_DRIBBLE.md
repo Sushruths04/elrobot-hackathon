@@ -20,25 +20,21 @@ Direct `.pt` weight transfer from SO-101 repositories is impossible because SO-1
 
 ---
 
-## 2. External Front-Camera 3D Ball Tracking (`src/normakit/pingpong_vision.py`)
+## 2. Calibration-Free Front-Camera Tracking (`src/normakit/pingpong_vision.py`)
 
-Because the paddle is clamped **flat horizontally** in the 2-finger gripper (`Gripper_Base_v1_1`) and viewed from the external `640x480 @ 30.5 fps` front USB camera (`calibration/camera_front.json`):
-- **HSV Orange Detector (`detect_orange_ball`):** thresholds an ITTF orange ping-pong ball (`H in [8, 25], S >= 145, V >= 110`). Avoid brown/orange tape on the paddle handle or red-orange edge tape—use a dark/black rubber face upward so the orange ball has clean contrast.
-- **Balance mode (`mode="balance"`):** intersects the calibrated front-camera ray `(u_px, v_px)` directly with the live encoder-FK paddle contact plane `(c_blade + (t_half + r_ball) * n_blade, n_blade)` (`~2.6 mm` accuracy, zero monocular depth ambiguity).
-- **Dribble mode (`mode="dribble"`):** estimates 3D flight position along the camera ray from apparent ball radius `Z_cam = f * R_ball / r_px` (`0.9-3.8 mm` height accuracy in the `0-12 cm` rapid dribble band).
+Matched directly to `results/photos/bat_grip_front_20261122_105923_{1,2,3}.jpg` and `{1:0.505, 2:0.019, 3:0.974, 4:0.464, 5:0.464, 6:0.35, 7:0.80, 8:0.341}` (`results/twin_vs_real_bat.jpg`):
+- **Sideways handle grip (`gripper = 0.341`):** the follower jaws clamp the neck of the wooden handle across the jaws, with the crimson-red JOOLA blade extending `11.8 cm` to `-X` (image-right in the front camera). Shoulder/elbow `j2, j3` stay parked steady (`0.030, 0.960`) while fast mid-range joints `[1, 4, 5, 6, 7]` decouple fore/aft pitch (`j4, j6`) and left/right roll (`j5, j7`).
+- **Direct Red-Blade + Ball Detector (`detect_bat_and_ball`):** finds the red JOOLA blade convex hull in `u in [195, 565], v in [100, 380]` (`0.3 px` jitter across your 3 real photos, completely ignoring the orange-red box at `u < 195`) and detects **either a white or orange 40 mm ball** inside that hull. Ball offset `(u_m, w_m)` is measured directly relative to the live detected red ellipse center & radii (`0.8-2.6 mm` accuracy, immune to handle slip or camera extrinsics drift).
 
 ---
 
-## 3. Simulation Evaluation Results
+## 3. Simulation Evaluation Results (Matched Sideways JOOLA Grip)
 
 | Policy & Checkpoint | Eval Mode | Episodes | Result | Video |
 |---|---|---|---|---|
-| **Paddle Balance** (`models/pingpong/balance_ppo.pt`, `553k` steps) | Randomised sim + noisy `FdVel3D` + `0-100 ms` lag + 2 ball kicks | 40 | **39 / 40 (`97.5%`)** `10.0 s` balance (`9.92 s` mean survival, **`0.97 cm`** median final offset) | `results/pingpong_balance.mp4` |
-| **Paddle Balance** (`models/pingpong/balance_ppo.pt`) | **Full `640x480` external front camera** (`HSV` + 3D ray-plane tracker + `FdVel3D`) | 15 | **15 / 15 (`100.0%`)** `10.0 s` balance (**`0.45 cm`** median final offset) | `results/pingpong_balance.mp4` |
-| **Paddle Dribble / Keep-Up** (`models/pingpong/dribble_ppo.pt`, `1.05M` steps warm-started from Balance) | Randomised sim + noisy `FdVel3D` + `0-100 ms` lag + `e in [0.80, 0.88]` + `2 deg` takeoff scatter | 40 | **`7.42` mean bounces** (`max = 18` bounces >= `3.5 cm` apex, `5.13 s` mean rally; passive zero-action baseline = `1` bounce) | `results/pingpong_dribble.mp4` |
-| **Paddle Dribble / Keep-Up** (`models/pingpong/dribble_ppo.pt`) | **Full `640x480` external front camera** (`HSV` + apparent-radius 3D depth + `FdVel3D`) | 12 | **`4.83` mean bounces** (`max = 15` consecutive bounces, `3.33 s` mean rally) | `results/pingpong_dribble.mp4` |
-
-*(Note: `mariapatni/robo-ping-pong` trains keep-up for `20M` steps; our `1.05M`-step CPU checkpoint already reaches up to `18` state / `15` camera bounces and can be continued on a GPU/multi-core server via `.venv/bin/python scripts/train_pingpong.py --task dribble --init models/pingpong/dribble_ppo.pt --iters 1200 --workers 16`.)*
+| **Paddle Balance** (`models/pingpong/balance_ppo.pt`, `522k` steps) | Randomised sim + noisy `FdVel3D` + `0-100 ms` lag + 2 ball kicks | 40 | **38 / 40 (`95.0%`)** `10.0 s` balance (`9.76 s` mean survival, **`1.23 cm`** median final offset) | `results/pingpong_balance.mp4` |
+| **Paddle Balance** (`models/pingpong/balance_ppo.pt`) | **Full `640x480` front camera** (`detect_bat_and_ball` red JOOLA hull + ball + `FdVel3D`) | 15 | **14 / 15 (`93.3%`)** `10.0 s` balance (`9.79 s` mean survival, **`0.81 cm`** median final offset) | `results/pingpong_balance.mp4` |
+| **Paddle Dribble / Keep-Up** (`models/pingpong/dribble_ppo.pt`, `553k` steps warm-started from Balance) | Randomised sim + noisy `FdVel3D` + `0-100 ms` lag + `e in [0.80, 0.88]` + `2 deg` scatter | 40 | **`6.15` mean bounces** (`max = 22` bounces >= `3.5 cm` apex; zero-action = `1` bounce) | `results/pingpong_dribble.mp4` |
 
 ---
 

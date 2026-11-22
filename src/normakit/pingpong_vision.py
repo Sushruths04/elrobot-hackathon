@@ -1,24 +1,26 @@
-"""External front-camera orange ping-pong ball detector, 3D blade-frame localizer, and FdVel velocity filter.
+"""Calibration-free front-camera red-JOOLA-bat + white/orange ping-pong ball tracker & FdVel3D filter.
 
-Runs identically in MuJoCo camera-in-the-loop evaluation and on the real ElRobot arm (`StationBackend` front camera).
+Verified directly against `results/photos/bat_grip_front_20261122_105923_{1,2,3}.jpg`:
+  1. Finds the crimson/red JOOLA paddle blade convex hull inside central workspace ROI (ignoring the red box at u < 190).
+  2. Finds the 40 mm ping-pong ball (WHITE or ORANGE automatically) inside/above the detected blade hull.
+  3. Computes ball offset directly relative to the live detected blade ellipse center & radii:
+       u_blade (-X_world, along handle->blade) = +(u_ball - u_pad) / rx_px * BLADE_RADIUS_M
+       w_blade (+Y_world, toward front camera) = +(v_ball - v_pad) / ry_px * BLADE_RADIUS_M
+     Because both bat and ball are measured in the same camera image, centering is immune to camera extrinsics error
+     or small shifts of the wooden handle in the jaws!
 """
 from __future__ import annotations
-
-import json
-from pathlib import Path
 
 import cv2
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[2]
 BALL_RADIUS_M = 0.020
 BLADE_HALF_THICK_M = 0.0035
-BLADE_RADIUS_M = 0.078
+BLADE_RADIUS_M = 0.077
 
 
 class FdVel3D:
-    """Smoothed finite-difference ball velocity in the blade frame (u, w, h).
-    Exactly the same filter runs in PPO training and on real hardware (zecice/so101-pingpong-balance)."""
+    """Smoothed finite-difference ball velocity in the blade frame (u, w, h)."""
 
     def __init__(self, alpha: float = 0.50, dt: float = 1.0 / 30.0):
         self.alpha = float(alpha)
@@ -40,133 +42,100 @@ class FdVel3D:
         return self.vel.copy()
 
 
-def detect_orange_ball(rgb: np.ndarray, min_area: int = 45, ball_color: str = "orange") -> dict:
-    """Detect an orange (or white-on-black-paddle) 40 mm ping-pong ball in an RGB 640x480 frame.
-    Returns {"visible": bool, "u": float, "v": float, "r_px": float}."""
+def detect_bat_and_ball(
+    rgb: np.ndarray,
+    roi: tuple[int, int, int, int] = (195, 100, 565, 380),
+    ball_color: str = "auto",
+) -> dict:
+    """Detect both the red JOOLA bat ellipse and the ball (white or orange) on/above it.
+    Returns:
+      {
+        "bat_visible": bool, "bat_u": float, "bat_v": float, "bat_rx": float, "bat_ry": float,
+        "visible": bool, "u": float, "v": float, "r_px": float,
+        "uwh_m": np.ndarray([u_m, w_m, h_m]) or None,
+      }
+    """
     hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
-    if ball_color in ("orange", "auto"):
-        mask = cv2.inRange(hsv, np.array([8, 145, 110], np.uint8), np.array([25, 255, 255], np.uint8))
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
-        cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if cnts:
-            c = max(cnts, key=cv2.contourArea)
-            area = float(cv2.contourArea(c))
-            if area >= min_area:
-                (cx, cy), r_encl = cv2.minEnclosingCircle(c)
-                r_area = float(np.sqrt(area / np.pi))
-                return {"visible": True, "u": float(cx), "v": float(cy), "r_px": 0.5 * (float(r_encl) + r_area)}
-        if ball_color == "orange":
-            return {"visible": False, "u": 0.0, "v": 0.0, "r_px": 0.0}
+    u0, v0, u1, v1 = roi
 
-    # White ball on dark/black paddle rubber: find dark paddle mask first, then bright round white blob inside its hull!
-    dark_pad = (hsv[:, :, 2] < 85).astype(np.uint8) * 255
-    dark_pad = cv2.morphologyEx(dark_pad, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (25, 25)))
-    pad_cnts, _ = cv2.findContours(dark_pad, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    if not pad_cnts:
-        return {"visible": False, "u": 0.0, "v": 0.0, "r_px": 0.0}
-    pad_hull = cv2.convexHull(max(pad_cnts, key=cv2.contourArea))
+    # 1) Red/crimson JOOLA rubber mask inside workspace ROI (excludes left orange-red box at u < 195!)
+    m_red1 = cv2.inRange(hsv, np.array([158, 28, 95], np.uint8), np.array([180, 245, 255], np.uint8))
+    m_red2 = cv2.inRange(hsv, np.array([0, 30, 95], np.uint8), np.array([7, 220, 255], np.uint8))
+    bat_m = m_red1 | m_red2
+    roi_m = np.zeros_like(bat_m)
+    roi_m[v0:v1, u0:u1] = 255
+    bat_m &= roi_m
+    bat_m = cv2.morphologyEx(bat_m, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (17, 17)))
+    bat_m = cv2.morphologyEx(bat_m, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
+
+    cnts, _ = cv2.findContours(bat_m, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not cnts:
+        return {"bat_visible": False, "visible": False, "uwh_m": None}
+    c_bat = max(cnts, key=cv2.contourArea)
+    hull = cv2.convexHull(c_bat)
+    if cv2.contourArea(hull) < 1800:
+        return {"bat_visible": False, "visible": False, "uwh_m": None}
+
+    bx, by, bw, bh = cv2.boundingRect(hull)
+    M = cv2.moments(hull)
+    bat_u = float(M["m10"] / max(1e-5, M["m00"]))
+    bat_v = float(M["m01"] / max(1e-5, M["m00"]))
+    bat_rx = max(35.0, 0.5 * float(bw))
+    bat_ry = max(22.0, 0.5 * float(bh))
+
+    # Build search mask inside the convex hull of the red bat (dilated slightly for balls near the rim)
     hull_mask = np.zeros(hsv.shape[:2], dtype=np.uint8)
-    cv2.drawContours(hull_mask, [pad_hull], -1, 255, thickness=-1)
-    white_m = cv2.inRange(hsv, np.array([0, 0, 175], np.uint8), np.array([180, 55, 255], np.uint8)) & hull_mask
-    white_m = cv2.morphologyEx(white_m, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
-    w_cnts, _ = cv2.findContours(white_m, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    best_w = None
-    for c in w_cnts:
-        area = float(cv2.contourArea(c))
-        if min_area <= area <= 4500:
-            (cx, cy), r_encl = cv2.minEnclosingCircle(c)
-            circ = area / max(1.0, np.pi * (r_encl ** 2))
-            if circ >= 0.55 and (best_w is None or area > best_w[0]):
-                r_area = float(np.sqrt(area / np.pi))
-                best_w = (area, {"visible": True, "u": float(cx), "v": float(cy), "r_px": 0.5 * (float(r_encl) + r_area)})
-    return best_w[1] if best_w is not None else {"visible": False, "u": 0.0, "v": 0.0, "r_px": 0.0}
+    cv2.drawContours(hull_mask, [hull], -1, 255, thickness=-1)
+    search_mask = cv2.dilate(hull_mask, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (19, 19)))
 
+    ball_det = None
+    # 2a) Check bright orange ping-pong ball first (H in 9..26, high saturation)
+    if ball_color in ("auto", "orange"):
+        m_org = cv2.inRange(hsv, np.array([9, 130, 115], np.uint8), np.array([26, 255, 255], np.uint8)) & search_mask
+        m_org = cv2.morphologyEx(m_org, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
+        oc, _ = cv2.findContours(m_org, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if oc:
+            co = max(oc, key=cv2.contourArea)
+            ao = float(cv2.contourArea(co))
+            if 35 <= ao <= 3500:
+                (cu, cv_p), r_e = cv2.minEnclosingCircle(co)
+                ball_det = (float(cu), float(cv_p), 0.5 * (float(r_e) + float(np.sqrt(ao / np.pi))))
 
-class FrontCameraBallTracker:
-    """Maps 2D orange-ball detections from the external front camera into 3D blade-frame (u, w, h)."""
+    # 2b) Check white ping-pong ball on the red JOOLA rubber (low saturation S <= 38, bright V >= 150)
+    if ball_det is None and ball_color in ("auto", "white"):
+        m_wht = cv2.inRange(hsv, np.array([0, 0, 150], np.uint8), np.array([180, 38, 255], np.uint8)) & search_mask
+        m_wht = cv2.morphologyEx(m_wht, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
+        wc, _ = cv2.findContours(m_wht, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        best_w = None
+        for cw in wc:
+            aw = float(cv2.contourArea(cw))
+            if 35 <= aw <= 3500:
+                (cu, cv_p), r_e = cv2.minEnclosingCircle(cw)
+                circ = aw / max(1.0, np.pi * (r_e ** 2))
+                if circ >= 0.50 and (best_w is None or aw > best_w[0]):
+                    best_w = (aw, (float(cu), float(cv_p), 0.5 * (float(r_e) + float(np.sqrt(aw / np.pi)))))
+        if best_w is not None:
+            ball_det = best_w[1]
 
-    def __init__(
-        self,
-        cam_calib_path: str | Path = ROOT / "calibration/camera_front.json",
-        cam_pos_world: np.ndarray | None = None,
-        R_wc_opencv: np.ndarray | None = None,
-        use_mujoco_intrinsics: bool = False,
-    ):
-        if use_mujoco_intrinsics:
-            import math
-            import mujoco
-            from .mujoco_backend import SCENE_XML
-            m = mujoco.MjModel.from_xml_path(str(SCENE_XML))
-            d = mujoco.MjData(m)
-            mujoco.mj_forward(m, d)
-            cid = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_CAMERA, "front")
-            fovy_rad = math.radians(float(m.cam_fovy[cid]))
-            f_mj = 240.0 / math.tan(0.5 * fovy_rad)
-            self.fx = self.fy = self.f_mean = f_mj
-            self.cx, self.cy = 320.0, 240.0
-            self.K = np.array([[f_mj, 0.0, 320.0], [0.0, f_mj, 240.0], [0.0, 0.0, 1.0]])
-            if cam_pos_world is None or R_wc_opencv is None:
-                cam_pos_world = d.cam_xpos[cid].copy()
-                r_mj = d.cam_xmat[cid].reshape(3, 3)
-                R_wc_opencv = np.column_stack([r_mj[:, 0], -r_mj[:, 1], -r_mj[:, 2]])
-        else:
-            cal = json.loads(Path(cam_calib_path).read_text())
-            self.K = np.array(cal["K"], dtype=np.float64)
-            self.fx = float(self.K[0, 0])
-            self.fy = float(self.K[1, 1])
-            self.cx = float(self.K[0, 2])
-            self.cy = float(self.K[1, 2])
-            self.f_mean = 0.5 * (self.fx + self.fy)
-            if cam_pos_world is None or R_wc_opencv is None:
-                from .mujoco_backend import SCENE_XML
-                import mujoco
-                m = mujoco.MjModel.from_xml_path(str(SCENE_XML))
-                d = mujoco.MjData(m)
-                mujoco.mj_forward(m, d)
-                cid = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_CAMERA, "front")
-                cam_pos_world = d.cam_xpos[cid].copy()
-                r_mj = d.cam_xmat[cid].reshape(3, 3)
-                R_wc_opencv = np.column_stack([r_mj[:, 0], -r_mj[:, 1], -r_mj[:, 2]])
-        self.cam_pos = np.asarray(cam_pos_world, dtype=np.float64)
-        self.R_wc = np.asarray(R_wc_opencv, dtype=np.float64)
-        self._r_px_filt: float | None = None
+    if ball_det is None:
+        return {
+            "bat_visible": True, "bat_u": bat_u, "bat_v": bat_v, "bat_rx": bat_rx, "bat_ry": bat_ry,
+            "visible": False, "u": 0.0, "v": 0.0, "r_px": 0.0, "uwh_m": None,
+        }
 
-    def localize(
-        self,
-        det: dict,
-        blade_pos: np.ndarray,
-        blade_mat: np.ndarray,
-        mode: str = "balance",
-    ) -> np.ndarray | None:
-        """Returns ball offset (u, w, h) in metres in the paddle blade frame:
-          u = right (+X_blade), w = forward (+Y_blade), h = height above top rubber surface (+Z_blade)."""
-        if not det.get("visible"):
-            return None
-        u_px, v_px, r_px = float(det["u"]), float(det["v"]), float(det["r_px"])
-        ray_cv = np.array([(u_px - self.cx) / self.fx, (v_px - self.cy) / self.fy, 1.0], dtype=np.float64)
-        d_world = self.R_wc @ ray_cv
-
-        u_ax = blade_mat[:, 0]
-        w_ax = blade_mat[:, 1]
-        n_ax = blade_mat[:, 2]
-        surf_origin = blade_pos + (BLADE_HALF_THICK_M + BALL_RADIUS_M) * n_ax
-
-        if mode == "balance":
-            # Exact ray-plane intersection onto the live FK paddle contact plane!
-            denom = float(np.dot(d_world, n_ax))
-            if abs(denom) < 1e-4:
-                return None
-            lam = float(np.dot(surf_origin - self.cam_pos, n_ax)) / denom
-            p_world = self.cam_pos + lam * d_world
-            rel = p_world - surf_origin
-            return np.array([float(np.dot(rel, u_ax)), float(np.dot(rel, w_ax)), 0.0], dtype=np.float64)
-
-        # 3D flight mode (dribble / keep-up): apparent diameter depth Z_cam = f * R_ball / r_px along ray
-        if r_px < 4.0:
-            return None
-        self._r_px_filt = r_px if self._r_px_filt is None else (0.30 * self._r_px_filt + 0.70 * r_px)
-        z_cam = self.f_mean * BALL_RADIUS_M / self._r_px_filt
-        p_world = self.cam_pos + z_cam * d_world
-        rel = p_world - surf_origin
-        h_est = max(0.0, float(np.dot(rel, n_ax)))
-        return np.array([float(np.dot(rel, u_ax)), float(np.dot(rel, w_ax)), h_est], dtype=np.float64)
+    bu, bv, br = ball_det
+    # In front camera:
+    #   +u_blade (+X_paddle = -Z_gb = +X_world) points IMAGE-LEFT (-du_px)!
+    #   +w_blade (+Y_paddle = +Y_gb = +Y_world, toward camera) points IMAGE-DOWN (+dv_px)!
+    # At ~30 deg camera elevation, a 20mm ball's center projects ~1.48 * r_px above its blade contact point!
+    contact_v = bv + 1.48 * br
+    u_m = -((bu - bat_u) / bat_rx) * BLADE_RADIUS_M
+    w_m = ((contact_v - bat_v) / bat_ry) * BLADE_RADIUS_M
+    # Apparent ball radius on blade is ~0.26 * bat_rx (~17 px); larger br means ball is higher above the blade!
+    nom_r = 0.26 * bat_rx
+    h_m = max(0.0, (br / max(6.0, nom_r) - 1.0) * 0.38)
+    return {
+        "bat_visible": True, "bat_u": bat_u, "bat_v": bat_v, "bat_rx": bat_rx, "bat_ry": bat_ry,
+        "visible": True, "u": bu, "v": bv, "r_px": br,
+        "uwh_m": np.array([float(u_m), float(w_m), float(h_m)], dtype=np.float64),
+    }
