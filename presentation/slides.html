@@ -31,7 +31,10 @@ h1{font-size:56px;line-height:1.06;margin:10px 0 18px;font-weight:800;letter-spa
 #num{position:fixed;right:18px;bottom:10px;color:var(--light);font-size:13px;font-weight:600}
 #help{position:fixed;left:18px;bottom:10px;color:var(--light);font-size:12.5px}
 </style></head>
-<body>
+<body><section style="padding:24px;font-family:sans-serif"><h2>Pen and marker pick-and-place</h2>
+<video src="videos/pen_marker_pick_place_161329_317.mp4" controls width="32%"></video> <video src="videos/pen_marker_pick_place_161346_001.mp4" controls width="32%"></video> <video src="videos/pen_marker_pick_place_161401_224.mp4" controls width="32%"></video>
+<h2>LEGO</h2><video src="videos/lego_140915_038.mp4" controls width="48%"></video> <video src="videos/lego_141350_110.mp4" controls width="48%"></video></section>
+
 <div id="stage"><section class="slide title"><div class="hero"><div class="kick">NormaCore Robotics Hackathon  •  Berlin</div><h1>Autonomous House Helper</h1><p class="lead">One 8-servo robot arm and one table camera: opening flip-top wet-wipe packs, pulling single tissues,<br>sweeping spilled coffee beans, collecting bottle caps magnetically, scooping beans, and tidying pens.</p><div class="pills"><span>1. Lid Open &amp; Tissue Pull</span><span>2. Coffee-Bean Cleaning</span><span>3. Magnetic Cap Pickup</span><span>4. Pen &amp; Marker Tidy</span><span>5. Physics Twin &amp; 30 Hz RL</span></div></div></section><section class="slide "><div class="kick">ARCHITECTURE</div><h2>How It Works — Local Closed-Loop Pipeline</h2><svg viewBox="0 0 1140 210" class="arch" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
 <defs>
   <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#18181b"/></marker>

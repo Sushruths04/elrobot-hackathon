@@ -1,3 +1,19 @@
+# ElRobot hackathon: autonomous house helper
+
+## Demo videos
+**Pen and marker pick-and-place**
+- [Pen/marker pick-and-place 1](https://github.com/Sushruths04/elrobot-hackathon/raw/main/presentation/videos/pen_marker_pick_place_161329_317.mp4)
+- [Pen/marker pick-and-place 2](https://github.com/Sushruths04/elrobot-hackathon/raw/main/presentation/videos/pen_marker_pick_place_161346_001.mp4)
+- [Pen/marker pick-and-place 3](https://github.com/Sushruths04/elrobot-hackathon/raw/main/presentation/videos/pen_marker_pick_place_161401_224.mp4)
+
+**LEGO**
+- [LEGO 1](https://github.com/Sushruths04/elrobot-hackathon/raw/main/presentation/videos/lego_140915_038.mp4)
+- [LEGO 2](https://github.com/Sushruths04/elrobot-hackathon/raw/main/presentation/videos/lego_141350_110.mp4)
+
+**Presentation:** [slides](https://htmlpreview.github.io/?https://github.com/Sushruths04/elrobot-hackathon/blob/main/presentation/slides.html) · [presentation video](https://github.com/Sushruths04/elrobot-hackathon/releases/download/submission-2026-11-22/Autonomous_House_Helper_Presentation_1080p.mp4)
+
+---
+
 # NormaCore hackathon - ElRobot + Claude (HackLab Berlin, 21-22 Nov 2026)
 
 Setup notes: `bin/`, `vendor/` and `.venv` are NOT in git.
